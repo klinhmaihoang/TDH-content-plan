@@ -1,0 +1,764 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{padding:1rem 0;max-width:680px;font-family:var(--font-sans)}
+.sec-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:12px;color:var(--color-text-secondary)}
+input[type=text],input[type=password],select,textarea{width:100%;padding:8px 10px;font-size:13px;border:.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans)}
+textarea{resize:vertical;line-height:1.6}
+.hint{font-size:11px;color:var(--color-text-tertiary);margin-top:4px}
+.nav{display:flex;border-bottom:.5px solid var(--color-border-tertiary);margin-bottom:16px}
+.nav-btn{padding:8px 14px;font-size:13px;border:none;background:transparent;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.nav-btn.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tab-content{display:none}.tab-content.active{display:block}
+.run-btn{width:100%;padding:10px;font-size:14px;font-weight:500;border-radius:var(--border-radius-md);border:.5px solid var(--color-border-secondary);background:var(--color-text-primary);color:var(--color-background-primary);cursor:pointer;transition:opacity .15s;margin-bottom:12px}
+.run-btn:hover{opacity:.85}.run-btn:disabled{opacity:.4;cursor:not-allowed}
+.sec-btn{padding:7px 14px;font-size:13px;border-radius:var(--border-radius-md);border:.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);cursor:pointer}
+.sec-btn:hover{background:var(--color-background-secondary)}
+.swatch{width:22px;height:22px;border-radius:4px;border:.5px solid var(--color-border-secondary);cursor:pointer;flex-shrink:0}
+.swatch-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tag{padding:3px 8px;font-size:11px;background:var(--color-background-secondary);border:.5px solid var(--color-border-secondary);border-radius:4px;display:flex;align-items:center;gap:4px;color:var(--color-text-secondary)}
+.tag button{background:none;border:none;cursor:pointer;font-size:11px;color:var(--color-text-tertiary);padding:0}
+.tag-input{font-size:12px;border:none;background:transparent;outline:none;color:var(--color-text-primary);min-width:80px;font-family:var(--font-sans);padding:4px 0}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:32px}
+.ref-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.ref-item{position:relative;aspect-ratio:1;border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;background:var(--color-background-secondary)}
+.ref-item img{width:100%;height:100%;object-fit:cover;display:block}
+.ref-del{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:var(--color-background-danger);color:var(--color-text-danger);font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;font-weight:500}
+.upload-zone{border:.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-md);padding:14px;text-align:center;cursor:pointer;font-size:13px;color:var(--color-text-tertiary);transition:all .15s}
+.upload-zone:hover{border-color:var(--color-border-primary)}
+.plan-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:14px}
+.day-card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px;min-height:100px;cursor:pointer;transition:border-color .15s}
+.day-card:hover{border-color:var(--color-border-secondary)}
+.day-card.sel{border-color:var(--color-border-info);background:var(--color-background-info)}
+.day-card.done{border-color:var(--color-border-success)}
+.day-card.skip{opacity:.35;cursor:default}
+.day-name{font-size:9px;font-weight:500;color:var(--color-text-tertiary);margin-bottom:3px;text-transform:uppercase}
+.day-type{font-size:10px;color:var(--color-text-secondary);line-height:1.4}
+.day-thumb{width:100%;aspect-ratio:1;border-radius:3px;object-fit:cover;margin-top:4px;display:block}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-top:4px}
+.d-idle{background:var(--color-border-secondary)}.d-load{background:#f0a500;animation:pu 1s infinite}.d-done{background:#1D9E75}.d-err{background:#E24B4A}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.4}}
+.out-card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:12px}
+.out-hd{padding:9px 14px;border-bottom:.5px solid var(--color-border-tertiary);font-size:12px;font-weight:500;color:var(--color-text-secondary);display:flex;align-items:center;justify-content:space-between}
+.out-body{padding:12px 14px;font-size:13px;line-height:1.7;color:var(--color-text-primary);white-space:pre-wrap;min-height:50px}
+.sbar{padding:7px 14px;font-size:12px;color:var(--color-text-secondary);border-top:.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:6px}
+.img-ph{width:100%;background:var(--color-background-secondary);display:flex;align-items:center;justify-content:center;color:var(--color-text-tertiary);font-size:12px;text-align:center;padding:24px;min-height:80px}
+.img-res{width:100%;display:block}
+.cp-btn{font-size:11px;padding:3px 9px;border:.5px solid var(--color-border-tertiary);border-radius:4px;cursor:pointer;background:transparent;color:var(--color-text-tertiary)}
+.cp-btn:hover{color:var(--color-text-primary)}
+.del-btn{padding:3px 9px;font-size:11px;border:.5px solid var(--color-border-danger);border-radius:4px;cursor:pointer;background:transparent;color:var(--color-text-danger)}
+.hist-item{border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-primary);margin-bottom:8px}
+.hist-hd{padding:10px 14px;display:flex;align-items:center;gap:10px}
+.hist-img{width:56px;height:56px;object-fit:cover;border-radius:4px;flex-shrink:0}
+.hist-img-ph{width:56px;height:56px;background:var(--color-background-secondary);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--color-text-tertiary);text-align:center}
+.post-editor{border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;margin-bottom:12px;background:var(--color-background-primary)}
+.badge{padding:2px 8px;font-size:10px;border-radius:4px}
+.badge-info{background:var(--color-background-info);color:var(--color-text-info)}
+.badge-success{background:var(--color-background-success);color:var(--color-text-success)}
+.info-box{background:var(--color-background-info);border:.5px solid var(--color-border-info);border-radius:var(--border-radius-md);padding:10px 12px;font-size:12px;color:var(--color-text-info);margin-bottom:12px;line-height:1.6}
+.warn-box{background:var(--color-background-warning);border:.5px solid var(--color-border-warning);border-radius:var(--border-radius-md);padding:10px 12px;font-size:12px;color:var(--color-text-warning);margin-bottom:12px;line-height:1.6;display:none}
+.err-box{background:var(--color-background-danger);border:.5px solid var(--color-border-danger);border-radius:var(--border-radius-md);padding:10px 12px;font-size:12px;color:var(--color-text-danger);margin-bottom:12px;line-height:1.6;display:none}
+.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.style-card{padding:8px 10px;border:.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;transition:all .15s}
+.style-card:hover{border-color:var(--color-border-primary)}
+.style-card.active{border-color:var(--color-border-info);background:var(--color-background-info)}
+.style-card .style-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.style-card .style-desc{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;line-height:1.4}
+</style>
+
+<div class="app">
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="switchTab('setup')">⚙️ Setup</button>
+  <button class="nav-btn" onclick="switchTab('plan')">📅 Content Plan</button>
+  <button class="nav-btn" onclick="switchTab('single')">✏️ Single Post</button>
+  <button class="nav-btn" onclick="switchTab('history')">🗂 Lịch sử <span id="histCount"></span></button>
+</nav>
+
+<!-- SETUP -->
+<div id="tab-setup" class="tab-content active">
+  <div class="info-box">
+    🔑 Lấy API key miễn phí: <strong>aistudio.google.com/apikey</strong> → đăng nhập Google → "Create API key". Dán vào ô bên dưới.
+  </div>
+
+  <div class="warn-box" id="quotaWarn">
+    ⚠️ <strong>Hết quota free tier.</strong> Thử: (1) đợi reset lúc 7h sáng (nửa đêm UTC), (2) bật billing tại <a href="https://console.cloud.google.com/billing" target="_blank" style="color:inherit;text-decoration:underline">console.cloud.google.com</a> — chỉ tốn ~900đ/ảnh.
+  </div>
+  <div class="err-box" id="apiErrBox"></div>
+
+  <div class="sec-label">API Key <span class="badge badge-success">Miễn phí</span></div>
+  <div class="card">
+    <div class="fg">
+      <label>Google AI Studio API Key — <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--color-text-info);font-size:11px">→ Lấy key tại đây</a></label>
+      <input type="password" id="geminiKey" placeholder="AIzaSy..." oninput="saveSettings()"/>
+    </div>
+    <p class="hint">Vào aistudio.google.com → đăng nhập → "Get API key" → "Create API key in new project" → copy dán vào đây.</p>
+  </div>
+
+  <div class="sec-label">Thông tin thương hiệu <span id="savedBadge" style="display:none;font-size:10px;padding:2px 7px;background:var(--color-background-success);color:var(--color-text-success);border-radius:4px;margin-left:4px">✓ Đã lưu</span></div>
+  <div class="card">
+    <div class="row2" style="margin-bottom:10px">
+      <div class="fg">
+        <label>Tên thương hiệu / Brand name</label>
+        <input type="text" id="brandName" placeholder="Ví dụ: Bloom Coffee, StyleVN..." oninput="saveSettings()"/>
+      </div>
+      <div class="fg">
+        <label>Ngành / lĩnh vực</label>
+        <select id="industry" onchange="saveSettings()">
+          <option value="">-- Chọn ngành --</option>
+          <option>Ẩm thực & F&B</option>
+          <option>Thời trang & phụ kiện</option>
+          <option>Làm đẹp & skincare</option>
+          <option>Sức khoẻ & wellness</option>
+          <option>Công nghệ & phần mềm</option>
+          <option>Giáo dục & đào tạo</option>
+          <option>Bất động sản</option>
+          <option>Du lịch & lưu trú</option>
+          <option>Thể thao & gym</option>
+          <option>Nội thất & thiết kế</option>
+          <option>Tài chính & đầu tư</option>
+          <option>Khác</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:10px">
+      <label>Mô tả thương hiệu — định hướng, cá tính, đối tượng khách hàng mục tiêu</label>
+      <textarea id="brandDesc" rows="2" placeholder="Ví dụ: Thương hiệu cà phê Việt Nam cao cấp, hướng đến millennials 25-35 tuổi ở TP.HCM & Hà Nội. Tính cách thương hiệu: tinh tế, gần gũi, hiện đại. Không phô trương." oninput="saveSettings()"></textarea>
+    </div>
+    <div class="fg" style="margin-bottom:10px">
+      <label>Đối tượng khách hàng (target audience)</label>
+      <input type="text" id="targetAudience" placeholder="Ví dụ: Nữ 22-35 tuổi, sống ở thành phố, thu nhập trung bình khá, yêu thích lối sống tối giản" oninput="saveSettings()"/>
+    </div>
+    <div class="row2" style="margin-bottom:10px">
+      <div class="fg">
+        <label>Platform chính</label>
+        <select id="platform" onchange="saveSettings()">
+          <option>Instagram</option><option>Facebook</option><option>TikTok</option><option>LinkedIn</option><option>Twitter/X</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Tone of voice</label>
+        <select id="toneVoice" onchange="saveSettings()">
+          <option>Gần gũi, thân thiện</option>
+          <option>Chuyên nghiệp, tin cậy</option>
+          <option>Trẻ trung, năng động</option>
+          <option>Sang trọng, cao cấp</option>
+          <option>Hài hước, vui vẻ</option>
+          <option>Truyền cảm hứng</option>
+          <option>Giáo dục, chia sẻ</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:10px">
+      <label>Brand colors (nhập HEX → Enter để thêm)</label>
+      <div class="swatch-row" id="swatchRow"></div>
+      <input type="text" id="colorInput" placeholder="#FF5A3D" style="margin-top:6px"/>
+    </div>
+    <div class="fg" style="margin-bottom:10px">
+      <label>Style keywords bổ sung (→ Enter)</label>
+      <div class="tag-row" id="tagRow"><input type="text" class="tag-input" id="tagInput" placeholder="golden hour, film grain, bokeh..."/></div>
+    </div>
+    <div class="fg">
+      <label>Tuyệt đối KHÔNG xuất hiện trong ảnh</label>
+      <input type="text" id="avoidList" placeholder="Ví dụ: chữ viết trong ảnh, màu sắc lòe loẹt, background lộn xộn, logo đối thủ" oninput="saveSettings()"/>
+    </div>
+  </div>
+
+  <div class="sec-label">Visual Style — Phong cách hình ảnh</div>
+  <div class="card">
+    <p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">Chọn phong cách phù hợp với thương hiệu. Ảnh hưởng trực tiếp đến prompt gửi cho Gemini.</p>
+    <div class="style-grid" id="styleGrid"></div>
+  </div>
+
+  <div class="sec-label">Photography Style — Kiểu chụp ảnh</div>
+  <div class="card">
+    <div class="style-grid" id="photoGrid"></div>
+  </div>
+
+  <div class="sec-label">Reference Images <span style="font-size:11px;font-weight:400;text-transform:none;color:var(--color-text-tertiary)">(tối đa 4 — Gemini học style từ đây)</span></div>
+  <div class="card">
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('refInput').click()">📁 Nhấn để chọn ảnh reference (JPG/PNG/WebP, max 5MB/ảnh)</div>
+    <input type="file" id="refInput" accept="image/*" multiple style="display:none" onchange="handleUpload(event)"/>
+    <div class="ref-grid" id="refGrid"></div>
+    <p class="hint" id="refHint"></p>
+  </div>
+</div>
+
+<!-- CONTENT PLAN -->
+<div id="tab-plan" class="tab-content">
+  <div class="card">
+    <div class="fg" style="margin-bottom:10px">
+      <label>Chủ đề / campaign tuần này</label>
+      <textarea id="weekTheme" rows="2" placeholder="Ví dụ: Ra mắt menu mùa hè, tropical vibes kết hợp cà phê Việt. Highlight: 3 món mới, giảm 20% tuần đầu."></textarea>
+    </div>
+    <div class="row3">
+      <div class="fg"><label>Tỉ lệ ảnh</label>
+        <select id="planAspect">
+          <option value="1:1">1:1 — Feed vuông</option>
+          <option value="9:16">9:16 — Story/Reel</option>
+          <option value="4:5">4:5 — Feed dọc</option>
+          <option value="16:9">16:9 — Ngang/YouTube</option>
+        </select>
+      </div>
+      <div class="fg"><label>Số posts / tuần</label>
+        <select id="postCount">
+          <option value="3">3 posts</option>
+          <option value="5">5 posts</option>
+          <option value="7" selected>7 posts</option>
+        </select>
+      </div>
+      <div class="fg"><label>Ngôn ngữ caption</label>
+        <select id="planLang">
+          <option>Tiếng Việt</option>
+          <option>English</option>
+          <option>Song ngữ VI/EN</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <button class="run-btn" onclick="generatePlan()">📅 Tạo Content Plan cho tuần</button>
+  <div id="planArea" style="display:none">
+    <div class="sec-label">Lịch tuần — nhấn vào ngày để xem & tạo ảnh</div>
+    <div class="plan-grid" id="planGrid"></div>
+    <div id="dayEditor" style="display:none">
+      <div class="post-editor">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge badge-info" id="edDay"></span>
+            <span style="font-size:13px;font-weight:500" id="edType"></span>
+          </div>
+          <button class="sec-btn" id="genDayBtn" onclick="generateDayImage()">🎨 Tạo ảnh</button>
+        </div>
+        <div class="fg" style="margin-bottom:8px">
+          <label>Caption (chỉnh tuỳ ý trước khi đăng)</label>
+          <textarea id="edCaption" rows="4" oninput="syncCaption()"></textarea>
+        </div>
+        <div class="fg" style="margin-bottom:8px">
+          <label>Image prompt gửi cho Gemini (có thể chỉnh)</label>
+          <textarea id="edPrompt" rows="3"></textarea>
+        </div>
+        <div id="dayImgWrap"></div>
+        <div class="sbar" id="dayBar" style="display:none"><span class="dot d-idle" id="dayDot"></span><span id="daySt"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SINGLE POST -->
+<div id="tab-single" class="tab-content">
+  <div class="card">
+    <div class="fg" style="margin-bottom:10px">
+      <label>Dán caption vào đây — tool tự build image prompt từ caption + brand guidelines</label>
+      <textarea id="singleCaption" rows="4" placeholder="Dán caption đã viết sẵn...&#10;&#10;Tool sẽ đọc nội dung + brand guidelines để tạo image prompt phù hợp." oninput="updatePreview()"></textarea>
+    </div>
+    <div class="row2" style="margin-bottom:10px">
+      <div class="fg">
+        <label>Ghi chú thêm cho ảnh (tuỳ chọn)</label>
+        <input type="text" id="singleNote" placeholder="sản phẩm ở trung tâm, tone ấm, ánh sáng chiều..." oninput="updatePreview()"/>
+      </div>
+      <div class="fg">
+        <label>Tỉ lệ ảnh</label>
+        <select id="singleAspect" onchange="updatePreview()">
+          <option value="1:1">1:1 — Feed vuông</option>
+          <option value="9:16">9:16 — Story/Reel</option>
+          <option value="4:5">4:5 — Feed dọc</option>
+          <option value="16:9">16:9 — Ngang</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="out-card">
+    <div class="out-hd">Image prompt sẽ gửi cho Gemini <button class="cp-btn" onclick="copyEl('singlePrev')">Copy</button></div>
+    <div class="out-body" id="singlePrev" style="color:var(--color-text-tertiary);font-style:italic">Nhập caption để xem prompt preview...</div>
+  </div>
+  <button class="run-btn" id="singleBtn" onclick="generateSingle()">🎨 Tạo ảnh với Gemini</button>
+  <div id="singleOut" style="display:none">
+    <div class="out-card">
+      <div class="out-hd">Kết quả <button class="cp-btn" id="singleDlBtn" style="display:none" onclick="downloadCurrent()">⬇ Tải ảnh</button></div>
+      <div id="singleImgWrap"><div class="img-ph" id="singleImgPh">Đang tạo...</div></div>
+      <div class="sbar"><span class="dot d-idle" id="sDot"></span><span id="sSt">Chờ...</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="tab-history" class="tab-content">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <span style="font-size:13px;color:var(--color-text-secondary)" id="histSummary">0 kết quả</span>
+    <button class="del-btn" onclick="clearAll()">Xóa tất cả</button>
+  </div>
+  <div id="historyList"></div>
+</div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const VISUAL_STYLES = [
+  {id:'minimal',name:'Tối giản (Minimal)',desc:'Không gian trống, bố cục đơn giản, ít màu sắc. Phù hợp: lifestyle cao cấp, skincare, tech.',en:'minimalist aesthetic, clean composition, lots of negative space, simple color palette'},
+  {id:'bold',name:'Nổi bật & Sống động (Bold)',desc:'Màu sắc mạnh, tương phản cao, bắt mắt ngay. Phù hợp: F&B, streetwear, gen Z.',en:'bold vibrant colors, high contrast, eye-catching composition, energetic'},
+  {id:'luxury',name:'Sang trọng (Luxury)',desc:'Tông màu tối, ánh vàng, chất liệu cao cấp. Phù hợp: fashion, jewellery, premium brand.',en:'luxury editorial style, dark rich tones, gold accents, premium materials, sophisticated lighting'},
+  {id:'natural',name:'Tự nhiên & Hữu cơ (Natural)',desc:'Tone đất, ánh sáng tự nhiên, chất liệu thô. Phù hợp: organic food, eco brand, wellness.',en:'natural organic aesthetic, earthy tones, natural materials, soft diffused daylight'},
+  {id:'retro',name:'Hoài cổ (Retro/Vintage)',desc:'Màu film cũ, grain, nhiệt độ vàng. Phù hợp: cà phê, thời trang vintage, music.',en:'retro vintage film aesthetic, warm grain texture, faded colors, nostalgic mood, analog photography look'},
+  {id:'moody',name:'Tối & Huyền bí (Dark Moody)',desc:'Tối, sương, ánh sáng chiaroscuro. Phù hợp: bar, cocktail, fine dining.',en:'dark moody atmosphere, dramatic shadows, chiaroscuro lighting, deep rich tones, mysterious mood'},
+  {id:'pastel',name:'Dịu nhẹ & Pastel',desc:'Màu nhạt, nền trắng sáng, nữ tính. Phù hợp: beauty, bakery, baby brand.',en:'soft pastel colors, bright airy feel, feminine aesthetic, light and dreamy'},
+  {id:'editorial',name:'Editorial / Tạp chí',desc:'Bố cục mạnh, nghệ thuật, như tạp chí thời trang. Phù hợp: fashion, art, creative.',en:'editorial magazine style, strong graphic composition, artistic direction, high fashion aesthetic'},
+  {id:'saigon',name:'Đô thị Việt Nam',desc:'Phố Sài Gòn / Hà Nội, xe máy, mưa, đèn neon, cà phê vỉa hè. Bản sắc Việt.',en:'Vietnamese urban street scene, Saigon/Hanoi atmosphere, motorbikes, street food culture, neon lights, authentic local feel'},
+  {id:'cozy',name:'Ấm áp & Cozy',desc:'Ánh đèn vàng, góc nhỏ, cảm giác dễ chịu. Phù hợp: cà phê, sách, home decor.',en:'cozy warm atmosphere, golden lamp light, intimate corners, comfortable and inviting mood, hygge aesthetic'},
+];
+
+const PHOTO_STYLES = [
+  {id:'lifestyle',name:'Lifestyle',desc:'Người thật, khoảnh khắc thật, tự nhiên.',en:'lifestyle photography, authentic candid moment, natural human interaction'},
+  {id:'flatlay',name:'Flat Lay (Từ trên xuống)',desc:'Chụp thẳng đứng từ trên, bố cục prop.',en:'flat lay photography, top-down aerial view, arranged props composition'},
+  {id:'product',name:'Product Shot (Sản phẩm)',desc:'Sản phẩm là nhân vật chính, nền sạch.',en:'product photography, subject as hero, clean background, studio quality'},
+  {id:'portrait',name:'Chân dung (Portrait)',desc:'Người, cảm xúc, ánh nhìn.',en:'portrait photography, expressive face, emotional connection, beautiful lighting'},
+  {id:'food',name:'Ẩm thực (Food Photography)',desc:'Món ăn đồ uống đẹp, appetizing.',en:'food photography, appetizing presentation, shallow depth of field, steam or texture detail'},
+  {id:'architecture',name:'Không gian & Kiến trúc',desc:'Không gian nội thất, mặt tiền, góc nhìn rộng.',en:'architectural photography, interior or exterior space, wide angle, geometric lines'},
+];
+
+let selectedVisualStyle = 'minimal';
+let selectedPhotoStyle = 'lifestyle';
+let brandColors=[], styleKeywords=[], refImages=[], history=[], planData={}, selectedDay=null, currentImgData='';
+
+const DAYS=['T.Hai','T.Ba','T.Tư','T.Năm','T.Sáu','T.Bảy','C.Nhật'];
+const TYPES=['Giới thiệu sản phẩm','Tip hữu ích','Behind the scenes','Câu chuyện thương hiệu','Lợi ích người dùng','Ưu đãi / khuyến mãi','Lifestyle & giá trị'];
+const ANGLES=['Nêu bật tính năng chính','Góc nhìn người dùng','Vấn đề → Giải pháp','Cảm xúc & khát vọng','Social proof','Chia sẻ kiến thức','Call to action'];
+
+// ── UI INIT ──────────────────────────────────────────────────────────
+function initStyleGrids(){
+  const sg = document.getElementById('styleGrid');
+  VISUAL_STYLES.forEach(s=>{
+    const c = document.createElement('div');
+    c.className = 'style-card' + (s.id===selectedVisualStyle?' active':'');
+    c.dataset.id = s.id;
+    c.innerHTML = `<div class="style-name">${s.name}</div><div class="style-desc">${s.desc}</div>`;
+    c.onclick = ()=>{
+      document.querySelectorAll('#styleGrid .style-card').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active'); selectedVisualStyle=s.id; saveSettings();
+    };
+    sg.appendChild(c);
+  });
+
+  const pg = document.getElementById('photoGrid');
+  PHOTO_STYLES.forEach(s=>{
+    const c = document.createElement('div');
+    c.className = 'style-card' + (s.id===selectedPhotoStyle?' active':'');
+    c.dataset.id = s.id;
+    c.innerHTML = `<div class="style-name">${s.name}</div><div class="style-desc">${s.desc}</div>`;
+    c.onclick = ()=>{
+      document.querySelectorAll('#photoGrid .style-card').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active'); selectedPhotoStyle=s.id; saveSettings();
+    };
+    pg.appendChild(c);
+  });
+}
+
+function switchTab(n){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`.nav-btn[onclick="switchTab('${n}')"]`).classList.add('active');
+  document.getElementById('tab-'+n).classList.add('active');
+  if(n==='history')renderHistory();
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────────────
+function loadSettings(){
+  try{
+    const s=JSON.parse(localStorage.getItem('gsc5_settings')||'{}');
+    ['geminiKey','brandName','brandDesc','avoidList','targetAudience'].forEach(id=>{if(s[id])document.getElementById(id).value=s[id]});
+    if(s.industry)document.getElementById('industry').value=s.industry;
+    if(s.visualStyle){selectedVisualStyle=s.visualStyle;document.querySelectorAll('#styleGrid .style-card').forEach(c=>{c.classList.toggle('active',c.dataset.id===s.visualStyle)})}
+    if(s.photoStyle){selectedPhotoStyle=s.photoStyle;document.querySelectorAll('#photoGrid .style-card').forEach(c=>{c.classList.toggle('active',c.dataset.id===s.photoStyle)})}
+    if(s.platform)document.getElementById('platform').value=s.platform;
+    if(s.toneVoice)document.getElementById('toneVoice').value=s.toneVoice;
+    if(s.brandColors){brandColors=s.brandColors;renderSwatches()}
+    if(s.styleKeywords){styleKeywords=s.styleKeywords;renderTags()}
+    history=JSON.parse(localStorage.getItem('gsc5_history')||'[]');
+    updateHistCount();
+  }catch(e){}
+}
+
+function saveSettings(){
+  const s={
+    geminiKey:document.getElementById('geminiKey').value,
+    brandName:document.getElementById('brandName').value,
+    brandDesc:document.getElementById('brandDesc').value,
+    avoidList:document.getElementById('avoidList').value,
+    targetAudience:document.getElementById('targetAudience').value,
+    industry:document.getElementById('industry').value,
+    visualStyle:selectedVisualStyle,
+    photoStyle:selectedPhotoStyle,
+    platform:document.getElementById('platform').value,
+    toneVoice:document.getElementById('toneVoice').value,
+    brandColors, styleKeywords
+  };
+  localStorage.setItem('gsc5_settings',JSON.stringify(s));
+  const b=document.getElementById('savedBadge');b.style.display='inline-block';
+  clearTimeout(window._st);window._st=setTimeout(()=>b.style.display='none',2000);
+}
+
+// ── COLORS & TAGS ────────────────────────────────────────────────────
+document.getElementById('colorInput').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){const v=this.value.trim();if(/^#[0-9A-Fa-f]{3,6}$/.test(v)&&brandColors.length<8){brandColors.push(v);renderSwatches();this.value='';saveSettings()}}
+});
+function renderSwatches(){
+  const row=document.getElementById('swatchRow');row.innerHTML='';
+  brandColors.forEach((c,i)=>{const s=document.createElement('div');s.className='swatch';s.style.background=c;s.title=c+' — click xóa';s.onclick=()=>{brandColors.splice(i,1);renderSwatches();saveSettings()};row.appendChild(s)});
+  if(brandColors.length){const l=document.createElement('span');l.style.cssText='font-size:11px;color:var(--color-text-tertiary)';l.textContent=brandColors.join(', ');row.appendChild(l)}
+}
+function renderTags(){
+  const row=document.getElementById('tagRow');row.innerHTML='';
+  styleKeywords.forEach((t,i)=>{const tag=document.createElement('div');tag.className='tag';tag.innerHTML=`${t}<button onclick="removeTag(${i})">×</button>`;row.appendChild(tag)});
+  const inp=document.createElement('input');inp.type='text';inp.className='tag-input';inp.id='tagInput';inp.placeholder='golden hour, film grain...';
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&this.value.trim()){styleKeywords.push(this.value.trim());renderTags();saveSettings()}});
+  row.appendChild(inp);
+}
+function removeTag(i){styleKeywords.splice(i,1);renderTags();saveSettings()}
+renderTags();
+
+// ── REF IMAGES ───────────────────────────────────────────────────────
+function handleUpload(e){
+  Array.from(e.target.files).slice(0,4-refImages.length).forEach(f=>{
+    if(f.size>5*1024*1024){alert(f.name+' quá 5MB, bỏ qua');return}
+    const r=new FileReader();r.onload=ev=>{refImages.push({base64:ev.target.result,mediaType:f.type});renderRefGrid()};r.readAsDataURL(f);
+  });e.target.value='';
+}
+function renderRefGrid(){
+  const g=document.getElementById('refGrid');g.innerHTML='';
+  refImages.forEach((img,i)=>{
+    const item=document.createElement('div');item.className='ref-item';
+    item.innerHTML=`<img src="${img.base64}" alt="ref ${i+1}"><button class="ref-del" onclick="removeRef(${i})">×</button>`;
+    g.appendChild(item);
+  });
+  document.getElementById('uploadZone').style.display=refImages.length>=4?'none':'block';
+  document.getElementById('refHint').textContent=refImages.length?`${refImages.length}/4 ảnh reference đã tải lên`:'';
+}
+function removeRef(i){refImages.splice(i,1);renderRefGrid()}
+
+// ── PROMPT BUILDER ────────────────────────────────────────────────────
+function buildPrompt(caption, note, aspect){
+  const bn = document.getElementById('brandName').value.trim();
+  const bd = document.getElementById('brandDesc').value.trim();
+  const ta = document.getElementById('targetAudience').value.trim();
+  const ind = document.getElementById('industry').value;
+  const av = document.getElementById('avoidList').value.trim();
+  const pl = document.getElementById('platform').value;
+
+  const vs = VISUAL_STYLES.find(s=>s.id===selectedVisualStyle);
+  const ps = PHOTO_STYLES.find(s=>s.id===selectedPhotoStyle);
+
+  const parts = [];
+
+  // Photo style
+  if(ps) parts.push(ps.en);
+
+  // Visual concept from caption
+  if(caption){
+    const stripped = caption.replace(/#\w+/g,'').replace(/\n/g,' ').replace(/[^\x00-\x7F]/g,' ').trim().slice(0,200);
+    if(stripped) parts.push(`Visual concept: "${stripped}"`);
+  }
+  if(note) parts.push(note);
+
+  // Brand + visual style
+  if(vs) parts.push(vs.en);
+  if(bn) parts.push(`for brand "${bn}"`);
+  if(ind) parts.push(`in the ${ind} industry`);
+  if(bd) parts.push(`brand personality: ${bd.slice(0,120)}`);
+  if(ta) parts.push(`targeting: ${ta.slice(0,80)}`);
+
+  // Colors & keywords
+  if(brandColors.length) parts.push(`color palette: ${brandColors.join(', ')}`);
+  if(styleKeywords.length) parts.push(styleKeywords.join(', '));
+
+  // Platform
+  parts.push(`optimized for ${pl}`);
+  parts.push('no text, words, or typography in the image');
+  parts.push('professional commercial quality, photorealistic');
+
+  // Avoid
+  if(av) parts.push(`do NOT include: ${av}`);
+
+  return parts.join('. ');
+}
+
+// ── GEMINI API CALL ───────────────────────────────────────────────────
+async function callGemini(prompt, aspect){
+  const key = document.getElementById('geminiKey').value.trim();
+  if(!key) throw new Error('Chưa có API key — vào tab Setup để nhập.');
+
+  document.getElementById('quotaWarn').style.display='none';
+  document.getElementById('apiErrBox').style.display='none';
+
+  // Build content parts
+  const contentParts = [];
+
+  // Add reference images first if any
+  if(refImages.length > 0){
+    refImages.slice(0,4).forEach((img,i)=>{
+      contentParts.push({inlineData:{mimeType:img.mediaType, data:img.base64.split(',')[1]}});
+      contentParts.push({text:`Reference image ${i+1}: please match the visual style, colors, lighting and mood from this image.`});
+    });
+  }
+
+  contentParts.push({text: prompt});
+
+  const aspectMap = {'1:1':'1:1','9:16':'9:16','4:5':'4:5','16:9':'16:9'};
+
+  const reqBody = {
+    contents:[{role:'user', parts: contentParts}],
+    generationConfig:{
+      responseModalities:['TEXT','IMAGE'],
+      imageConfig:{ aspectRatio: aspectMap[aspect] || '1:1' }
+    }
+  };
+
+  // Try models in order
+  const models = ['gemini-2.5-flash-image', 'gemini-3.1-flash-image-preview'];
+  let lastErr = null;
+
+  for(const model of models){
+    try{
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+      const res = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(reqBody)});
+      const data = await res.json();
+
+      if(data.error){
+        const msg = data.error.message || '';
+        if(msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED') || data.error.code===429){
+          lastErr = new Error('QUOTA');
+          continue; // try next model
+        }
+        throw new Error(`[${model}] ${msg}`);
+      }
+
+      const parts = data?.candidates?.[0]?.content?.parts || [];
+      const imgPart = parts.find(p=>p.inlineData?.mimeType?.startsWith('image/'));
+      if(imgPart) return 'data:'+imgPart.inlineData.mimeType+';base64,'+imgPart.inlineData.data;
+
+      const textPart = parts.find(p=>p.text);
+      lastErr = new Error(`[${model}] Không trả về ảnh. ${textPart?.text||''}`);
+    }catch(e){
+      if(e.message==='QUOTA'){lastErr=e;continue}
+      throw e;
+    }
+  }
+
+  if(lastErr?.message==='QUOTA'){
+    document.getElementById('quotaWarn').style.display='block';
+    switchTab('setup');
+    throw new Error('Hết quota free tier. Xem hướng dẫn ở tab Setup.');
+  }
+  throw lastErr || new Error('Không tạo được ảnh.');
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────
+function saveToHistory(caption,prompt,dataUrl){
+  history.unshift({id:Date.now(),date:new Date().toLocaleString('vi-VN'),caption,prompt,imgData:dataUrl});
+  if(history.length>30)history=history.slice(0,30);
+  localStorage.setItem('gsc5_history',JSON.stringify(history));
+  updateHistCount();
+}
+function updateHistCount(){document.getElementById('histCount').textContent=history.length?`(${history.length})`:''}
+
+// ── SINGLE POST ───────────────────────────────────────────────────────
+function updatePreview(){
+  const c=document.getElementById('singleCaption').value.trim();
+  const n=document.getElementById('singleNote').value;
+  const a=document.getElementById('singleAspect').value;
+  const el=document.getElementById('singlePrev');
+  if(c){const p=buildPrompt(c,n,a);el.textContent=p;el.style.color='var(--color-text-primary)';el.style.fontStyle='normal'}
+  else{el.textContent='Nhập caption để xem prompt preview...';el.style.color='var(--color-text-tertiary)';el.style.fontStyle='italic'}
+}
+
+function downloadCurrent(){
+  if(!currentImgData)return;
+  const a=document.createElement('a');a.href=currentImgData;a.download=`post-${Date.now()}.png`;document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+async function generateSingle(){
+  const cap=document.getElementById('singleCaption').value.trim();
+  if(!cap){alert('Nhập caption trước!');return}
+  const aspect=document.getElementById('singleAspect').value;
+  const prompt=buildPrompt(cap,document.getElementById('singleNote').value,aspect);
+
+  document.getElementById('singleOut').style.display='block';
+  document.getElementById('singleBtn').disabled=true;
+  document.getElementById('singleBtn').textContent='⏳ Đang tạo...';
+  document.getElementById('singleImgPh').style.display='flex';
+  document.getElementById('singleImgPh').textContent='Gemini đang tạo ảnh, vui lòng chờ...';
+  const old=document.getElementById('singleImgWrap').querySelector('img');if(old)old.remove();
+  document.getElementById('singleDlBtn').style.display='none';
+  document.getElementById('sDot').className='dot d-load';
+  document.getElementById('sSt').textContent='Đang gọi Gemini API...';
+
+  try{
+    const dataUrl=await callGemini(prompt,aspect);
+    currentImgData=dataUrl;
+    document.getElementById('singleImgPh').style.display='none';
+    const img=document.createElement('img');img.className='img-res';img.src=dataUrl;img.alt='Generated';
+    document.getElementById('singleImgWrap').appendChild(img);
+    document.getElementById('singleDlBtn').style.display='inline-block';
+    document.getElementById('sDot').className='dot d-done';
+    document.getElementById('sSt').textContent='✓ Xong! Đã lưu vào lịch sử.';
+    saveToHistory(cap,prompt,dataUrl);
+  }catch(err){
+    document.getElementById('singleImgPh').textContent='❌ '+err.message;
+    document.getElementById('sDot').className='dot d-err';
+    document.getElementById('sSt').textContent=err.message;
+    const eb=document.getElementById('apiErrBox');
+    eb.style.display='block';eb.textContent='Chi tiết lỗi: '+err.message;
+  }
+  document.getElementById('singleBtn').disabled=false;
+  document.getElementById('singleBtn').textContent='🎨 Tạo lại';
+}
+
+// ── CONTENT PLAN ──────────────────────────────────────────────────────
+function generatePlan(){
+  const theme=document.getElementById('weekTheme').value.trim();
+  if(!theme){alert('Nhập chủ đề tuần trước!');return}
+  const count=parseInt(document.getElementById('postCount').value);
+  const lang=document.getElementById('planLang').value;
+  const bn=document.getElementById('brandName').value||'thương hiệu';
+  const tone=document.getElementById('toneVoice').value;
+
+  planData={};
+  DAYS.forEach((day,i)=>{
+    if(i<count){
+      const type=TYPES[i%TYPES.length], angle=ANGLES[i%ANGLES.length];
+      let caption='';
+      if(lang==='Tiếng Việt'){
+        caption=`[${type}]\n\nGóc nhìn: ${angle}\nChủ đề tuần: ${theme}\nTone: ${tone}\n\n✏️ Viết lại caption phù hợp với thương hiệu ${bn} trước khi đăng.\n\n#${bn.replace(/\s+/g,'')} #${type.replace(/\s+/g,'')}`;
+      }else if(lang==='English'){
+        caption=`[${type}]\n\nAngle: ${angle}\nWeekly theme: ${theme}\nTone: ${tone}\n\n✏️ Rewrite this caption for ${bn} before posting.\n\n#${bn.replace(/\s+/g,'')}`;
+      }else{
+        caption=`[${type}] — ${bn}\n🇻🇳 Góc nhìn: ${angle} | Chủ đề: ${theme}\n🇬🇧 Angle: ${angle} | Theme: ${theme}\n\n✏️ Chỉnh caption này trước khi đăng.\n\n#${bn.replace(/\s+/g,'')}`;
+      }
+      const prompt=buildPrompt(caption,'',document.getElementById('planAspect').value);
+      planData[day]={day,type,angle,caption,prompt,imgData:null,status:'idle'};
+    }else{
+      planData[day]={status:'skip'};
+    }
+  });
+
+  renderPlanGrid();
+  document.getElementById('planArea').style.display='block';
+  document.getElementById('dayEditor').style.display='none';
+  selectedDay=null;
+}
+
+function renderPlanGrid(){
+  const g=document.getElementById('planGrid');g.innerHTML='';
+  DAYS.forEach(day=>{
+    const d=planData[day]||{status:'skip'};
+    const card=document.createElement('div');
+    card.className='day-card'+(d.status==='skip'?' skip':'')+(selectedDay===day?' sel':'')+(d.status==='done'?' done':'');
+    card.innerHTML=`<div class="day-name">${day}</div>
+      <div class="day-type">${d.type||'—'}</div>
+      ${d.imgData?`<img class="day-thumb" src="${d.imgData}" alt="thumb">`:''}
+      <div><span class="dot ${d.status==='done'?'d-done':d.status==='load'?'d-load':'d-idle'}"></span></div>`;
+    if(d.status!=='skip') card.onclick=()=>selectDay(day);
+    g.appendChild(card);
+  });
+}
+
+function selectDay(day){
+  selectedDay=day;
+  const d=planData[day];
+  document.getElementById('edDay').textContent=day;
+  document.getElementById('edType').textContent=d.type||'';
+  document.getElementById('edCaption').value=d.caption||'';
+  document.getElementById('edPrompt').value=d.prompt||'';
+  const wrap=document.getElementById('dayImgWrap');wrap.innerHTML='';
+  if(d.imgData){const img=document.createElement('img');img.className='img-res';img.src=d.imgData;wrap.appendChild(img)}
+  else{const ph=document.createElement('div');ph.className='img-ph';ph.textContent='Nhấn "Tạo ảnh" để Gemini generate';wrap.appendChild(ph)}
+  document.getElementById('dayBar').style.display='flex';
+  document.getElementById('dayDot').className='dot '+(d.status==='done'?'d-done':'d-idle');
+  document.getElementById('daySt').textContent=d.status==='done'?'✓ Đã có ảnh':'Chưa tạo ảnh';
+  document.getElementById('dayEditor').style.display='block';
+  renderPlanGrid();
+}
+
+function syncCaption(){
+  if(!selectedDay)return;
+  const c=document.getElementById('edCaption').value;
+  planData[selectedDay].caption=c;
+  const p=buildPrompt(c,'',document.getElementById('planAspect').value);
+  planData[selectedDay].prompt=p;
+  document.getElementById('edPrompt').value=p;
+}
+
+async function generateDayImage(){
+  if(!selectedDay)return;
+  const d=planData[selectedDay];
+  const prompt=document.getElementById('edPrompt').value.trim()||d.prompt;
+  const aspect=document.getElementById('planAspect').value;
+
+  document.getElementById('genDayBtn').disabled=true;
+  document.getElementById('genDayBtn').textContent='⏳ Đang tạo...';
+  d.status='load';renderPlanGrid();
+  document.getElementById('dayDot').className='dot d-load';
+  document.getElementById('daySt').textContent='Gemini đang xử lý...';
+
+  const wrap=document.getElementById('dayImgWrap');
+  wrap.innerHTML='<div class="img-ph">Đang tạo ảnh, vui lòng chờ...</div>';
+
+  try{
+    const dataUrl=await callGemini(prompt,aspect);
+    d.imgData=dataUrl;d.status='done';
+    wrap.innerHTML='';
+    const img=document.createElement('img');img.className='img-res';img.src=dataUrl;img.alt='Generated';
+    wrap.appendChild(img);
+    document.getElementById('dayDot').className='dot d-done';
+    document.getElementById('daySt').textContent='✓ Xong! Đã lưu vào lịch sử.';
+    saveToHistory(d.caption,prompt,dataUrl);
+    renderPlanGrid();
+  }catch(err){
+    d.status='idle';
+    wrap.innerHTML=`<div class="img-ph">❌ ${err.message}</div>`;
+    document.getElementById('dayDot').className='dot d-err';
+    document.getElementById('daySt').textContent=err.message;
+    renderPlanGrid();
+  }
+  document.getElementById('genDayBtn').disabled=false;
+  document.getElementById('genDayBtn').textContent='🎨 Tạo ảnh';
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  document.getElementById('histSummary').textContent=`${history.length} kết quả đã lưu`;
+  if(!history.length){list.innerHTML='<div style="text-align:center;padding:32px;color:var(--color-text-tertiary);font-size:13px">Chưa có ảnh nào được lưu.<br>Tạo ảnh ở Single Post hoặc Content Plan để lưu tại đây.</div>';return}
+  list.innerHTML='';
+  history.forEach((item,i)=>{
+    const el=document.createElement('div');el.className='hist-item';
+    el.innerHTML=`<div class="hist-hd">
+      ${item.imgData?`<img class="hist-img" src="${item.imgData}" alt="hist">`:`<div class="hist-img-ph">No image</div>`}
+      <div style="flex:1;min-width:0;padding:0 10px">
+        <div style="font-size:13px;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(item.caption||'').replace(/\n/g,' ')}</div>
+        <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:3px">${item.date}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        ${item.imgData?`<button class="cp-btn" onclick="dlHist(${i})">⬇ Tải</button>`:''}
+        <button class="del-btn" onclick="deleteHist(${i})">Xóa</button>
+      </div>
+    </div>`;
+    list.appendChild(el);
+  });
+}
+
+function dlHist(i){
+  const item=history[i];if(!item?.imgData)return;
+  const a=document.createElement('a');a.href=item.imgData;a.download=`post-${item.id}.png`;document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+function deleteHist(i){if(confirm('Xóa ảnh này?')){history.splice(i,1);localStorage.setItem('gsc5_history',JSON.stringify(history));updateHistCount();renderHistory()}}
+function clearAll(){if(confirm('Xóa toàn bộ lịch sử?')){history=[];localStorage.removeItem('gsc5_history');updateHistCount();renderHistory()}}
+function copyEl(id){navigator.clipboard.writeText(document.getElementById(id).textContent);event.target.textContent='✓ Đã copy!';setTimeout(()=>event.target.textContent='Copy',1500)}
+
+// ── BOOT ─────────────────────────────────────────────────────────────
+initStyleGrids();
+loadSettings();
+</script>
