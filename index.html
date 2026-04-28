@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Content Studio — Miễn Phí</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<title>Content Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --bg:#0e0e11;--s1:#16161a;--s2:#1e1e24;--s3:#26262e;
-  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.12);
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);
   --tx:#f0eff4;--tx2:#8e8d9a;--tx3:#55545f;
   --ac:#c8f060;--ac2:#a8d040;--ad:rgba(200,240,96,.12);--ad2:rgba(200,240,96,.06);
-  --red:#ff5f57;--rd:rgba(255,95,87,.12);
+  --red:#ff5f57;--rd:rgba(255,95,87,.12);--gold:#f5c842;
   --r:14px;--rs:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -24,8 +24,6 @@ body{padding:28px 24px 80px;max-width:740px;margin:0 auto}
 .lm svg{width:18px;height:18px}
 .ln{font-family:'Instrument Serif',serif;font-size:19px;letter-spacing:-.3px}
 .ln em{color:var(--ac);font-style:normal}
-.hdr-right{display:flex;align-items:center;gap:8px}
-.free-badge{padding:4px 10px;background:var(--ad);border:1px solid rgba(200,240,96,.25);color:var(--ac);border-radius:20px;font-size:11px;font-weight:500}
 .sp{padding:4px 10px;background:rgba(200,240,96,.13);color:var(--ac);border-radius:20px;font-size:11px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none}
 .sp.on{opacity:1}
 
@@ -46,12 +44,16 @@ body{padding:28px 24px 80px;max-width:740px;margin:0 auto}
 input,select,textarea{width:100%;padding:9px 12px;font-size:13px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);color:var(--tx);font-family:'DM Sans',sans-serif;transition:border-color .2s;outline:none}
 input::placeholder,textarea::placeholder{color:var(--tx3)}
 input:focus,select:focus,textarea:focus{border-color:rgba(200,240,96,.4)}
+input[type=password]{letter-spacing:.05em}
 textarea{resize:vertical;line-height:1.65}
 select option{background:var(--s2)}
 .hint{font-size:11px;color:var(--tx3);margin-top:4px;line-height:1.55}
+.hint a{color:var(--ac);text-decoration:none}
 
-.ibox{background:var(--ad2);border:1px solid rgba(200,240,96,.18);border-radius:var(--rs);padding:12px 14px;font-size:12px;color:var(--tx2);line-height:1.75;margin-bottom:16px}
-.ibox strong{color:var(--ac)}
+.ibox{background:var(--ad2);border:1px solid rgba(200,240,96,.18);border-radius:var(--rs);padding:12px 14px;font-size:12px;color:var(--tx2);line-height:1.75;margin-bottom:14px}
+.ibox strong{color:var(--ac)}.ibox a{color:var(--ac);text-decoration:none}
+.wbox{background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--rs);padding:11px 14px;font-size:12px;color:var(--gold);line-height:1.7;margin-bottom:12px;display:none}
+.wbox a{color:var(--gold);text-decoration:underline}
 .ebox{background:var(--rd);border:1px solid rgba(255,95,87,.2);border-radius:var(--rs);padding:11px 14px;font-size:12px;color:var(--red);line-height:1.7;margin-bottom:12px;display:none}
 
 .swrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:24px;margin-bottom:7px}
@@ -91,6 +93,21 @@ select option{background:var(--s2)}
 .btnd{font-size:11px;padding:3px 9px;border:1px solid rgba(255,95,87,.25);border-radius:6px;cursor:pointer;background:transparent;color:var(--red);font-family:'DM Sans',sans-serif;transition:all .15s}
 .btnd:hover{background:var(--rd)}
 
+/* result panel */
+.result-panel{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.result-panel .rp-hd{padding:11px 15px;border-bottom:1px solid var(--bd);font-size:10px;font-weight:500;color:var(--tx3);display:flex;align-items:center;justify-content:space-between;letter-spacing:.09em;text-transform:uppercase}
+.result-panel .rp-body{padding:14px 15px;font-size:13px;line-height:1.75;color:var(--tx);white-space:pre-wrap;min-height:60px}
+.result-panel .rp-body.placeholder{color:var(--tx3);font-style:italic;font-size:12px}
+.iph{width:100%;min-height:120px;background:var(--s2);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tx3);font-size:12px;text-align:center;padding:24px;gap:10px}
+.spin{width:20px;height:20px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ir{width:100%;display:block}
+.sb{padding:8px 15px;font-size:11px;color:var(--tx3);border-top:1px solid var(--bd);display:flex;align-items:center;gap:7px}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.di{background:var(--tx3)}.dl{background:var(--gold);animation:pu 1s infinite}.dd{background:#6fdf7f}.de{background:var(--red)}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* week grid */
 .wg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:16px}
 .dt{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:9px 7px;min-height:90px;cursor:pointer;transition:all .2s}
 .dt:hover{border-color:var(--bd2)}
@@ -100,28 +117,20 @@ select option{background:var(--s2)}
 .dt .dn{font-size:9px;font-weight:500;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
 .dt .dtp{font-size:10px;color:var(--tx2);line-height:1.35}
 .dt .dth{width:100%;aspect-ratio:1;border-radius:5px;object-fit:cover;margin-top:5px;display:block}
-.dot{width:5px;height:5px;border-radius:50%;display:inline-block;margin-top:5px}
-.di{background:var(--tx3)}.dl{background:#f5c842;animation:pu 1s infinite}.dd{background:#6fdf7f}.de{background:var(--red)}
-@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+.dt .ddot{width:5px;height:5px;border-radius:50%;display:inline-block;margin-top:5px}
 
 .ec{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:12px}
 .eh{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
 .dbadge{padding:3px 11px;background:var(--ad);color:var(--ac);border-radius:20px;font-size:11px;font-weight:500}
 
-.oc{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
-.oh{padding:10px 15px;border-bottom:1px solid var(--bd);font-size:10px;font-weight:500;color:var(--tx3);display:flex;align-items:center;justify-content:space-between;letter-spacing:.09em;text-transform:uppercase}
-.ob{padding:12px 15px;font-size:12.5px;line-height:1.7;color:var(--tx2);white-space:pre-wrap;min-height:48px}
-.iph{width:100%;min-height:100px;background:var(--s2);display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:12px;text-align:center;padding:24px}
-.ir{width:100%;display:block}
-.sb{padding:8px 15px;font-size:11px;color:var(--tx3);border-top:1px solid var(--bd);display:flex;align-items:center;gap:7px}
-
+/* history */
 .hi{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:8px;transition:border-color .2s}
 .hi:hover{border-color:var(--bd2)}
 .hr2{padding:13px 15px;display:flex;align-items:center;gap:13px}
-.hth{width:54px;height:54px;border-radius:8px;object-fit:cover;flex-shrink:0}
-.hph{width:54px;height:54px;background:var(--s2);border-radius:8px;flex-shrink:0;display:grid;place-items:center;font-size:20px}
-.hcap{font-size:13px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hdt{font-size:11px;color:var(--tx3);margin-top:2px}
+.hth{width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.hph{width:60px;height:60px;background:var(--s2);border-radius:8px;flex-shrink:0;display:grid;place-items:center;font-size:22px}
+.hcap{font-size:13px;color:var(--tx);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.hdt{font-size:11px;color:var(--tx3);margin-top:3px}
 .empty{text-align:center;padding:52px 20px;color:var(--tx3);font-size:13px;line-height:2.2}
 .empty .big{font-size:36px;margin-bottom:6px}
 
@@ -147,28 +156,36 @@ select option{background:var(--s2)}
     </div>
     <span class="ln">Content<em>Studio</em></span>
   </div>
-  <div class="hdr-right">
-    <span class="free-badge">✦ Hoàn toàn miễn phí</span>
-    <span class="sp" id="sp">✓ Đã lưu</span>
-  </div>
+  <span class="sp" id="sp">✓ Đã lưu</span>
 </div>
 
 <nav class="nav">
-  <button class="nb on" onclick="go('setup')">Setup</button>
-  <button class="nb" onclick="go('plan')">Lịch tuần</button>
-  <button class="nb" onclick="go('single')">Single Post</button>
-  <button class="nb" onclick="go('history')">Lịch sử <span id="hc"></span></button>
+  <button class="nb on" onclick="go('setup')">⚙ Setup</button>
+  <button class="nb" onclick="go('create')">✦ Tạo Post</button>
+  <button class="nb" onclick="go('plan')">📅 Lịch tuần</button>
+  <button class="nb" onclick="go('history')">🗂 Lịch sử <span id="hc"></span></button>
 </nav>
 
-<!-- SETUP -->
+<!-- ═══════ SETUP ═══════ -->
 <div id="tab-setup" class="tab on">
+
   <div class="ibox">
-    ✦ <strong>Không cần API key. Không cần thẻ. Không tốn tiền.</strong><br>
-    Tool dùng <strong>Pollinations AI</strong> — nền tảng open-source Berlin, miễn phí hoàn toàn, không giới hạn số ảnh mỗi ngày. Chỉ cần điền brand guidelines rồi dùng thôi.
+    Dùng <strong>1 Gemini API key</strong> để làm tất cả: viết caption + tạo ảnh.<br>
+    Lấy key miễn phí tại <a href="https://aistudio.google.com/apikey" target="_blank"><strong>aistudio.google.com/apikey</strong></a>. Cần bật billing để tạo ảnh ổn định (~1.000đ/ảnh).
   </div>
+  <div class="wbox" id="wbox">⚠️ <strong>Hết quota.</strong> Cần bật billing: <a href="https://console.cloud.google.com/billing" target="_blank">console.cloud.google.com/billing</a> → gắn thẻ → tạo API key mới.</div>
   <div class="ebox" id="ebox"></div>
 
-  <div class="lbl t0">Thông tin thương hiệu</div>
+  <div class="lbl t0">API Key</div>
+  <div class="card">
+    <div class="f">
+      <label>Gemini API Key — <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ac);font-size:10px">→ Lấy key tại đây</a></label>
+      <input type="password" id="apiKey" placeholder="AIzaSy..." oninput="sv()"/>
+      <div class="hint">Key này dùng để Gemini viết caption VÀ tạo ảnh. Lưu trong máy bạn, không gửi đi đâu cả.</div>
+    </div>
+  </div>
+
+  <div class="lbl">Thông tin thương hiệu</div>
   <div class="card">
     <div class="r2" style="margin-bottom:13px">
       <div class="f mb0"><label>Tên thương hiệu</label><input type="text" id="bn" placeholder="Bloom Coffee, StyleVN..." oninput="sv()"/></div>
@@ -203,7 +220,7 @@ select option{background:var(--s2)}
       </div>
     </div>
     <div class="f">
-      <label>Brand Colors (nhập HEX → Enter, click swatch để xóa)</label>
+      <label>Brand Colors (nhập HEX → Enter, click để xóa)</label>
       <div class="swrow" id="swr"></div>
       <input type="text" id="swi" placeholder="#FF5A3D"/>
     </div>
@@ -222,7 +239,7 @@ select option{background:var(--s2)}
   <div class="lbl">Photography Style — Kiểu chụp</div>
   <div class="card" style="padding:12px"><div class="sg" id="psg"></div></div>
 
-  <div class="lbl">Reference Images <span style="color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0;font-weight:400">(tối đa 4 ảnh)</span></div>
+  <div class="lbl">Reference Images <span style="color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0;font-weight:400">(tối đa 4 — Gemini học style từ đây)</span></div>
   <div class="card">
     <div class="upzone" id="upz" onclick="document.getElementById('rfi').click()">📁 Nhấn để chọn ảnh reference (JPG/PNG/WebP, max 5MB)</div>
     <input type="file" id="rfi" accept="image/*" multiple style="display:none" onchange="addR(event)"/>
@@ -231,15 +248,72 @@ select option{background:var(--s2)}
   </div>
 </div>
 
-<!-- PLAN -->
+<!-- ═══════ CREATE POST ═══════ -->
+<div id="tab-create" class="tab">
+
+  <div class="card">
+    <div class="f"><label>Chủ đề / ý tưởng bài đăng</label>
+      <textarea id="topic" rows="3" placeholder="Mô tả ngắn gọn bài đăng bạn muốn.&#10;&#10;Ví dụ: Ra mắt menu cà phê mùa hè mới, highlight ly Cold Brew chanh dây, giảm 15% tuần đầu.&#10;&#10;Gemini sẽ tự viết caption + tạo ảnh phù hợp."></textarea>
+    </div>
+    <div class="r2" style="margin-bottom:10px">
+      <div class="f mb0"><label>Loại nội dung</label>
+        <select id="postType">
+          <option>Giới thiệu sản phẩm</option><option>Tip hữu ích</option>
+          <option>Behind the scenes</option><option>Câu chuyện thương hiệu</option>
+          <option>Khuyến mãi / ưu đãi</option><option>Lifestyle & giá trị</option>
+          <option>User testimonial</option><option>Educational</option>
+        </select>
+      </div>
+      <div class="f mb0"><label>Ngôn ngữ caption</label>
+        <select id="capLang">
+          <option>Tiếng Việt</option><option>English</option><option>Song ngữ VI/EN</option>
+        </select>
+      </div>
+    </div>
+    <div class="f mb0"><label>Tỉ lệ ảnh</label>
+      <div class="apr" id="sar">
+        <button class="ap on" data-v="1:1" onclick="setA(this)">1:1 Feed</button>
+        <button class="ap" data-v="9:16" onclick="setA(this)">9:16 Story</button>
+        <button class="ap" data-v="4:5" onclick="setA(this)">4:5 Portrait</button>
+        <button class="ap" data-v="16:9" onclick="setA(this)">16:9 Wide</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btnp" id="createBtn" onclick="createPost()">✦ Gemini viết caption + tạo ảnh</button>
+
+  <div id="createOut" style="display:none">
+    <!-- Caption -->
+    <div class="result-panel">
+      <div class="rp-hd">Caption <button class="btng" onclick="cpEl('captionOut')">Copy</button></div>
+      <div class="rp-body placeholder" id="captionOut">Gemini đang viết caption...</div>
+      <div class="sb"><span class="dot di" id="capDot"></span><span id="capSt" style="font-size:11px">Chờ...</span></div>
+    </div>
+    <!-- Image -->
+    <div class="result-panel">
+      <div class="rp-hd">Ảnh <button class="btng" id="imgDlBtn" style="display:none" onclick="dlCur()">⬇ Tải ảnh</button></div>
+      <div id="imgWrap"><div class="iph" id="imgPh"><div class="spin"></div><span>Chờ caption xong...</span></div></div>
+      <div class="sb"><span class="dot di" id="imgDot"></span><span id="imgSt" style="font-size:11px">Chờ...</span></div>
+    </div>
+    <!-- Chỉnh caption -->
+    <div class="card" id="editCard" style="display:none">
+      <div class="f"><label>Chỉnh caption trước khi đăng</label>
+        <textarea id="editCaption" rows="5"></textarea>
+      </div>
+      <button class="btns" style="width:100%" onclick="regenImage()">↻ Tạo lại ảnh theo caption đã chỉnh</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PLAN ═══════ -->
 <div id="tab-plan" class="tab">
   <div class="card">
     <div class="f"><label>Chủ đề / campaign tuần này</label>
-      <textarea id="wt" rows="2" placeholder="Ví dụ: Ra mắt menu mùa hè, tropical vibes kết hợp cà phê Việt."></textarea>
+      <textarea id="wt" rows="2" placeholder="Ví dụ: Ra mắt menu mùa hè, tropical vibes kết hợp cà phê Việt. Highlight 3 món mới, giảm 20% tuần đầu."></textarea>
     </div>
     <div class="r3">
       <div class="f mb0"><label>Tỉ lệ ảnh</label>
-        <select id="pa"><option value="1024x1024">1:1 Feed</option><option value="683x1024">9:16 Story</option><option value="819x1024">4:5 Portrait</option><option value="1024x576">16:9 Wide</option></select>
+        <select id="pa"><option value="1:1">1:1 Feed</option><option value="9:16">9:16 Story</option><option value="4:5">4:5 Portrait</option><option value="16:9">16:9 Wide</option></select>
       </div>
       <div class="f mb0"><label>Số posts</label>
         <select id="pc"><option value="3">3 posts</option><option value="5">5 posts</option><option value="7" selected>7 posts</option></select>
@@ -249,9 +323,10 @@ select option{background:var(--s2)}
       </div>
     </div>
   </div>
-  <button class="btnp" onclick="mkPlan()">Tạo Content Plan cho tuần</button>
+  <button class="btnp" id="planBtn" onclick="mkPlan()">📅 Tạo Content Plan cho tuần</button>
+
   <div id="po" style="display:none">
-    <div class="lbl">Lịch tuần — nhấn vào ô để xem & tạo ảnh</div>
+    <div class="lbl">Lịch tuần — nhấn ô để Gemini viết caption & tạo ảnh</div>
     <div class="wg" id="wg"></div>
     <div id="de" style="display:none">
       <div class="ec">
@@ -260,52 +335,20 @@ select option{background:var(--s2)}
             <span class="dbadge" id="eday"></span>
             <span style="font-size:13px;color:var(--tx2)" id="etype"></span>
           </div>
-          <button class="btns" id="gdb" onclick="gDay()">Tạo ảnh</button>
+          <button class="btns" id="gdb" onclick="gDay()">Tạo caption + ảnh</button>
         </div>
-        <div class="f"><label>Caption</label><textarea id="ecp" rows="4" oninput="syncD()"></textarea></div>
-        <div class="f"><label>Image Prompt</label><textarea id="epr" rows="2"></textarea></div>
-        <div id="diw"></div>
+        <div class="f" id="dayCaptionWrap" style="margin-bottom:10px">
+          <label>Caption</label>
+          <textarea id="ecp" rows="4" placeholder="Gemini sẽ viết tự động..."></textarea>
+        </div>
+        <div id="diw"><div class="iph" style="aspect-ratio:auto;min-height:80px">Nhấn "Tạo caption + ảnh" để bắt đầu</div></div>
         <div class="sb" id="dsb" style="display:none"><span class="dot di" id="dd"></span><span id="dst" style="font-size:11px"></span></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SINGLE -->
-<div id="tab-single" class="tab">
-  <div class="card">
-    <div class="f"><label>Caption của bạn — tool tự build image prompt từ caption + brand guidelines</label>
-      <textarea id="sc" rows="4" placeholder="Dán caption đã viết sẵn vào đây..." oninput="prev()"></textarea>
-    </div>
-    <div class="r2">
-      <div class="f mb0"><label>Ghi chú thêm cho ảnh</label>
-        <input type="text" id="sn" placeholder="sản phẩm ở trung tâm, ánh sáng chiều ấm..." oninput="prev()"/>
-      </div>
-      <div class="f mb0"><label>Tỉ lệ ảnh</label>
-        <div class="apr" id="sar">
-          <button class="ap on" data-v="1024x1024" onclick="setA(this)">1:1</button>
-          <button class="ap" data-v="683x1024" onclick="setA(this)">9:16</button>
-          <button class="ap" data-v="819x1024" onclick="setA(this)">4:5</button>
-          <button class="ap" data-v="1024x576" onclick="setA(this)">16:9</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="oc">
-    <div class="oh">Image Prompt Preview <button class="btng" onclick="cp('spv')">Copy</button></div>
-    <div class="ob" id="spv" style="color:var(--tx3);font-style:italic;font-size:12px">Nhập caption để xem prompt...</div>
-  </div>
-  <button class="btnp" id="sb2" onclick="gSingle()">✦ Tạo ảnh miễn phí</button>
-  <div id="so" style="display:none">
-    <div class="oc">
-      <div class="oh">Kết quả <button class="btng" id="sdl" style="display:none" onclick="dlN()">⬇ Tải ảnh</button></div>
-      <div id="siw"><div class="iph" id="sip">Đang tạo...</div></div>
-      <div class="sb"><span class="dot di" id="sd"></span><span id="ss" style="font-size:11px">Chờ...</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- HISTORY -->
+<!-- ═══════ HISTORY ═══════ -->
 <div id="tab-history" class="tab">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
     <span style="font-size:13px;color:var(--tx2)" id="hs">0 kết quả</span>
@@ -315,23 +358,24 @@ select option{background:var(--s2)}
 </div>
 
 <script>
+// ── DATA ──
 const VS=[
-  {id:'minimal',n:'Tối giản',d:'Không gian trống, bố cục clean, ít màu.',e:'minimalist aesthetic, clean composition, generous negative space'},
+  {id:'minimal',n:'Tối giản',d:'Không gian trống, clean, ít màu sắc.',e:'minimalist aesthetic, clean composition, generous negative space'},
   {id:'bold',n:'Nổi bật & Sống động',d:'Màu mạnh, tương phản cao, bắt mắt.',e:'bold vibrant colors, high contrast, energetic eye-catching'},
   {id:'luxury',n:'Sang trọng',d:'Tông tối, ánh vàng, chất liệu cao cấp.',e:'luxury editorial, dark rich tones, gold accents, sophisticated'},
   {id:'natural',n:'Tự nhiên & Hữu cơ',d:'Tone đất, ánh sáng tự nhiên, thô.',e:'natural organic, earthy tones, soft diffused daylight, raw materials'},
-  {id:'retro',n:'Hoài cổ (Retro)',d:'Film cũ, grain, màu vàng ấm.',e:'retro vintage film aesthetic, warm grain, faded colors, analog look'},
+  {id:'retro',n:'Hoài cổ (Retro)',d:'Film cũ, grain, màu vàng ấm.',e:'retro vintage film aesthetic, warm grain, faded colors, analog'},
   {id:'moody',n:'Tối & Huyền bí',d:'Tối, sương, ánh sáng dramatic.',e:'dark moody, dramatic shadows, chiaroscuro lighting, mysterious'},
   {id:'pastel',n:'Dịu nhẹ & Pastel',d:'Màu nhạt, nền sáng, nữ tính.',e:'soft pastel colors, bright airy, feminine, light and dreamy'},
-  {id:'editorial',n:'Editorial / Tạp chí',d:'Bố cục mạnh, nghệ thuật.',e:'editorial magazine style, strong graphic composition, high fashion'},
-  {id:'saigon',n:'Đô thị Việt Nam',d:'Phố Sài Gòn/HN, neon, xe máy.',e:'Vietnamese urban, Saigon street atmosphere, neon lights, motorbikes, authentic local'},
+  {id:'editorial',n:'Editorial / Tạp chí',d:'Bố cục mạnh, nghệ thuật.',e:'editorial magazine style, strong composition, high fashion'},
+  {id:'saigon',n:'Đô thị Việt Nam',d:'Phố Sài Gòn/HN, neon, xe máy.',e:'Vietnamese urban, Saigon street, neon lights, motorbikes, authentic local'},
   {id:'cozy',n:'Ấm áp & Cozy',d:'Đèn vàng, góc nhỏ, dễ chịu.',e:'cozy warm, golden lamp light, intimate corners, hygge'},
 ];
 const PS=[
   {id:'lifestyle',n:'Lifestyle',d:'Khoảnh khắc thật, tự nhiên.',e:'lifestyle photography, authentic candid moment'},
   {id:'flatlay',n:'Flat Lay (từ trên xuống)',d:'Chụp thẳng đứng, bố cục prop.',e:'flat lay photography, top-down view, arranged props'},
-  {id:'product',n:'Product Shot (sản phẩm)',d:'Sản phẩm là nhân vật chính.',e:'product photography, hero shot, clean background'},
-  {id:'portrait',n:'Chân dung (Portrait)',d:'Người, cảm xúc, ánh nhìn.',e:'portrait photography, expressive face, emotional lighting'},
+  {id:'product',n:'Product Shot',d:'Sản phẩm là nhân vật chính.',e:'product photography, hero shot, clean studio background'},
+  {id:'portrait',n:'Chân dung (Portrait)',d:'Người, cảm xúc, ánh nhìn.',e:'portrait photography, expressive face, beautiful lighting'},
   {id:'food',n:'Ẩm thực (Food Photo)',d:'Món ăn & đồ uống ngon mắt.',e:'food photography, appetizing, shallow depth of field'},
   {id:'space',n:'Không gian & Kiến trúc',d:'Nội thất, mặt tiền, góc rộng.',e:'architectural photography, interior space, wide angle'},
 ];
@@ -339,15 +383,23 @@ const DAYS=['T.Hai','T.Ba','T.Tư','T.Năm','T.Sáu','T.Bảy','C.Nhật'];
 const TYPES=['Giới thiệu sản phẩm','Tip hữu ích','Behind the scenes','Câu chuyện thương hiệu','Lợi ích người dùng','Ưu đãi / Khuyến mãi','Lifestyle & Giá trị'];
 const ANGLES=['Nêu bật tính năng chính','Góc nhìn người dùng','Vấn đề → Giải pháp','Cảm xúc & Khát vọng','Social proof','Chia sẻ kiến thức','Call to action'];
 
-let sVS='minimal',sPS='lifestyle',sAsp='1024x1024';
-let cols=[],tags=[],refs=[],hist=[],plan={},selDay=null,curImg='';
+let sVS='minimal', sPS='lifestyle', sAsp='1:1';
+let cols=[], tags=[], refs=[], hist=[], plan={}, selDay=null, curImg='';
 
+// ── INIT ──
 function initGrids(){
-  const vg=document.getElementById('vsg');
-  VS.forEach(s=>{const c=document.createElement('div');c.className='sc'+(s.id===sVS?' on':'');c.dataset.id=s.id;c.innerHTML=`<div class="sn">${s.n}</div><div class="sd">${s.d}</div>`;c.onclick=()=>{document.querySelectorAll('#vsg .sc').forEach(x=>x.classList.remove('on'));c.classList.add('on');sVS=s.id;sv()};vg.appendChild(c)});
-  const pg=document.getElementById('psg');
-  PS.forEach(s=>{const c=document.createElement('div');c.className='sc'+(s.id===sPS?' on':'');c.dataset.id=s.id;c.innerHTML=`<div class="sn">${s.n}</div><div class="sd">${s.d}</div>`;c.onclick=()=>{document.querySelectorAll('#psg .sc').forEach(x=>x.classList.remove('on'));c.classList.add('on');sPS=s.id;sv()};pg.appendChild(c)});
+  VS.forEach(s=>{
+    const c=mkSC(s);c.onclick=()=>{document.querySelectorAll('#vsg .sc').forEach(x=>x.classList.remove('on'));c.classList.add('on');sVS=s.id;sv()};
+    if(s.id===sVS)c.classList.add('on');
+    document.getElementById('vsg').appendChild(c);
+  });
+  PS.forEach(s=>{
+    const c=mkSC(s);c.onclick=()=>{document.querySelectorAll('#psg .sc').forEach(x=>x.classList.remove('on'));c.classList.add('on');sPS=s.id;sv()};
+    if(s.id===sPS)c.classList.add('on');
+    document.getElementById('psg').appendChild(c);
+  });
 }
+function mkSC(s){const c=document.createElement('div');c.className='sc';c.dataset.id=s.id;c.innerHTML=`<div class="sn">${s.n}</div><div class="sd">${s.d}</div>`;return c}
 
 function go(n){
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
@@ -357,24 +409,22 @@ function go(n){
   if(n==='history')renderH();
 }
 
+// ── SETTINGS ──
 function g(id){const e=document.getElementById(id);return e?e.value:''}
-
 function ld(){
   try{
-    const s=JSON.parse(localStorage.getItem('cs8')||'{}');
-    ['bn','bd','bt','ba'].forEach(id=>{if(s[id])document.getElementById(id).value=s[id]});
+    const s=JSON.parse(localStorage.getItem('cs9')||'{}');
+    ['apiKey','bn','bd','bt','ba'].forEach(id=>{if(s[id])document.getElementById(id).value=s[id]});
     ['bi','bp','bv'].forEach(id=>{if(s[id])document.getElementById(id).value=s[id]});
     if(s.sVS){sVS=s.sVS;document.querySelectorAll('#vsg .sc').forEach(c=>c.classList.toggle('on',c.dataset.id===s.sVS))}
     if(s.sPS){sPS=s.sPS;document.querySelectorAll('#psg .sc').forEach(c=>c.classList.toggle('on',c.dataset.id===s.sPS))}
     if(s.cols){cols=s.cols;renderSw()}
     if(s.tags){tags=s.tags;renderTags()}
-    hist=JSON.parse(localStorage.getItem('cs8h')||'[]');
-    uhc();
+    hist=JSON.parse(localStorage.getItem('cs9h')||'[]');uhc();
   }catch(e){}
 }
-
 function sv(){
-  localStorage.setItem('cs8',JSON.stringify({bn:g('bn'),bd:g('bd'),bt:g('bt'),ba:g('ba'),bi:g('bi'),bp:g('bp'),bv:g('bv'),sVS,sPS,cols,tags}));
+  localStorage.setItem('cs9',JSON.stringify({apiKey:g('apiKey'),bn:g('bn'),bd:g('bd'),bt:g('bt'),ba:g('ba'),bi:g('bi'),bp:g('bp'),bv:g('bv'),sVS,sPS,cols,tags}));
   const p=document.getElementById('sp');p.classList.add('on');clearTimeout(window._sv);window._sv=setTimeout(()=>p.classList.remove('on'),2000);
 }
 
@@ -386,12 +436,11 @@ function renderSw(){
   cols.forEach((c,i)=>{const s=document.createElement('div');s.className='sw';s.style.background=c;s.title=c;s.onclick=()=>{cols.splice(i,1);renderSw();sv()};r.appendChild(s)});
   if(cols.length){const l=document.createElement('span');l.className='swlbl';l.textContent=cols.join(' · ');r.appendChild(l)}
 }
-
 function renderTags(){
   const r=document.getElementById('tr');r.innerHTML='';
   tags.forEach((t,i)=>{const el=document.createElement('div');el.className='tag';el.innerHTML=`${t}<button onclick="rmT(${i})">×</button>`;r.appendChild(el)});
   const inp=document.createElement('input');inp.className='ti';inp.id='ti';inp.placeholder=tags.length?'thêm...':'golden hour, film grain...';
-  inp.addEventListener('keydown',function(e){if(e.key==='Enter'&&this.value.trim()){tags.push(this.value.trim());renderTags();sv()}});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&inp.value.trim()){tags.push(inp.value.trim());renderTags();sv()}});
   r.appendChild(inp);
 }
 function rmT(i){tags.splice(i,1);renderTags();sv()}
@@ -404,108 +453,235 @@ function addR(e){
 }
 function renderR(){
   const g2=document.getElementById('rg');g2.innerHTML='';
-  refs.forEach((img,i)=>{const el=document.createElement('div');el.className='ri';el.innerHTML=`<img src="${img.b64}" alt="ref"><button class="rdel" onclick="rmR(${i})">×</button>`;g2.appendChild(el)});
+  refs.forEach((img,i)=>{const el=document.createElement('div');el.className='ri';el.innerHTML=`<img src="${img.b64}" alt=""><button class="rdel" onclick="rmR(${i})">×</button>`;g2.appendChild(el)});
   document.getElementById('upz').style.display=refs.length>=4?'none':'block';
   document.getElementById('rh').textContent=refs.length?`${refs.length}/4 ảnh reference`:'';
 }
 function rmR(i){refs.splice(i,1);renderR()}
+function setA(btn){document.querySelectorAll('#sar .ap').forEach(x=>x.classList.remove('on'));btn.classList.add('on');sAsp=btn.dataset.v}
 
-function mkPr(cap,note){
-  const vs=VS.find(s=>s.id===sVS),ps=PS.find(s=>s.id===sPS);
-  const p=[];
-  if(ps)p.push(ps.e);
-  if(cap){const s=cap.replace(/#\w+/g,'').replace(/\n/g,' ').replace(/[^\x00-\x7F]/g,' ').trim().slice(0,200);if(s)p.push(`visual concept: "${s}"`)}
-  if(note)p.push(note);
-  if(vs)p.push(vs.e);
-  const bn=g('bn'),bd=g('bd'),bt=g('bt'),bi=g('bi'),bp=g('bp');
-  if(bn)p.push(`for brand "${bn}"`);
-  if(bi)p.push(`${bi} industry`);
-  if(bd)p.push(`brand personality: ${bd.slice(0,100)}`);
-  if(bt)p.push(`target: ${bt.slice(0,80)}`);
-  if(cols.length)p.push(`color palette: ${cols.join(', ')}`);
-  if(tags.length)p.push(tags.join(', '));
-  if(bp)p.push(`for ${bp}`);
-  p.push('no text or typography in image','photorealistic commercial quality');
-  const ba=g('ba');if(ba)p.push(`avoid: ${ba}`);
-  return p.join(', ');
+// ── BRAND CONTEXT ──
+function brandCtx(){
+  const bn=g('bn'),bd=g('bd'),bt=g('bt'),bi=g('bi'),bp=g('bp'),bv=g('bv'),ba=g('ba');
+  let ctx='';
+  if(bn) ctx+=`Tên thương hiệu: ${bn}\n`;
+  if(bi) ctx+=`Ngành: ${bi}\n`;
+  if(bd) ctx+=`Mô tả: ${bd}\n`;
+  if(bt) ctx+=`Khách hàng mục tiêu: ${bt}\n`;
+  if(bp) ctx+=`Platform: ${bp}\n`;
+  if(bv) ctx+=`Tone of voice: ${bv}\n`;
+  if(cols.length) ctx+=`Brand colors: ${cols.join(', ')}\n`;
+  if(ba) ctx+=`Không có trong ảnh: ${ba}\n`;
+  return ctx;
 }
 
-async function callFree(prompt,wh){
-  const [w,h]=wh.split('x');
-  const seed=Math.floor(Math.random()*999999);
-  const url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${seed}&nologo=true&enhance=true&model=flux`;
-  const res=await fetch(url);
-  if(!res.ok)throw new Error(`HTTP ${res.status} — thử lại sau vài giây`);
-  const blob=await res.blob();
-  return URL.createObjectURL(blob);
+function imgPromptExtra(){
+  const vs=VS.find(s=>s.id===sVS), ps=PS.find(s=>s.id===sPS);
+  const parts=[];
+  if(ps) parts.push(ps.e);
+  if(vs) parts.push(vs.e);
+  if(cols.length) parts.push(`color palette: ${cols.join(', ')}`);
+  if(tags.length) parts.push(tags.join(', '));
+  parts.push('no text or typography in the image','photorealistic commercial quality');
+  const ba=g('ba');if(ba) parts.push(`avoid: ${ba}`);
+  return parts.join(', ');
 }
 
-function addH(cap,pr,imgUrl){
-  const entry={id:Date.now(),date:new Date().toLocaleString('vi-VN'),cap,pr,imgUrl};
-  hist.unshift(entry);
-  if(hist.length>40)hist=hist.slice(0,40);
-  // Save data URL for persistence
-  fetch(imgUrl).then(r=>r.blob()).then(b=>{
-    const rd=new FileReader();rd.onload=ev=>{
-      const idx=hist.findIndex(x=>x.id===entry.id);
-      if(idx>=0){hist[idx].imgData=ev.target.result;localStorage.setItem('cs8h',JSON.stringify(hist.map(({imgUrl:_,...rest})=>rest)))}
-    };rd.readAsDataURL(b);
-  }).catch(()=>{});
-  uhc();
-}
-function uhc(){document.getElementById('hc').textContent=hist.length?`(${hist.length})`:''}
-
-function setA(btn){document.querySelectorAll('#sar .ap').forEach(x=>x.classList.remove('on'));btn.classList.add('on');sAsp=btn.dataset.v;prev()}
-
-function prev(){
-  const c=g('sc'),n=g('sn'),el=document.getElementById('spv');
-  if(c){el.textContent=mkPr(c,n);el.style.color='var(--tx2)';el.style.fontStyle='normal'}
-  else{el.textContent='Nhập caption để xem prompt...';el.style.color='var(--tx3)';el.style.fontStyle='italic'}
+// ── GEMINI TEXT (caption) ──
+async function geminiText(prompt){
+  const key=g('apiKey');
+  if(!key) throw new Error('Chưa có API key — vào tab Setup để nhập.');
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}]})
+  });
+  const data=await res.json();
+  if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
+  return data.candidates?.[0]?.content?.parts?.[0]?.text||'';
 }
 
-function dlN(){if(curImg){const a=document.createElement('a');a.href=curImg;a.download='post-'+Date.now()+'.jpg';document.body.appendChild(a);a.click();document.body.removeChild(a)}}
-
-async function gSingle(){
-  const cap=g('sc');if(!cap){alert('Nhập caption trước!');return}
-  const pr=mkPr(cap,g('sn'));
-  document.getElementById('so').style.display='block';
-  document.getElementById('sb2').disabled=true;document.getElementById('sb2').textContent='Đang tạo...';
-  document.getElementById('sip').style.display='flex';document.getElementById('sip').textContent='Pollinations AI đang tạo ảnh miễn phí...';
-  const old=document.getElementById('siw').querySelector('img');if(old)old.remove();
-  document.getElementById('sdl').style.display='none';
-  document.getElementById('sd').className='dot dl';document.getElementById('ss').textContent='Đang xử lý (khoảng 5-15 giây)...';
+// ── GEMINI IMAGE ──
+async function geminiImage(prompt, aspect){
+  const key=g('apiKey');
+  if(!key) throw new Error('Chưa có API key');
+  document.getElementById('wbox').style.display='none';
   document.getElementById('ebox').style.display='none';
-  try{
-    const url=await callFree(pr,sAsp);curImg=url;
-    document.getElementById('sip').style.display='none';
-    const img=document.createElement('img');img.className='ir';img.src=url;
-    document.getElementById('siw').appendChild(img);
-    document.getElementById('sdl').style.display='inline-block';
-    document.getElementById('sd').className='dot dd';document.getElementById('ss').textContent='✓ Xong! Đã lưu vào lịch sử.';
-    addH(cap,pr,url);
-  }catch(err){
-    document.getElementById('sip').textContent='❌ '+err.message;
-    document.getElementById('sd').className='dot de';document.getElementById('ss').textContent=err.message;
-    const eb=document.getElementById('ebox');eb.style.display='block';eb.textContent='Lỗi: '+err.message+'. Pollinations AI đôi khi bảo trì ngắn — thử lại sau 1 phút.';
+
+  const parts=[];
+  refs.slice(0,4).forEach((img,i)=>{
+    parts.push({inlineData:{mimeType:img.mt,data:img.b64.split(',')[1]}});
+    parts.push({text:`Reference image ${i+1}: match this visual style, colors, mood.`});
+  });
+  parts.push({text:prompt});
+
+  const body={
+    contents:[{role:'user',parts}],
+    generationConfig:{responseModalities:['TEXT','IMAGE'],imageConfig:{aspectRatio:aspect}}
+  };
+
+  const models=['gemini-2.5-flash-image','gemini-3.1-flash-image-preview'];
+  let lastErr=null;
+  for(const model of models){
+    try{
+      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const data=await res.json();
+      if(data.error){
+        const msg=data.error.message||'';
+        if(msg.includes('quota')||msg.includes('RESOURCE_EXHAUSTED')||data.error.code===429){
+          lastErr=new Error('QUOTA');continue;
+        }
+        throw new Error(`[${model}] ${msg}`);
+      }
+      const imgPart=data?.candidates?.[0]?.content?.parts?.find(p=>p.inlineData?.mimeType?.startsWith('image/'));
+      if(imgPart) return 'data:'+imgPart.inlineData.mimeType+';base64,'+imgPart.inlineData.data;
+      const tp=data?.candidates?.[0]?.content?.parts?.find(p=>p.text);
+      lastErr=new Error(`[${model}] Không trả về ảnh. ${tp?.text||''}`);
+    }catch(e){if(e.message==='QUOTA'){lastErr=e;continue}throw e}
   }
-  document.getElementById('sb2').disabled=false;document.getElementById('sb2').textContent='✦ Tạo lại';
+  if(lastErr?.message==='QUOTA'){
+    document.getElementById('wbox').style.display='block';
+    go('setup');
+    throw new Error('Hết quota. Cần bật billing — xem hướng dẫn ở tab Setup.');
+  }
+  throw lastErr||new Error('Không tạo được ảnh.');
 }
 
+// ── CREATE POST ──
+async function createPost(){
+  const topic=g('topic');
+  if(!topic){alert('Nhập chủ đề bài đăng trước!');return}
+
+  const postType=g('postType'), capLang=g('capLang');
+  const btn=document.getElementById('createBtn');
+  btn.disabled=true;btn.textContent='Đang tạo...';
+  document.getElementById('createOut').style.display='block';
+  document.getElementById('editCard').style.display='none';
+  document.getElementById('imgDlBtn').style.display='none';
+
+  // Reset caption
+  const capEl=document.getElementById('captionOut');
+  capEl.textContent='Gemini đang viết caption...';
+  capEl.classList.add('placeholder');
+  document.getElementById('capDot').className='dot dl';
+  document.getElementById('capSt').textContent='Đang viết caption...';
+
+  // Reset image
+  document.getElementById('imgWrap').innerHTML='<div class="iph"><div class="spin"></div><span>Chờ caption xong...</span></div>';
+  document.getElementById('imgDot').className='dot di';
+  document.getElementById('imgSt').textContent='Chờ caption...';
+  curImg='';
+
+  // ── Step 1: Write caption ──
+  const captionPrompt=`Bạn là chuyên gia viết content social media cho thương hiệu.
+
+${brandCtx()}
+
+Viết caption cho bài đăng trên ${g('bp')||'Instagram'} với:
+- Loại nội dung: ${postType}
+- Chủ đề / ý tưởng: ${topic}
+- Ngôn ngữ: ${capLang}
+- Tone: ${g('bv')||'Gần gũi, thân thiện'}
+
+Yêu cầu:
+- Có hook hấp dẫn ở đầu
+- Có emoji phù hợp
+- Có call-to-action cuối
+- Có hashtag (5-10 hashtag)
+- Độ dài phù hợp với platform
+
+Chỉ trả về caption, không giải thích thêm.`;
+
+  let caption='';
+  try{
+    caption=await geminiText(captionPrompt);
+    capEl.textContent=caption;
+    capEl.classList.remove('placeholder');
+    document.getElementById('capDot').className='dot dd';
+    document.getElementById('capSt').textContent='✓ Caption xong';
+    document.getElementById('editCaption').value=caption;
+    document.getElementById('editCard').style.display='block';
+  }catch(err){
+    capEl.textContent='❌ Lỗi viết caption: '+err.message;
+    capEl.classList.remove('placeholder');
+    document.getElementById('capDot').className='dot de';
+    document.getElementById('capSt').textContent=err.message;
+    btn.disabled=false;btn.textContent='✦ Gemini viết caption + tạo ảnh';
+    return;
+  }
+
+  // ── Step 2: Generate image ──
+  document.getElementById('imgWrap').innerHTML='<div class="iph"><div class="spin"></div><span>Gemini đang tạo ảnh...</span></div>';
+  document.getElementById('imgDot').className='dot dl';
+  document.getElementById('imgSt').textContent='Đang tạo ảnh...';
+
+  const stripped=caption.replace(/#\w+/g,'').replace(/\n/g,' ').replace(/[^\x00-\x7F]/g,' ').trim().slice(0,200);
+  const imagePrompt=`Generate a social media image for this post.
+Visual concept from caption: "${stripped}"
+Topic: ${topic}
+Brand: ${g('bn')||'brand'}, ${g('bi')||''}
+${imgPromptExtra()}`;
+
+  try{
+    const dataUrl=await geminiImage(imagePrompt, sAsp);
+    curImg=dataUrl;
+    document.getElementById('imgWrap').innerHTML='';
+    const img=document.createElement('img');img.className='ir';img.src=dataUrl;img.alt='Generated';
+    document.getElementById('imgWrap').appendChild(img);
+    document.getElementById('imgDlBtn').style.display='inline-block';
+    document.getElementById('imgDot').className='dot dd';
+    document.getElementById('imgSt').textContent='✓ Ảnh xong! Đã lưu vào lịch sử.';
+    addH(caption,dataUrl);
+  }catch(err){
+    document.getElementById('imgWrap').innerHTML=`<div class="iph">❌ ${err.message}</div>`;
+    document.getElementById('imgDot').className='dot de';
+    document.getElementById('imgSt').textContent=err.message;
+  }
+
+  btn.disabled=false;btn.textContent='✦ Tạo lại';
+}
+
+async function regenImage(){
+  const cap=g('editCaption');
+  if(!cap)return;
+  document.getElementById('imgWrap').innerHTML='<div class="iph"><div class="spin"></div><span>Đang tạo lại ảnh...</span></div>';
+  document.getElementById('imgDot').className='dot dl';
+  document.getElementById('imgSt').textContent='Đang tạo lại...';
+  document.getElementById('imgDlBtn').style.display='none';
+  document.getElementById('captionOut').textContent=cap;
+  const stripped=cap.replace(/#\w+/g,'').replace(/\n/g,' ').replace(/[^\x00-\x7F]/g,' ').trim().slice(0,200);
+  const imagePrompt=`Generate a social media image. Visual concept: "${stripped}". Brand: ${g('bn')||'brand'}. ${imgPromptExtra()}`;
+  try{
+    const dataUrl=await geminiImage(imagePrompt,sAsp);
+    curImg=dataUrl;
+    document.getElementById('imgWrap').innerHTML='';
+    const img=document.createElement('img');img.className='ir';img.src=dataUrl;
+    document.getElementById('imgWrap').appendChild(img);
+    document.getElementById('imgDlBtn').style.display='inline-block';
+    document.getElementById('imgDot').className='dot dd';
+    document.getElementById('imgSt').textContent='✓ Xong!';
+    addH(cap,dataUrl);
+  }catch(err){
+    document.getElementById('imgWrap').innerHTML=`<div class="iph">❌ ${err.message}</div>`;
+    document.getElementById('imgDot').className='dot de';
+    document.getElementById('imgSt').textContent=err.message;
+  }
+}
+
+function dlCur(){if(curImg){const a=document.createElement('a');a.href=curImg;a.download='post-'+Date.now()+'.png';document.body.appendChild(a);a.click();document.body.removeChild(a)}}
+
+// ── PLAN ──
 function mkPlan(){
   const theme=g('wt');if(!theme){alert('Nhập chủ đề tuần trước!');return}
-  const count=parseInt(g('pc')),lang=g('pl'),bn=g('bn')||'thương hiệu',tv=g('bv');
+  const count=parseInt(g('pc'));
   plan={};selDay=null;
   DAYS.forEach((day,i)=>{
-    if(i<count){
-      const type=TYPES[i%TYPES.length],angle=ANGLES[i%ANGLES.length];
-      let cap='';
-      if(lang==='Tiếng Việt')cap=`[${type}]\nGóc nhìn: ${angle}\nChủ đề: ${theme}\nTone: ${tv}\n\n✏️ Viết lại caption cho ${bn} trước khi đăng.\n\n#${bn.replace(/\s+/g,'')}`;
-      else if(lang==='English')cap=`[${type}]\nAngle: ${angle}\nTheme: ${theme}\n\n✏️ Rewrite for ${bn} before posting.\n\n#${bn.replace(/\s+/g,'')}`;
-      else cap=`🇻🇳 [${type}] ${angle} — ${theme}\n🇬🇧 [${type}] ${angle} — ${theme}\n\n#${bn.replace(/\s+/g,'')}`;
-      plan[day]={day,type,angle,cap,pr:mkPr(cap,''),img:null,st:'idle'};
-    }else plan[day]={st:'skip'};
+    if(i<count) plan[day]={day,type:TYPES[i%TYPES.length],angle:ANGLES[i%ANGLES.length],cap:'',img:null,st:'idle'};
+    else plan[day]={st:'skip'};
   });
-  renderPlan();document.getElementById('po').style.display='block';document.getElementById('de').style.display='none';
+  renderPlan();
+  document.getElementById('po').style.display='block';
+  document.getElementById('de').style.display='none';
 }
 
 function renderPlan(){
@@ -513,10 +689,11 @@ function renderPlan(){
   DAYS.forEach(day=>{
     const d=plan[day]||{st:'skip'};
     const t=document.createElement('div');
+    const dotCls=d.st==='done'?'dd':d.st==='load'?'dl':'di';
     t.className='dt'+(d.st==='skip'?' skip':'')+(selDay===day?' sel':'')+(d.st==='done'?' done':'');
     t.innerHTML=`<div class="dn">${day}</div><div class="dtp">${d.type||'—'}</div>${d.img?`<img class="dth" src="${d.img}" alt="">`:''}
-      <div><span class="dot ${d.st==='done'?'dd':d.st==='load'?'dl':'di'}"></span></div>`;
-    if(d.st!=='skip')t.onclick=()=>selD(day);
+      <div><span class="ddot dot ${dotCls}"></span></div>`;
+    if(d.st!=='skip') t.onclick=()=>selD(day);
     wg.appendChild(t);
   });
 }
@@ -526,71 +703,99 @@ function selD(day){
   document.getElementById('eday').textContent=day;
   document.getElementById('etype').textContent=d.type||'';
   document.getElementById('ecp').value=d.cap||'';
-  document.getElementById('epr').value=d.pr||'';
   const w=document.getElementById('diw');w.innerHTML='';
   if(d.img){const img=document.createElement('img');img.className='ir';img.src=d.img;w.appendChild(img)}
-  else{const ph=document.createElement('div');ph.className='iph';ph.textContent='Nhấn "Tạo ảnh" để generate';w.appendChild(ph)}
+  else{const ph=document.createElement('div');ph.className='iph';ph.style.cssText='aspect-ratio:auto;min-height:80px';ph.textContent='Nhấn "Tạo caption + ảnh" để Gemini xử lý';w.appendChild(ph)}
   document.getElementById('dsb').style.display='flex';
   document.getElementById('dd').className='dot '+(d.st==='done'?'dd':'di');
-  document.getElementById('dst').textContent=d.st==='done'?'✓ Đã có ảnh':'Chưa tạo ảnh';
+  document.getElementById('dst').textContent=d.st==='done'?'✓ Đã có caption & ảnh':'Chưa tạo';
   document.getElementById('de').style.display='block';
   renderPlan();
 }
 
-function syncD(){
-  if(!selDay)return;
-  const c=g('ecp');plan[selDay].cap=c;
-  const pr=mkPr(c,'');plan[selDay].pr=pr;
-  document.getElementById('epr').value=pr;
-}
-
 async function gDay(){
   if(!selDay)return;
-  const d=plan[selDay],pr=g('epr')||d.pr,wh=g('pa');
+  const d=plan[selDay];
+  const theme=g('wt'), lang=g('pl'), asp=g('pa');
   document.getElementById('gdb').disabled=true;document.getElementById('gdb').textContent='Đang tạo...';
   d.st='load';renderPlan();
-  document.getElementById('dd').className='dot dl';document.getElementById('dst').textContent='Đang tạo ảnh...';
-  const w=document.getElementById('diw');w.innerHTML='<div class="iph">Pollinations AI đang xử lý...</div>';
+  document.getElementById('dd').className='dot dl';
+  document.getElementById('dst').textContent='Gemini đang viết caption...';
+  const w=document.getElementById('diw');
+  w.innerHTML='<div class="iph" style="min-height:80px"><div class="spin"></div><span>Đang viết caption...</span></div>';
+
+  // Caption
+  const capPrompt=`${brandCtx()}
+Viết caption ${lang} cho ${g('bp')||'Instagram'} về chủ đề: "${theme}".
+Loại bài: ${d.type}. Góc nhìn: ${d.angle}. Tone: ${g('bv')||'Gần gũi'}.
+Có hook, emoji, CTA, hashtag. Chỉ trả về caption.`;
+
+  let cap='';
   try{
-    const url=await callFree(pr,wh);d.img=url;d.st='done';
+    cap=await geminiText(capPrompt);
+    d.cap=cap;
+    document.getElementById('ecp').value=cap;
+    document.getElementById('dst').textContent='✓ Caption xong — đang tạo ảnh...';
+    w.innerHTML='<div class="iph" style="min-height:80px"><div class="spin"></div><span>Đang tạo ảnh...</span></div>';
+  }catch(err){
+    d.st='idle';
+    w.innerHTML=`<div class="iph" style="min-height:80px">❌ Lỗi caption: ${err.message}</div>`;
+    document.getElementById('dd').className='dot de';document.getElementById('dst').textContent=err.message;
+    document.getElementById('gdb').disabled=false;document.getElementById('gdb').textContent='Tạo caption + ảnh';
+    renderPlan();return;
+  }
+
+  // Image
+  const stripped=cap.replace(/#\w+/g,'').replace(/\n/g,' ').replace(/[^\x00-\x7F]/g,' ').trim().slice(0,200);
+  const imgPr=`Generate a ${g('bp')||'Instagram'} social media image. Visual concept: "${stripped}". Theme: ${theme}. ${imgPromptExtra()}`;
+  try{
+    const url=await geminiImage(imgPr,asp);
+    d.img=url;d.st='done';
     w.innerHTML='';const img=document.createElement('img');img.className='ir';img.src=url;w.appendChild(img);
     document.getElementById('dd').className='dot dd';document.getElementById('dst').textContent='✓ Xong!';
-    addH(d.cap,pr,url);renderPlan();
+    addH(cap,url);renderPlan();
   }catch(err){
-    d.st='idle';w.innerHTML=`<div class="iph">❌ ${err.message}</div>`;
+    d.st='idle';
+    w.innerHTML=`<div class="iph" style="min-height:80px">Caption ✓ — Lỗi ảnh: ${err.message}</div>`;
     document.getElementById('dd').className='dot de';document.getElementById('dst').textContent=err.message;
     renderPlan();
   }
-  document.getElementById('gdb').disabled=false;document.getElementById('gdb').textContent='Tạo ảnh';
+  document.getElementById('gdb').disabled=false;document.getElementById('gdb').textContent='Tạo caption + ảnh';
 }
+
+// ── HISTORY ──
+function addH(cap,imgData){
+  hist.unshift({id:Date.now(),date:new Date().toLocaleString('vi-VN'),cap,imgData});
+  if(hist.length>40)hist=hist.slice(0,40);
+  localStorage.setItem('cs9h',JSON.stringify(hist));uhc();
+}
+function uhc(){document.getElementById('hc').textContent=hist.length?`(${hist.length})`:''}
 
 function renderH(){
   const l=document.getElementById('hl');
   document.getElementById('hs').textContent=`${hist.length} kết quả đã lưu`;
-  if(!hist.length){l.innerHTML=`<div class="empty"><div class="big">🖼️</div>Chưa có ảnh nào.<br>Tạo ảnh ở Single Post hoặc Lịch tuần.</div>`;return}
+  if(!hist.length){l.innerHTML=`<div class="empty"><div class="big">🖼️</div>Chưa có ảnh nào.<br>Tạo post ở tab "Tạo Post" hoặc "Lịch tuần".</div>`;return}
   l.innerHTML='';
   hist.forEach((item,i)=>{
-    const src=item.imgData||item.imgUrl||'';
     const el=document.createElement('div');el.className='hi';
     el.innerHTML=`<div class="hr2">
-      ${src?`<img class="hth" src="${src}" alt="">`:`<div class="hph">🖼️</div>`}
+      ${item.imgData?`<img class="hth" src="${item.imgData}" alt="">`:`<div class="hph">🖼️</div>`}
       <div style="flex:1;min-width:0">
-        <div class="hcap">${(item.cap||'').replace(/\n/g,' ')}</div>
+        <div class="hcap">${(item.cap||'').replace(/\n/g,' ').slice(0,120)}</div>
         <div class="hdt">${item.date}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
-        ${src?`<button class="btng" onclick="dlH(${i})">⬇</button>`:''}
+        ${item.imgData?`<button class="btng" onclick="dlH(${i})">⬇</button>`:''}
         <button class="btnd" onclick="rmH(${i})">Xóa</button>
       </div>
     </div>`;
     l.appendChild(el);
   });
 }
-
-function dlH(i){const it=hist[i];const src=it.imgData||it.imgUrl;if(!src)return;const a=document.createElement('a');a.href=src;a.download='post-'+it.id+'.jpg';document.body.appendChild(a);a.click();document.body.removeChild(a)}
-function rmH(i){if(confirm('Xóa?')){hist.splice(i,1);localStorage.setItem('cs8h',JSON.stringify(hist));uhc();renderH()}}
-function clrAll(){if(confirm('Xóa tất cả?')){hist=[];localStorage.removeItem('cs8h');uhc();renderH()}}
-function cp(id){navigator.clipboard.writeText(document.getElementById(id).textContent);event.target.textContent='✓';setTimeout(()=>event.target.textContent='Copy',1500)}
+function dlH(i){const it=hist[i];if(!it?.imgData)return;const a=document.createElement('a');a.href=it.imgData;a.download='post-'+it.id+'.png';document.body.appendChild(a);a.click();document.body.removeChild(a)}
+function rmH(i){if(confirm('Xóa?')){hist.splice(i,1);localStorage.setItem('cs9h',JSON.stringify(hist));uhc();renderH()}}
+function clrAll(){if(confirm('Xóa tất cả?')){hist=[];localStorage.removeItem('cs9h');uhc();renderH()}}
+function cpEl(id){navigator.clipboard.writeText(document.getElementById(id).textContent);event.target.textContent='✓';setTimeout(()=>event.target.textContent='Copy',1500)}
 
 initGrids();ld();
 </script>
