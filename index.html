@@ -3,44 +3,48 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Content Studio</title>
+<title>Content Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --bg:#0e0e11;--s1:#16161a;--s2:#1e1e24;--s3:#26262e;
   --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);
   --tx:#f0eff4;--tx2:#8e8d9a;--tx3:#55545f;
-  --ac:#c8f060;--ac2:#a8d040;--ad:rgba(200,240,96,.12);--ad2:rgba(200,240,96,.06);
+  --ac:#c8f060;--ac2:#a8d040;--ad:rgba(200,240,96,.12);--ad2:rgba(200,240,96,.05);
   --red:#ff5f57;--rd:rgba(255,95,87,.12);--gold:#f5c842;
   --r:14px;--rs:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh}
-body{padding:28px 24px 80px;max-width:740px;margin:0 auto}
+body{padding:28px 24px 80px;max-width:780px;margin:0 auto}
 
+/* HEADER */
 .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
 .logo{display:flex;align-items:center;gap:10px}
 .lm{width:34px;height:34px;background:var(--ac);border-radius:9px;display:grid;place-items:center;flex-shrink:0}
 .lm svg{width:18px;height:18px}
 .ln{font-family:'Instrument Serif',serif;font-size:19px;letter-spacing:-.3px}
 .ln em{color:var(--ac);font-style:normal}
-.sp{padding:4px 10px;background:rgba(200,240,96,.13);color:var(--ac);border-radius:20px;font-size:11px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none}
+.sp{padding:4px 10px;background:rgba(200,240,96,.13);color:var(--ac);border-radius:20px;font-size:11px;opacity:0;transition:opacity .3s;pointer-events:none}
 .sp.on{opacity:1}
 
+/* NAV */
 .nav{display:flex;gap:2px;background:var(--s1);border:1px solid var(--bd);border-radius:13px;padding:4px;margin-bottom:26px}
-.nb{flex:1;padding:8px 4px;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--tx2);cursor:pointer;border-radius:9px;transition:all .2s;font-family:'DM Sans',sans-serif}
+.nb{flex:1;padding:8px 6px;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--tx2);cursor:pointer;border-radius:9px;transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
 .nb:hover{color:var(--tx);background:var(--s2)}
 .nb.on{background:var(--s3);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .tab{display:none}.tab.on{display:block}
 
+/* LABELS & CARDS */
 .lbl{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;margin-top:22px}
 .lbl.t0{margin-top:0}
+.sub{font-size:12px;color:var(--tx3);margin-bottom:12px;line-height:1.6}
 .card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:12px}
 .r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .f{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
 .f:last-child,.f.mb0{margin-bottom:0}
-.f>label{font-size:11px;color:var(--tx2)}
+.f>label{font-size:11px;color:var(--tx2);font-weight:400}
 input,select,textarea{width:100%;padding:9px 12px;font-size:13px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);color:var(--tx);font-family:'DM Sans',sans-serif;transition:border-color .2s;outline:none}
 input::placeholder,textarea::placeholder{color:var(--tx3)}
 input:focus,select:focus,textarea:focus{border-color:rgba(200,240,96,.4)}
@@ -50,93 +54,83 @@ select option{background:var(--s2)}
 .hint{font-size:11px;color:var(--tx3);margin-top:4px;line-height:1.55}
 .hint a{color:var(--ac);text-decoration:none}
 
-.ibox{background:var(--ad2);border:1px solid rgba(200,240,96,.18);border-radius:var(--rs);padding:12px 14px;font-size:12px;color:var(--tx2);line-height:1.75;margin-bottom:14px}
+/* BOXES */
+.ibox{background:var(--ad2);border:1px solid rgba(200,240,96,.15);border-radius:var(--rs);padding:12px 14px;font-size:12px;color:var(--tx2);line-height:1.75;margin-bottom:14px}
 .ibox strong{color:var(--ac)}.ibox a{color:var(--ac);text-decoration:none}
-.wbox{background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--rs);padding:11px 14px;font-size:12px;color:var(--gold);line-height:1.7;margin-bottom:12px;display:none}
-.wbox a{color:var(--gold);text-decoration:underline}
 .ebox{background:var(--rd);border:1px solid rgba(255,95,87,.2);border-radius:var(--rs);padding:11px 14px;font-size:12px;color:var(--red);line-height:1.7;margin-bottom:12px;display:none}
 
-.swrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:24px;margin-bottom:7px}
-.sw{width:23px;height:23px;border-radius:6px;cursor:pointer;border:1px solid var(--bd2);flex-shrink:0;transition:transform .15s}
-.sw:hover{transform:scale(1.15)}
-.swlbl{font-size:11px;color:var(--tx3)}
-.trow{display:flex;gap:5px;flex-wrap:wrap;align-items:center;min-height:32px;padding:2px 0}
+/* TAGS */
+.trow{display:flex;gap:5px;flex-wrap:wrap;align-items:center;min-height:36px;padding:4px 0;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:6px 10px}
 .tag{padding:3px 9px;font-size:11px;background:var(--s3);border:1px solid var(--bd2);border-radius:20px;display:flex;align-items:center;gap:4px;color:var(--tx2)}
 .tag button{background:none;border:none;cursor:pointer;font-size:12px;color:var(--tx3);padding:0;line-height:1}
 .tag button:hover{color:var(--red)}
-.ti{font-size:12px;border:none;background:transparent;outline:none;color:var(--tx);min-width:80px;font-family:'DM Sans',sans-serif;padding:4px 0}
+.ti{font-size:12px;border:none;background:transparent;outline:none;color:var(--tx);min-width:80px;font-family:'DM Sans',sans-serif;padding:2px 0;flex:1}
 .ti::placeholder{color:var(--tx3)}
 
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.sc{padding:11px 13px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);cursor:pointer;transition:all .2s}
-.sc:hover{border-color:var(--bd2)}
-.sc.on{background:var(--ad);border-color:rgba(200,240,96,.35)}
-.sc .sn{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:2px}
-.sc .sd{font-size:11px;color:var(--tx3);line-height:1.4}
-.sc.on .sn{color:var(--ac)}.sc.on .sd{color:rgba(200,240,96,.55)}
+/* TONE PILLS */
+.pill-row{display:flex;gap:6px;flex-wrap:wrap}
+.pill{padding:6px 13px;font-size:12px;border:1px solid var(--bd2);border-radius:20px;cursor:pointer;background:transparent;color:var(--tx2);transition:all .15s;font-family:'DM Sans',sans-serif}
+.pill:hover{border-color:var(--bd2);color:var(--tx)}
+.pill.on{background:var(--ad);color:var(--ac);border-color:rgba(200,240,96,.35)}
 
-.upzone{border:1.5px dashed var(--bd2);border-radius:var(--rs);padding:18px;text-align:center;cursor:pointer;font-size:12px;color:var(--tx3);transition:all .2s}
-.upzone:hover{border-color:rgba(200,240,96,.3);color:var(--tx2)}
-.rg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-.ri{position:relative;aspect-ratio:1;border:1px solid var(--bd);border-radius:var(--rs);overflow:hidden}
-.ri img{width:100%;height:100%;object-fit:cover;display:block}
-.rdel{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;font-weight:700;line-height:1}
-
-.btnp{width:100%;padding:12px;font-size:14px;font-weight:500;border-radius:var(--rs);border:none;background:var(--ac);color:#0e0e11;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-bottom:12px}
+/* BUTTONS */
+.btnp{width:100%;padding:12px;font-size:14px;font-weight:500;border-radius:var(--rs);border:none;background:var(--ac);color:#0e0e11;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-bottom:0}
 .btnp:hover:not(:disabled){background:var(--ac2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(200,240,96,.2)}
 .btnp:disabled{opacity:.4;cursor:not-allowed}
-.btns{padding:8px 16px;font-size:13px;border-radius:var(--rs);border:1px solid var(--bd2);background:transparent;color:var(--tx2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btns{padding:7px 14px;font-size:13px;border-radius:var(--rs);border:1px solid var(--bd2);background:transparent;color:var(--tx2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
 .btns:hover:not(:disabled){color:var(--tx);background:var(--s2)}
 .btns:disabled{opacity:.4;cursor:not-allowed}
 .btng{font-size:11px;padding:3px 9px;border:1px solid var(--bd);border-radius:6px;cursor:pointer;background:transparent;color:var(--tx3);font-family:'DM Sans',sans-serif;transition:all .15s}
 .btng:hover{color:var(--tx);border-color:var(--bd2)}
-.btnd{font-size:11px;padding:3px 9px;border:1px solid rgba(255,95,87,.25);border-radius:6px;cursor:pointer;background:transparent;color:var(--red);font-family:'DM Sans',sans-serif;transition:all .15s}
+.btnd{font-size:11px;padding:3px 9px;border:1px solid rgba(255,95,87,.25);border-radius:6px;cursor:pointer;background:transparent;color:var(--red);font-family:'DM Sans',sans-serif}
 .btnd:hover{background:var(--rd)}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.btn-row .btnp{margin-bottom:0}
 
-/* result panel */
-.result-panel{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
-.result-panel .rp-hd{padding:11px 15px;border-bottom:1px solid var(--bd);font-size:10px;font-weight:500;color:var(--tx3);display:flex;align-items:center;justify-content:space-between;letter-spacing:.09em;text-transform:uppercase}
-.result-panel .rp-body{padding:14px 15px;font-size:13px;line-height:1.75;color:var(--tx);white-space:pre-wrap;min-height:60px}
-.result-panel .rp-body.placeholder{color:var(--tx3);font-style:italic;font-size:12px}
-.iph{width:100%;min-height:120px;background:var(--s2);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tx3);font-size:12px;text-align:center;padding:24px;gap:10px}
-.spin{width:20px;height:20px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ir{width:100%;display:block}
-.sb{padding:8px 15px;font-size:11px;color:var(--tx3);border-top:1px solid var(--bd);display:flex;align-items:center;gap:7px}
-.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.di{background:var(--tx3)}.dl{background:var(--gold);animation:pu 1s infinite}.dd{background:#6fdf7f}.de{background:var(--red)}
+/* PLAN OUTPUT */
+.plan-grid{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.post-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:border-color .2s}
+.post-card:hover{border-color:var(--bd2)}
+.post-hd{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.post-hd-left{display:flex;align-items:center;gap:10px}
+.post-day{padding:3px 9px;font-size:11px;font-weight:500;border-radius:6px;background:var(--ad);color:var(--ac)}
+.post-type{font-size:12px;color:var(--tx2)}
+.post-status{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ps-idle{background:var(--tx3)}
+.ps-load{background:var(--gold);animation:pu 1s infinite}
+.ps-done{background:#6fdf7f}
+.ps-err{background:var(--red)}
 @keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
+.post-body{padding:0 16px 16px;display:none;border-top:1px solid var(--bd)}
+.post-body.open{display:block}
+.caption-box{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:14px;font-size:13px;line-height:1.8;color:var(--tx);white-space:pre-wrap;margin-top:12px;min-height:60px}
+.caption-box.loading{color:var(--tx3);font-style:italic}
+.caption-edit{width:100%;padding:12px;font-size:13px;line-height:1.8;background:var(--s2);border:1px solid rgba(200,240,96,.3);border-radius:var(--rs);color:var(--tx);font-family:'DM Sans',sans-serif;resize:vertical;outline:none;margin-top:12px;display:none}
+.post-meta{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
+.meta-pill{padding:2px 8px;font-size:10px;background:var(--s3);border-radius:4px;color:var(--tx3)}
+.post-actions{display:flex;gap:6px;margin-top:10px}
 
-/* week grid */
-.wg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:16px}
-.dt{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:9px 7px;min-height:90px;cursor:pointer;transition:all .2s}
-.dt:hover{border-color:var(--bd2)}
-.dt.sel{border-color:rgba(200,240,96,.5);background:var(--ad2)}
-.dt.done{border-color:rgba(111,223,127,.35)}
-.dt.skip{opacity:.22;cursor:default;pointer-events:none}
-.dt .dn{font-size:9px;font-weight:500;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
-.dt .dtp{font-size:10px;color:var(--tx2);line-height:1.35}
-.dt .dth{width:100%;aspect-ratio:1;border-radius:5px;object-fit:cover;margin-top:5px;display:block}
-.dt .ddot{width:5px;height:5px;border-radius:50%;display:inline-block;margin-top:5px}
+/* LOADING SPINNER */
+.spin{width:16px;height:16px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.ec{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:12px}
-.eh{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
-.dbadge{padding:3px 11px;background:var(--ad);color:var(--ac);border-radius:20px;font-size:11px;font-weight:500}
+/* WEEK/MONTH TABS */
+.period-tabs{display:flex;gap:2px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:3px;margin-bottom:16px;width:fit-content}
+.ptab{padding:6px 16px;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--tx2);cursor:pointer;border-radius:7px;transition:all .2s;font-family:'DM Sans',sans-serif}
+.ptab.on{background:var(--s3);color:var(--tx)}
 
-/* history */
-.hi{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-bottom:8px;transition:border-color .2s}
-.hi:hover{border-color:var(--bd2)}
-.hr2{padding:13px 15px;display:flex;align-items:center;gap:13px}
-.hth{width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0}
-.hph{width:60px;height:60px;background:var(--s2);border-radius:8px;flex-shrink:0;display:grid;place-items:center;font-size:22px}
-.hcap{font-size:13px;color:var(--tx);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.hdt{font-size:11px;color:var(--tx3);margin-top:3px}
+/* HISTORY */
+.hist-item{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;transition:border-color .2s}
+.hist-item:hover{border-color:var(--bd2)}
+.hist-cap{font-size:13px;color:var(--tx);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.hist-meta{display:flex;align-items:center;gap:8px;margin-top:8px}
+.hist-date{font-size:11px;color:var(--tx3)}
 .empty{text-align:center;padding:52px 20px;color:var(--tx3);font-size:13px;line-height:2.2}
 .empty .big{font-size:36px;margin-bottom:6px}
 
-.apr{display:flex;gap:5px;flex-wrap:wrap}
-.ap{padding:5px 13px;font-size:11px;border:1px solid var(--bd);border-radius:20px;cursor:pointer;background:transparent;color:var(--tx3);transition:all .15s;font-family:'DM Sans',sans-serif}
-.ap.on{background:var(--ad);color:var(--ac);border-color:rgba(200,240,96,.35)}
+/* PROGRESS */
+.progress-bar{height:3px;background:var(--s3);border-radius:2px;margin:12px 0;overflow:hidden}
+.progress-fill{height:100%;background:var(--ac);border-radius:2px;transition:width .3s}
 
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
@@ -154,650 +148,798 @@ select option{background:var(--s2)}
         <rect x="10" y="10" width="6" height="6" rx="1.5" fill="#0e0e11" opacity=".3"/>
       </svg>
     </div>
-    <span class="ln">Content<em>Studio</em></span>
+    <span class="ln">Content<em>Planner</em></span>
   </div>
   <span class="sp" id="sp">✓ Đã lưu</span>
 </div>
 
 <nav class="nav">
-  <button class="nb on" onclick="go('setup')">⚙ Setup</button>
-  <button class="nb" onclick="go('create')">✦ Tạo Post</button>
-  <button class="nb" onclick="go('plan')">📅 Lịch tuần</button>
-  <button class="nb" onclick="go('history')">🗂 Lịch sử <span id="hc"></span></button>
+  <button class="nb on" onclick="go('brand')">Brand Profile</button>
+  <button class="nb" onclick="go('plan')">Lên Content Plan</button>
+  <button class="nb" onclick="go('saved')">Đã lưu <span id="hc"></span></button>
 </nav>
 
-<!-- ═══════ SETUP ═══════ -->
-<div id="tab-setup" class="tab on">
+<!-- ═══════════════ BRAND PROFILE ═══════════════ -->
+<div id="tab-brand" class="tab on">
 
   <div class="ibox">
-    Dùng <strong>1 Gemini API key</strong> để làm tất cả: viết caption + tạo ảnh.<br>
-    Lấy key miễn phí tại <a href="https://aistudio.google.com/apikey" target="_blank"><strong>aistudio.google.com/apikey</strong></a>. Cần bật billing để tạo ảnh ổn định (~1.000đ/ảnh).
+    Điền thông tin thương hiệu càng chi tiết càng tốt — Gemini sẽ dùng để viết caption đúng giọng, đúng audience, đúng style. Chỉ cần điền 1 lần, tự động lưu lại.
   </div>
-  <div class="wbox" id="wbox">⚠️ <strong>Hết quota.</strong> Cần bật billing: <a href="https://console.cloud.google.com/billing" target="_blank">console.cloud.google.com/billing</a> → gắn thẻ → tạo API key mới.</div>
-  <div class="ebox" id="ebox"></div>
 
-  <div class="lbl t0">API Key</div>
+  <!-- API KEY -->
+  <div class="lbl t0">Gemini API Key</div>
   <div class="card">
-    <div class="f">
-      <label>Gemini API Key — <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ac);font-size:10px">→ Lấy key tại đây</a></label>
+    <div class="f mb0">
+      <label>API Key — <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ac);font-size:10px">→ Lấy miễn phí tại aistudio.google.com/apikey</a></label>
       <input type="password" id="apiKey" placeholder="AIzaSy..." oninput="sv()"/>
-      <div class="hint">Key này dùng để Gemini viết caption VÀ tạo ảnh. Lưu trong máy bạn, không gửi đi đâu cả.</div>
+      <div class="hint">Gemini Flash miễn phí. Cần bật billing để dùng ổn định — ~200đ/caption.</div>
     </div>
   </div>
 
-  <div class="lbl">Thông tin thương hiệu</div>
+  <!-- THÔNG TIN CƠ BẢN -->
+  <div class="lbl">Thông tin cơ bản</div>
   <div class="card">
     <div class="r2" style="margin-bottom:13px">
-      <div class="f mb0"><label>Tên thương hiệu</label><input type="text" id="bn" placeholder="Bloom Coffee, StyleVN..." oninput="sv()"/></div>
-      <div class="f mb0"><label>Ngành / lĩnh vực</label>
+      <div class="f mb0">
+        <label>Tên thương hiệu / Brand name</label>
+        <input type="text" id="bn" placeholder="Ví dụ: Trương Dáng Hương Academy" oninput="sv()"/>
+      </div>
+      <div class="f mb0">
+        <label>Ngành / lĩnh vực</label>
         <select id="bi" onchange="sv()">
           <option value="">Chọn ngành...</option>
           <option>Ẩm thực & F&B</option><option>Thời trang & phụ kiện</option>
           <option>Làm đẹp & skincare</option><option>Sức khoẻ & wellness</option>
-          <option>Công nghệ & phần mềm</option><option>Giáo dục & đào tạo</option>
+          <option>Giáo dục & đào tạo</option><option>Công nghệ & phần mềm</option>
           <option>Bất động sản</option><option>Du lịch & lưu trú</option>
           <option>Thể thao & gym</option><option>Nội thất & thiết kế</option>
-          <option>Tài chính & đầu tư</option><option>Khác</option>
+          <option>Tài chính & đầu tư</option><option>Dịch vụ cá nhân</option>
+          <option>Personal brand / KOL</option><option>Khác</option>
         </select>
       </div>
     </div>
-    <div class="f"><label>Mô tả thương hiệu — định hướng, cá tính, đối tượng</label>
-      <textarea id="bd" rows="2" placeholder="Thương hiệu cà phê Việt Nam cao cấp, hướng đến millennials 25-35 tuổi TP.HCM. Tính cách: tinh tế, gần gũi, hiện đại." oninput="sv()"></textarea>
+    <div class="f" style="margin-bottom:13px">
+      <label>Mô tả thương hiệu</label>
+      <textarea id="bd" rows="3" placeholder="Mô tả ngắn về thương hiệu: bạn làm gì, bán gì, giá trị cốt lõi là gì, điều gì khiến bạn khác biệt so với đối thủ?" oninput="sv()"></textarea>
     </div>
-    <div class="f"><label>Khách hàng mục tiêu</label>
-      <input type="text" id="bt" placeholder="Nữ 22-35, sống thành phố, thu nhập trung bình khá, yêu lối sống tối giản" oninput="sv()"/>
+    <div class="f mb0">
+      <label>Sản phẩm / dịch vụ chính</label>
+      <textarea id="bprod" rows="2" placeholder="Liệt kê các sản phẩm/dịch vụ chính. Ví dụ: Khóa học làm nước detox, coaching 1-1, workshop cuối tuần..." oninput="sv()"></textarea>
+    </div>
+  </div>
+
+  <!-- TARGET AUDIENCE -->
+  <div class="lbl">Target Audience — Khách hàng mục tiêu</div>
+  <div class="card">
+    <div class="r2" style="margin-bottom:13px">
+      <div class="f mb0">
+        <label>Nhân khẩu học</label>
+        <input type="text" id="demo" placeholder="Nữ 25-40, sống TP lớn, có con nhỏ..." oninput="sv()"/>
+      </div>
+      <div class="f mb0">
+        <label>Thu nhập / mức sống</label>
+        <select id="income" onchange="sv()">
+          <option value="">Chọn...</option>
+          <option>Bình dân (dưới 10tr/tháng)</option>
+          <option>Trung bình (10-20tr/tháng)</option>
+          <option>Trung bình khá (20-40tr/tháng)</option>
+          <option>Khá giả (40-80tr/tháng)</option>
+          <option>Cao cấp (trên 80tr/tháng)</option>
+        </select>
+      </div>
+    </div>
+    <div class="f" style="margin-bottom:13px">
+      <label>Pain points — Vấn đề / nỗi đau của khách hàng</label>
+      <textarea id="pain" rows="2" placeholder="Ví dụ: Bận rộn không có thời gian chăm sóc bản thân, cảm thấy thiếu năng lượng, muốn giảm cân nhưng không biết bắt đầu từ đâu..." oninput="sv()"></textarea>
+    </div>
+    <div class="f mb0">
+      <label>Desires — Khách hàng mong muốn điều gì</label>
+      <textarea id="desire" rows="2" placeholder="Ví dụ: Muốn có vóc dáng đẹp, lấy lại tự tin, có nhiều năng lượng hơn, được người xung quanh ngưỡng mộ..." oninput="sv()"></textarea>
+    </div>
+  </div>
+
+  <!-- BRAND VOICE & TONE -->
+  <div class="lbl">Brand Voice & Tone — Giọng điệu thương hiệu</div>
+  <div class="card">
+    <div class="f" style="margin-bottom:13px">
+      <label>Chọn tone phù hợp (có thể chọn nhiều)</label>
+      <div class="pill-row" id="toneRow">
+        <button class="pill" data-v="Gần gũi như bạn bè" onclick="togglePill(this)">Gần gũi như bạn bè</button>
+        <button class="pill" data-v="Chuyên nghiệp, tin cậy" onclick="togglePill(this)">Chuyên nghiệp, tin cậy</button>
+        <button class="pill" data-v="Truyền cảm hứng, động lực" onclick="togglePill(this)">Truyền cảm hứng</button>
+        <button class="pill" data-v="Hài hước, vui vẻ" onclick="togglePill(this)">Hài hước, vui vẻ</button>
+        <button class="pill" data-v="Sang trọng, cao cấp" onclick="togglePill(this)">Sang trọng, cao cấp</button>
+        <button class="pill" data-v="Giáo dục, chia sẻ kiến thức" onclick="togglePill(this)">Giáo dục, chia sẻ</button>
+        <button class="pill" data-v="Thẳng thắn, trực tiếp" onclick="togglePill(this)">Thẳng thắn</button>
+        <button class="pill" data-v="Nhẹ nhàng, tinh tế" onclick="togglePill(this)">Nhẹ nhàng, tinh tế</button>
+        <button class="pill" data-v="Năng động, trẻ trung" onclick="togglePill(this)">Năng động, trẻ trung</button>
+        <button class="pill" data-v="Cảm xúc, chạm đến lòng người" onclick="togglePill(this)">Cảm xúc, chạm lòng</button>
+      </div>
+    </div>
+    <div class="f" style="margin-bottom:13px">
+      <label>Mô tả thêm về giọng điệu</label>
+      <textarea id="voiceDesc" rows="2" placeholder="Ví dụ: Viết như đang nói chuyện 1-1 với bạn thân, thường dùng 'chị em', 'mình', hay kể câu chuyện cá nhân trước rồi mới vào sản phẩm..." oninput="sv()"></textarea>
+    </div>
+    <div class="f mb0">
+      <label>Những từ / cụm từ THƯỜNG DÙNG</label>
+      <div class="trow" id="wordsUsed">
+        <input class="ti" id="wordInput" placeholder="Nhập → Enter để thêm. Ví dụ: chị em, năng lượng, bứt phá..."/>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERENCE CAPTIONS -->
+  <div class="lbl">Reference Captions — Caption mẫu</div>
+  <div class="card">
+    <div class="sub">Dán 2-5 caption đã đăng mà bạn thấy hiệu quả nhất. Gemini sẽ học style, cấu trúc và giọng điệu từ đây.</div>
+    <div class="f" style="margin-bottom:13px">
+      <label>Caption mẫu 1 (bắt buộc nếu muốn Gemini viết đúng style)</label>
+      <textarea id="ref1" rows="5" placeholder="Dán caption bạn thích vào đây..." oninput="sv()"></textarea>
+    </div>
+    <div class="f" style="margin-bottom:13px">
+      <label>Caption mẫu 2</label>
+      <textarea id="ref2" rows="5" placeholder="Caption mẫu thứ 2..." oninput="sv()"></textarea>
+    </div>
+    <div class="f mb0">
+      <label>Caption mẫu 3</label>
+      <textarea id="ref3" rows="5" placeholder="Caption mẫu thứ 3..." oninput="sv()"></textarea>
+    </div>
+  </div>
+
+  <!-- NỀN TẢNG & FORMAT -->
+  <div class="lbl">Nền tảng & Format</div>
+  <div class="card">
+    <div class="r2" style="margin-bottom:13px">
+      <div class="f mb0">
+        <label>Platform chính</label>
+        <select id="platform" onchange="sv()">
+          <option>Facebook</option><option>Instagram</option><option>TikTok</option>
+          <option>LinkedIn</option><option>Threads</option><option>Twitter/X</option>
+        </select>
+      </div>
+      <div class="f mb0">
+        <label>Độ dài caption ưa thích</label>
+        <select id="capLen" onchange="sv()">
+          <option value="short">Ngắn (dưới 100 chữ)</option>
+          <option value="medium" selected>Vừa (100-250 chữ)</option>
+          <option value="long">Dài (250-500 chữ)</option>
+          <option value="vlong">Rất dài (trên 500 chữ, kể chuyện)</option>
+        </select>
+      </div>
+    </div>
+    <div class="f" style="margin-bottom:13px">
+      <label>Cấu trúc caption thường dùng</label>
+      <select id="capStruct" onchange="sv()">
+        <option value="hook-body-cta">Hook → Nội dung → CTA</option>
+        <option value="story-lesson-cta">Kể chuyện → Bài học → CTA</option>
+        <option value="problem-solution-cta">Vấn đề → Giải pháp → CTA</option>
+        <option value="question-answer-cta">Đặt câu hỏi → Trả lời → CTA</option>
+        <option value="list-cta">Liệt kê (list) → CTA</option>
+        <option value="freeform">Tự do, không có cấu trúc cố định</option>
+      </select>
     </div>
     <div class="r2" style="margin-bottom:13px">
-      <div class="f mb0"><label>Platform chính</label>
-        <select id="bp" onchange="sv()"><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>LinkedIn</option><option>Twitter/X</option></select>
-      </div>
-      <div class="f mb0"><label>Tone of voice</label>
-        <select id="bv" onchange="sv()">
-          <option>Gần gũi, thân thiện</option><option>Chuyên nghiệp, tin cậy</option>
-          <option>Trẻ trung, năng động</option><option>Sang trọng, cao cấp</option>
-          <option>Hài hước, vui vẻ</option><option>Truyền cảm hứng</option><option>Giáo dục, chia sẻ</option>
-        </select>
-      </div>
-    </div>
-    <div class="f">
-      <label>Brand Colors (nhập HEX → Enter, click để xóa)</label>
-      <div class="swrow" id="swr"></div>
-      <input type="text" id="swi" placeholder="#FF5A3D"/>
-    </div>
-    <div class="f">
-      <label>Style Keywords (→ Enter)</label>
-      <div class="trow" id="tr"><input class="ti" id="ti" placeholder="golden hour, film grain, bokeh..."/></div>
-    </div>
-    <div class="f"><label>KHÔNG xuất hiện trong ảnh</label>
-      <input type="text" id="ba" placeholder="Chữ viết trên ảnh, màu sắc lòe loẹt, background lộn xộn" oninput="sv()"/>
-    </div>
-  </div>
-
-  <div class="lbl">Visual Style — Phong cách hình ảnh</div>
-  <div class="card" style="padding:12px"><div class="sg" id="vsg"></div></div>
-
-  <div class="lbl">Photography Style — Kiểu chụp</div>
-  <div class="card" style="padding:12px"><div class="sg" id="psg"></div></div>
-
-  <div class="lbl">Reference Images <span style="color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0;font-weight:400">(tối đa 4 — Gemini học style từ đây)</span></div>
-  <div class="card">
-    <div class="upzone" id="upz" onclick="document.getElementById('rfi').click()">📁 Nhấn để chọn ảnh reference (JPG/PNG/WebP, max 5MB)</div>
-    <input type="file" id="rfi" accept="image/*" multiple style="display:none" onchange="addR(event)"/>
-    <div class="rg" id="rg"></div>
-    <div class="hint" id="rh" style="margin-top:8px"></div>
-  </div>
-</div>
-
-<!-- ═══════ CREATE POST ═══════ -->
-<div id="tab-create" class="tab">
-
-  <div class="card">
-    <div class="f"><label>Chủ đề / ý tưởng bài đăng</label>
-      <textarea id="topic" rows="3" placeholder="Mô tả ngắn gọn bài đăng bạn muốn.&#10;&#10;Ví dụ: Ra mắt menu cà phê mùa hè mới, highlight ly Cold Brew chanh dây, giảm 15% tuần đầu.&#10;&#10;Gemini sẽ tự viết caption + tạo ảnh phù hợp."></textarea>
-    </div>
-    <div class="r2" style="margin-bottom:10px">
-      <div class="f mb0"><label>Loại nội dung</label>
-        <select id="postType">
-          <option>Giới thiệu sản phẩm</option><option>Tip hữu ích</option>
-          <option>Behind the scenes</option><option>Câu chuyện thương hiệu</option>
-          <option>Khuyến mãi / ưu đãi</option><option>Lifestyle & giá trị</option>
-          <option>User testimonial</option><option>Educational</option>
-        </select>
-      </div>
-      <div class="f mb0"><label>Ngôn ngữ caption</label>
-        <select id="capLang">
+      <div class="f mb0">
+        <label>Ngôn ngữ</label>
+        <select id="capLang" onchange="sv()">
           <option>Tiếng Việt</option><option>English</option><option>Song ngữ VI/EN</option>
         </select>
       </div>
+      <div class="f mb0">
+        <label>Số lượng hashtag</label>
+        <select id="hashCount" onchange="sv()">
+          <option value="none">Không dùng hashtag</option>
+          <option value="few">Ít (3-5 hashtag)</option>
+          <option value="medium" selected>Vừa (5-10 hashtag)</option>
+          <option value="many">Nhiều (10-20 hashtag)</option>
+        </select>
+      </div>
     </div>
-    <div class="f mb0"><label>Tỉ lệ ảnh</label>
-      <div class="apr" id="sar">
-        <button class="ap on" data-v="1:1" onclick="setA(this)">1:1 Feed</button>
-        <button class="ap" data-v="9:16" onclick="setA(this)">9:16 Story</button>
-        <button class="ap" data-v="4:5" onclick="setA(this)">4:5 Portrait</button>
-        <button class="ap" data-v="16:9" onclick="setA(this)">16:9 Wide</button>
+    <div class="f mb0">
+      <label>Hashtag cố định luôn dùng (nhập → Enter)</label>
+      <div class="trow" id="fixedTags">
+        <input class="ti" id="hashInput" placeholder="#TênBrand #Hashtag..."/>
       </div>
     </div>
   </div>
 
-  <button class="btnp" id="createBtn" onclick="createPost()">✦ Gemini viết caption + tạo ảnh</button>
-
-  <div id="createOut" style="display:none">
-    <!-- Caption -->
-    <div class="result-panel">
-      <div class="rp-hd">Caption <button class="btng" onclick="cpEl('captionOut')">Copy</button></div>
-      <div class="rp-body placeholder" id="captionOut">Gemini đang viết caption...</div>
-      <div class="sb"><span class="dot di" id="capDot"></span><span id="capSt" style="font-size:11px">Chờ...</span></div>
-    </div>
-    <!-- Image -->
-    <div class="result-panel">
-      <div class="rp-hd">Ảnh <button class="btng" id="imgDlBtn" style="display:none" onclick="dlCur()">⬇ Tải ảnh</button></div>
-      <div id="imgWrap"><div class="iph" id="imgPh"><div class="spin"></div><span>Chờ caption xong...</span></div></div>
-      <div class="sb"><span class="dot di" id="imgDot"></span><span id="imgSt" style="font-size:11px">Chờ...</span></div>
-    </div>
-    <!-- Chỉnh caption -->
-    <div class="card" id="editCard" style="display:none">
-      <div class="f"><label>Chỉnh caption trước khi đăng</label>
-        <textarea id="editCaption" rows="5"></textarea>
+  <!-- CÁC CHỦ ĐỀ -->
+  <div class="lbl">Trụ cột nội dung (Content Pillars)</div>
+  <div class="card">
+    <div class="sub">Những chủ đề chính bạn thường xuyên đăng. Gemini sẽ đa dạng hóa nội dung xoay quanh các trụ cột này.</div>
+    <div class="f mb0">
+      <label>Các trụ cột nội dung (nhập → Enter)</label>
+      <div class="trow" id="pillarsRow">
+        <input class="ti" id="pillarInput" placeholder="Ví dụ: Kiến thức detox, Câu chuyện khách hàng, Behind the scenes, Tips sức khoẻ..."/>
       </div>
-      <button class="btns" style="width:100%" onclick="regenImage()">↻ Tạo lại ảnh theo caption đã chỉnh</button>
     </div>
   </div>
+
+  <!-- LƯU Ý KHÁC -->
+  <div class="lbl">Lưu ý khác</div>
+  <div class="card">
+    <div class="f" style="margin-bottom:13px">
+      <label>Những điều KHÔNG được đề cập / tránh</label>
+      <textarea id="avoid" rows="2" placeholder="Ví dụ: Không so sánh với đối thủ, không cam kết kết quả tuyệt đối, không dùng từ 'đảm bảo 100%'..." oninput="sv()"></textarea>
+    </div>
+    <div class="f mb0">
+      <label>Thông tin bổ sung khác (USP, câu chuyện thương hiệu...)</label>
+      <textarea id="extra" rows="3" placeholder="Bất kỳ thông tin nào khác bạn muốn Gemini biết để viết caption tốt hơn..." oninput="sv()"></textarea>
+    </div>
+  </div>
+
+  <button class="btnp" onclick="go('plan');sv()">Xong, đến Lên Content Plan →</button>
+
 </div>
 
-<!-- ═══════ PLAN ═══════ -->
+<!-- ═══════════════ CONTENT PLAN ═══════════════ -->
 <div id="tab-plan" class="tab">
+  <div class="ebox" id="ebox"></div>
+
   <div class="card">
-    <div class="f"><label>Chủ đề / campaign tuần này</label>
-      <textarea id="wt" rows="2" placeholder="Ví dụ: Ra mắt menu mùa hè, tropical vibes kết hợp cà phê Việt. Highlight 3 món mới, giảm 20% tuần đầu."></textarea>
+    <div class="r2" style="margin-bottom:13px">
+      <div class="f mb0">
+        <label>Chủ đề / campaign</label>
+        <input type="text" id="theme" placeholder="Ví dụ: Ra mắt sản phẩm mới tháng 5, Tháng detox mùa hè..."/>
+      </div>
+      <div class="f mb0">
+        <label>Thời gian</label>
+        <div class="period-tabs" style="margin-bottom:0;width:100%">
+          <button class="ptab on" style="flex:1" onclick="setPeriod('week',this)">1 tuần (7 posts)</button>
+          <button class="ptab" style="flex:1" onclick="setPeriod('month',this)">1 tháng (30 posts)</button>
+        </div>
+      </div>
+    </div>
+    <div class="f" style="margin-bottom:13px">
+      <label>Mô tả thêm — campaign này về gì, có sự kiện/ưu đãi gì không?</label>
+      <textarea id="campaignDesc" rows="2" placeholder="Ví dụ: Tuần này tập trung vào sản phẩm Trà Mận Mơ mới ra, có giảm 20% 3 ngày đầu, muốn tạo FOMO và tăng DM..."></textarea>
     </div>
     <div class="r3">
-      <div class="f mb0"><label>Tỉ lệ ảnh</label>
-        <select id="pa"><option value="1:1">1:1 Feed</option><option value="9:16">9:16 Story</option><option value="4:5">4:5 Portrait</option><option value="16:9">16:9 Wide</option></select>
+      <div class="f mb0">
+        <label>Loại nội dung ưu tiên</label>
+        <select id="contentMix">
+          <option value="balanced">Cân bằng (đa dạng)</option>
+          <option value="edu">Nặng giáo dục / tips</option>
+          <option value="sell">Nặng bán hàng / CTA</option>
+          <option value="story">Nặng storytelling</option>
+          <option value="engage">Nặng tương tác / hỏi đáp</option>
+        </select>
       </div>
-      <div class="f mb0"><label>Số posts</label>
-        <select id="pc"><option value="3">3 posts</option><option value="5">5 posts</option><option value="7" selected>7 posts</option></select>
+      <div class="f mb0">
+        <label>Tần suất đăng</label>
+        <select id="freq">
+          <option value="1">1 post/ngày</option>
+          <option value="2">2 posts/ngày</option>
+          <option value="alt">Cách ngày</option>
+          <option value="3week">3 posts/tuần</option>
+        </select>
       </div>
-      <div class="f mb0"><label>Ngôn ngữ</label>
-        <select id="pl"><option>Tiếng Việt</option><option>English</option><option>Song ngữ</option></select>
+      <div class="f mb0">
+        <label>Viết caption luôn?</label>
+        <select id="writeCap">
+          <option value="yes">Có, viết caption ngay</option>
+          <option value="outline">Chỉ lên outline trước</option>
+        </select>
       </div>
     </div>
   </div>
-  <button class="btnp" id="planBtn" onclick="mkPlan()">📅 Tạo Content Plan cho tuần</button>
 
-  <div id="po" style="display:none">
-    <div class="lbl">Lịch tuần — nhấn ô để Gemini viết caption & tạo ảnh</div>
-    <div class="wg" id="wg"></div>
-    <div id="de" style="display:none">
-      <div class="ec">
-        <div class="eh">
-          <div style="display:flex;align-items:center;gap:9px">
-            <span class="dbadge" id="eday"></span>
-            <span style="font-size:13px;color:var(--tx2)" id="etype"></span>
-          </div>
-          <button class="btns" id="gdb" onclick="gDay()">Tạo caption + ảnh</button>
-        </div>
-        <div class="f" id="dayCaptionWrap" style="margin-bottom:10px">
-          <label>Caption</label>
-          <textarea id="ecp" rows="4" placeholder="Gemini sẽ viết tự động..."></textarea>
-        </div>
-        <div id="diw"><div class="iph" style="aspect-ratio:auto;min-height:80px">Nhấn "Tạo caption + ảnh" để bắt đầu</div></div>
-        <div class="sb" id="dsb" style="display:none"><span class="dot di" id="dd"></span><span id="dst" style="font-size:11px"></span></div>
-      </div>
-    </div>
+  <button class="btnp" id="genBtn" onclick="generatePlan()" style="margin-bottom:12px">✦ Gemini lên Content Plan</button>
+
+  <div id="planProgress" style="display:none">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div style="font-size:12px;color:var(--tx3);text-align:center" id="progressTxt">Đang xử lý...</div>
   </div>
+
+  <div id="planOut"></div>
 </div>
 
-<!-- ═══════ HISTORY ═══════ -->
-<div id="tab-history" class="tab">
+<!-- ═══════════════ SAVED ═══════════════ -->
+<div id="tab-saved" class="tab">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-    <span style="font-size:13px;color:var(--tx2)" id="hs">0 kết quả</span>
-    <button class="btnd" onclick="clrAll()">Xóa tất cả</button>
+    <span style="font-size:13px;color:var(--tx2)" id="savedCount">0 caption đã lưu</span>
+    <button class="btnd" onclick="clearSaved()">Xóa tất cả</button>
   </div>
-  <div id="hl"></div>
+  <div id="savedList"></div>
 </div>
 
 <script>
-// ── DATA ──
-const VS=[
-  {id:'minimal',n:'Tối giản',d:'Không gian trống, clean, ít màu sắc.',e:'minimalist aesthetic, clean composition, generous negative space'},
-  {id:'bold',n:'Nổi bật & Sống động',d:'Màu mạnh, tương phản cao, bắt mắt.',e:'bold vibrant colors, high contrast, energetic eye-catching'},
-  {id:'luxury',n:'Sang trọng',d:'Tông tối, ánh vàng, chất liệu cao cấp.',e:'luxury editorial, dark rich tones, gold accents, sophisticated'},
-  {id:'natural',n:'Tự nhiên & Hữu cơ',d:'Tone đất, ánh sáng tự nhiên, thô.',e:'natural organic, earthy tones, soft diffused daylight, raw materials'},
-  {id:'retro',n:'Hoài cổ (Retro)',d:'Film cũ, grain, màu vàng ấm.',e:'retro vintage film aesthetic, warm grain, faded colors, analog'},
-  {id:'moody',n:'Tối & Huyền bí',d:'Tối, sương, ánh sáng dramatic.',e:'dark moody, dramatic shadows, chiaroscuro lighting, mysterious'},
-  {id:'pastel',n:'Dịu nhẹ & Pastel',d:'Màu nhạt, nền sáng, nữ tính.',e:'soft pastel colors, bright airy, feminine, light and dreamy'},
-  {id:'editorial',n:'Editorial / Tạp chí',d:'Bố cục mạnh, nghệ thuật.',e:'editorial magazine style, strong composition, high fashion'},
-  {id:'saigon',n:'Đô thị Việt Nam',d:'Phố Sài Gòn/HN, neon, xe máy.',e:'Vietnamese urban, Saigon street, neon lights, motorbikes, authentic local'},
-  {id:'cozy',n:'Ấm áp & Cozy',d:'Đèn vàng, góc nhỏ, dễ chịu.',e:'cozy warm, golden lamp light, intimate corners, hygge'},
-];
-const PS=[
-  {id:'lifestyle',n:'Lifestyle',d:'Khoảnh khắc thật, tự nhiên.',e:'lifestyle photography, authentic candid moment'},
-  {id:'flatlay',n:'Flat Lay (từ trên xuống)',d:'Chụp thẳng đứng, bố cục prop.',e:'flat lay photography, top-down view, arranged props'},
-  {id:'product',n:'Product Shot',d:'Sản phẩm là nhân vật chính.',e:'product photography, hero shot, clean studio background'},
-  {id:'portrait',n:'Chân dung (Portrait)',d:'Người, cảm xúc, ánh nhìn.',e:'portrait photography, expressive face, beautiful lighting'},
-  {id:'food',n:'Ẩm thực (Food Photo)',d:'Món ăn & đồ uống ngon mắt.',e:'food photography, appetizing, shallow depth of field'},
-  {id:'space',n:'Không gian & Kiến trúc',d:'Nội thất, mặt tiền, góc rộng.',e:'architectural photography, interior space, wide angle'},
-];
-const DAYS=['T.Hai','T.Ba','T.Tư','T.Năm','T.Sáu','T.Bảy','C.Nhật'];
-const TYPES=['Giới thiệu sản phẩm','Tip hữu ích','Behind the scenes','Câu chuyện thương hiệu','Lợi ích người dùng','Ưu đãi / Khuyến mãi','Lifestyle & Giá trị'];
-const ANGLES=['Nêu bật tính năng chính','Góc nhìn người dùng','Vấn đề → Giải pháp','Cảm xúc & Khát vọng','Social proof','Chia sẻ kiến thức','Call to action'];
+// ── STATE ──
+let selTones=[], wordsUsed=[], fixedTags=[], pillars=[], saved=[];
+let period='week';
 
-let sVS='minimal', sPS='lifestyle', sAsp='1:1';
-let cols=[], tags=[], refs=[], hist=[], plan={}, selDay=null, curImg='';
-
-// ── INIT ──
-function initGrids(){
-  VS.forEach(s=>{
-    const c=mkSC(s);c.onclick=()=>{document.querySelectorAll('#vsg .sc').forEach(x=>x.classList.remove('on'));c.classList.add('on');sVS=s.id;sv()};
-    if(s.id===sVS)c.classList.add('on');
-    document.getElementById('vsg').appendChild(c);
-  });
-  PS.forEach(s=>{
-    const c=mkSC(s);c.onclick=()=>{document.querySelectorAll('#psg .sc').forEach(x=>x.classList.remove('on'));c.classList.add('on');sPS=s.id;sv()};
-    if(s.id===sPS)c.classList.add('on');
-    document.getElementById('psg').appendChild(c);
-  });
-}
-function mkSC(s){const c=document.createElement('div');c.className='sc';c.dataset.id=s.id;c.innerHTML=`<div class="sn">${s.n}</div><div class="sd">${s.d}</div>`;return c}
-
+// ── NAV ──
 function go(n){
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.querySelector(`.nb[onclick="go('${n}')"]`).classList.add('on');
   document.getElementById('tab-'+n).classList.add('on');
-  if(n==='history')renderH();
+  if(n==='saved')renderSaved();
+}
+function setPeriod(p,btn){
+  period=p;
+  document.querySelectorAll('.period-tabs .ptab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ── PILLS ──
+function togglePill(btn){
+  btn.classList.toggle('on');
+  selTones=Array.from(document.querySelectorAll('#toneRow .pill.on')).map(b=>b.dataset.v);
+  sv();
+}
+
+// ── TAG INPUTS ──
+function initTagInput(inputId,rowId,arrRef,saveKey){
+  const inp=document.getElementById(inputId);
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&this.value.trim()){
+      arrRef.push(this.value.trim());this.value='';
+      renderTags(rowId,arrRef,inputId);sv();
+    }
+  });
+}
+function renderTags(rowId,arr,inputId){
+  const row=document.getElementById(rowId);
+  const inp=document.getElementById(inputId);
+  // remove old tags
+  Array.from(row.querySelectorAll('.tag')).forEach(t=>t.remove());
+  arr.forEach((t,i)=>{
+    const el=document.createElement('div');el.className='tag';
+    el.innerHTML=`${t}<button onclick="removeTag('${rowId}','${inputId}',${i})">×</button>`;
+    row.insertBefore(el,inp);
+  });
+}
+function removeTag(rowId,inputId,i){
+  if(rowId==='wordsUsed')wordsUsed.splice(i,1),renderTags(rowId,wordsUsed,inputId);
+  else if(rowId==='fixedTags')fixedTags.splice(i,1),renderTags(rowId,fixedTags,inputId);
+  else if(rowId==='pillarsRow')pillars.splice(i,1),renderTags(rowId,pillars,inputId);
+  sv();
 }
 
 // ── SETTINGS ──
 function g(id){const e=document.getElementById(id);return e?e.value:''}
 function ld(){
   try{
-    const s=JSON.parse(localStorage.getItem('cs9')||'{}');
-    ['apiKey','bn','bd','bt','ba'].forEach(id=>{if(s[id])document.getElementById(id).value=s[id]});
-    ['bi','bp','bv'].forEach(id=>{if(s[id])document.getElementById(id).value=s[id]});
-    if(s.sVS){sVS=s.sVS;document.querySelectorAll('#vsg .sc').forEach(c=>c.classList.toggle('on',c.dataset.id===s.sVS))}
-    if(s.sPS){sPS=s.sPS;document.querySelectorAll('#psg .sc').forEach(c=>c.classList.toggle('on',c.dataset.id===s.sPS))}
-    if(s.cols){cols=s.cols;renderSw()}
-    if(s.tags){tags=s.tags;renderTags()}
-    hist=JSON.parse(localStorage.getItem('cs9h')||'[]');uhc();
+    const s=JSON.parse(localStorage.getItem('cp1')||'{}');
+    ['apiKey','bn','bi','bd','bprod','demo','income','pain','desire','voiceDesc',
+     'ref1','ref2','ref3','platform','capLen','capStruct','capLang','hashCount','avoid','extra']
+      .forEach(id=>{if(s[id]&&document.getElementById(id))document.getElementById(id).value=s[id]});
+    if(s.selTones){selTones=s.selTones;selTones.forEach(v=>{const b=document.querySelector(`#toneRow .pill[data-v="${v}"]`);if(b)b.classList.add('on')})}
+    if(s.wordsUsed){wordsUsed=s.wordsUsed;renderTags('wordsUsed',wordsUsed,'wordInput')}
+    if(s.fixedTags){fixedTags=s.fixedTags;renderTags('fixedTags',fixedTags,'hashInput')}
+    if(s.pillars){pillars=s.pillars;renderTags('pillarsRow',pillars,'pillarInput')}
+    saved=JSON.parse(localStorage.getItem('cp1_saved')||'[]');uhc();
   }catch(e){}
 }
 function sv(){
-  localStorage.setItem('cs9',JSON.stringify({apiKey:g('apiKey'),bn:g('bn'),bd:g('bd'),bt:g('bt'),ba:g('ba'),bi:g('bi'),bp:g('bp'),bv:g('bv'),sVS,sPS,cols,tags}));
-  const p=document.getElementById('sp');p.classList.add('on');clearTimeout(window._sv);window._sv=setTimeout(()=>p.classList.remove('on'),2000);
+  const s={apiKey:g('apiKey'),bn:g('bn'),bi:g('bi'),bd:g('bd'),bprod:g('bprod'),
+    demo:g('demo'),income:g('income'),pain:g('pain'),desire:g('desire'),voiceDesc:g('voiceDesc'),
+    ref1:g('ref1'),ref2:g('ref2'),ref3:g('ref3'),
+    platform:g('platform'),capLen:g('capLen'),capStruct:g('capStruct'),capLang:g('capLang'),
+    hashCount:g('hashCount'),avoid:g('avoid'),extra:g('extra'),
+    selTones,wordsUsed,fixedTags,pillars};
+  localStorage.setItem('cp1',JSON.stringify(s));
+  const p=document.getElementById('sp');p.classList.add('on');
+  clearTimeout(window._sv);window._sv=setTimeout(()=>p.classList.remove('on'),2000);
 }
 
-document.getElementById('swi').addEventListener('keydown',function(e){
-  if(e.key==='Enter'){const v=this.value.trim();if(/^#[0-9A-Fa-f]{3,6}$/.test(v)&&cols.length<8){cols.push(v);renderSw();this.value='';sv()}}
-});
-function renderSw(){
-  const r=document.getElementById('swr');r.innerHTML='';
-  cols.forEach((c,i)=>{const s=document.createElement('div');s.className='sw';s.style.background=c;s.title=c;s.onclick=()=>{cols.splice(i,1);renderSw();sv()};r.appendChild(s)});
-  if(cols.length){const l=document.createElement('span');l.className='swlbl';l.textContent=cols.join(' · ');r.appendChild(l)}
-}
-function renderTags(){
-  const r=document.getElementById('tr');r.innerHTML='';
-  tags.forEach((t,i)=>{const el=document.createElement('div');el.className='tag';el.innerHTML=`${t}<button onclick="rmT(${i})">×</button>`;r.appendChild(el)});
-  const inp=document.createElement('input');inp.className='ti';inp.id='ti';inp.placeholder=tags.length?'thêm...':'golden hour, film grain...';
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&inp.value.trim()){tags.push(inp.value.trim());renderTags();sv()}});
-  r.appendChild(inp);
-}
-function rmT(i){tags.splice(i,1);renderTags();sv()}
-
-function addR(e){
-  Array.from(e.target.files).slice(0,4-refs.length).forEach(f=>{
-    if(f.size>5*1024*1024){alert(f.name+' quá 5MB');return}
-    const r=new FileReader();r.onload=ev=>{refs.push({b64:ev.target.result,mt:f.type});renderR()};r.readAsDataURL(f);
-  });e.target.value='';
-}
-function renderR(){
-  const g2=document.getElementById('rg');g2.innerHTML='';
-  refs.forEach((img,i)=>{const el=document.createElement('div');el.className='ri';el.innerHTML=`<img src="${img.b64}" alt=""><button class="rdel" onclick="rmR(${i})">×</button>`;g2.appendChild(el)});
-  document.getElementById('upz').style.display=refs.length>=4?'none':'block';
-  document.getElementById('rh').textContent=refs.length?`${refs.length}/4 ảnh reference`:'';
-}
-function rmR(i){refs.splice(i,1);renderR()}
-function setA(btn){document.querySelectorAll('#sar .ap').forEach(x=>x.classList.remove('on'));btn.classList.add('on');sAsp=btn.dataset.v}
-
-// ── BRAND CONTEXT ──
-function brandCtx(){
-  const bn=g('bn'),bd=g('bd'),bt=g('bt'),bi=g('bi'),bp=g('bp'),bv=g('bv'),ba=g('ba');
-  let ctx='';
-  if(bn) ctx+=`Tên thương hiệu: ${bn}\n`;
-  if(bi) ctx+=`Ngành: ${bi}\n`;
-  if(bd) ctx+=`Mô tả: ${bd}\n`;
-  if(bt) ctx+=`Khách hàng mục tiêu: ${bt}\n`;
-  if(bp) ctx+=`Platform: ${bp}\n`;
-  if(bv) ctx+=`Tone of voice: ${bv}\n`;
-  if(cols.length) ctx+=`Brand colors: ${cols.join(', ')}\n`;
-  if(ba) ctx+=`Không có trong ảnh: ${ba}\n`;
-  return ctx;
-}
-
-function imgPromptExtra(){
-  const vs=VS.find(s=>s.id===sVS), ps=PS.find(s=>s.id===sPS);
+// ── BUILD BRAND CONTEXT ──
+function buildCtx(){
   const parts=[];
-  if(ps) parts.push(ps.e);
-  if(vs) parts.push(vs.e);
-  if(cols.length) parts.push(`color palette: ${cols.join(', ')}`);
-  if(tags.length) parts.push(tags.join(', '));
-  parts.push('no text or typography in the image','photorealistic commercial quality');
-  const ba=g('ba');if(ba) parts.push(`avoid: ${ba}`);
-  return parts.join(', ');
+  const bn=g('bn'),bi=g('bi'),bd=g('bd'),bprod=g('bprod');
+  if(bn) parts.push(`Thương hiệu: ${bn}`);
+  if(bi) parts.push(`Ngành: ${bi}`);
+  if(bd) parts.push(`Mô tả: ${bd}`);
+  if(bprod) parts.push(`Sản phẩm/dịch vụ: ${bprod}`);
+
+  const demo=g('demo'),income=g('income'),pain=g('pain'),desire=g('desire');
+  if(demo||income) parts.push(`Khách hàng: ${[demo,income].filter(Boolean).join(', ')}`);
+  if(pain) parts.push(`Pain points: ${pain}`);
+  if(desire) parts.push(`Mong muốn: ${desire}`);
+
+  if(selTones.length) parts.push(`Tone: ${selTones.join(', ')}`);
+  const vd=g('voiceDesc');if(vd) parts.push(`Giọng điệu: ${vd}`);
+  if(wordsUsed.length) parts.push(`Từ hay dùng: ${wordsUsed.join(', ')}`);
+
+  if(pillars.length) parts.push(`Content pillars: ${pillars.join(', ')}`);
+
+  const platform=g('platform'),capLen=g('capLen'),capStruct=g('capStruct'),capLang=g('capLang');
+  if(platform) parts.push(`Platform: ${platform}`);
+  const lenMap={short:'ngắn (dưới 100 chữ)',medium:'vừa (100-250 chữ)',long:'dài (250-500 chữ)',vlong:'rất dài (trên 500 chữ)'};
+  if(capLen) parts.push(`Độ dài caption: ${lenMap[capLen]||capLen}`);
+  const structMap={'hook-body-cta':'Hook → Nội dung → CTA','story-lesson-cta':'Kể chuyện → Bài học → CTA','problem-solution-cta':'Vấn đề → Giải pháp → CTA','question-answer-cta':'Đặt câu hỏi → Trả lời → CTA','list-cta':'Liệt kê → CTA','freeform':'Tự do'};
+  if(capStruct) parts.push(`Cấu trúc: ${structMap[capStruct]||capStruct}`);
+  if(capLang) parts.push(`Ngôn ngữ: ${capLang}`);
+
+  const hashCount=g('hashCount');
+  const hashMap={none:'không dùng hashtag',few:'3-5 hashtag',medium:'5-10 hashtag',many:'10-20 hashtag'};
+  if(hashCount) parts.push(`Hashtag: ${hashMap[hashCount]||hashCount}`);
+  if(fixedTags.length) parts.push(`Hashtag cố định: ${fixedTags.join(' ')}`);
+
+  const avoid=g('avoid');if(avoid) parts.push(`Tránh: ${avoid}`);
+  const extra=g('extra');if(extra) parts.push(`Thông tin thêm: ${extra}`);
+
+  return parts.join('\n');
 }
 
-// ── GEMINI TEXT (caption) ──
-async function geminiText(prompt){
+function buildRefCtx(){
+  const refs=[g('ref1'),g('ref2'),g('ref3')].filter(Boolean);
+  if(!refs.length) return '';
+  return `\n\nCACH VIẾT THAM KHẢO (học style, cấu trúc, giọng điệu từ các caption này):\n${refs.map((r,i)=>`--- Caption mẫu ${i+1} ---\n${r}`).join('\n\n')}`;
+}
+
+// ── GEMINI TEXT ──
+async function callGemini(prompt){
   const key=g('apiKey');
-  if(!key) throw new Error('Chưa có API key — vào tab Setup để nhập.');
+  if(!key) throw new Error('Chưa có API key — vào tab Brand Profile để nhập.');
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}]})
+    body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],
+      generationConfig:{temperature:0.9}})
   });
   const data=await res.json();
-  if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
+  if(data.error){
+    const msg=data.error.message||JSON.stringify(data.error);
+    if(msg.includes('quota')||data.error.code===429) throw new Error('QUOTA');
+    throw new Error(msg);
+  }
   return data.candidates?.[0]?.content?.parts?.[0]?.text||'';
 }
 
-// ── GEMINI IMAGE ──
-async function geminiImage(prompt, aspect){
+// ── POST TYPES BY MIX ──
+const POST_TYPES_MAP={
+  balanced:['Giới thiệu sản phẩm','Tip / kiến thức hữu ích','Behind the scenes','Câu chuyện khách hàng','Câu hỏi tương tác','Khuyến mãi / ưu đãi','Câu chuyện thương hiệu'],
+  edu:['Tip / kiến thức hữu ích','Giải thích khái niệm','Top 5 / danh sách','Myth vs Fact','FAQ','Case study','How-to hướng dẫn'],
+  sell:['Giới thiệu sản phẩm','Social proof / testimonial','Khuyến mãi / ưu đãi','FOMO / limited offer','Before & After','Objection handling','Direct CTA'],
+  story:['Câu chuyện cá nhân','Hành trình thương hiệu','Câu chuyện khách hàng','Bài học rút ra','Thất bại & bứt dậy','Khoảnh khắc đáng nhớ','Tại sao tôi làm điều này'],
+  engage:['Câu hỏi cho followers','This or That','Poll / khảo sát','Chia sẻ quan điểm','Tag một người','Thử thách / challenge','Ý kiến của bạn thế nào?'],
+};
+
+// ── GENERATE PLAN ──
+async function generatePlan(){
   const key=g('apiKey');
-  if(!key) throw new Error('Chưa có API key');
-  document.getElementById('wbox').style.display='none';
+  if(!key){alert('Vui lòng nhập Gemini API key ở tab Brand Profile!');go('brand');return}
+  const theme=g('theme');
+  if(!theme){alert('Nhập chủ đề / campaign trước!');return}
+
+  const writeCap=g('writeCap')==='yes';
+  const count=period==='week'?7:30;
+  const mix=g('contentMix');
+  const types=POST_TYPES_MAP[mix]||POST_TYPES_MAP.balanced;
+  const ctx=buildCtx();
+  const refCtx=buildRefCtx();
+  const campaignDesc=g('campaignDesc');
+  const freq=g('freq');
+
+  document.getElementById('genBtn').disabled=true;
+  document.getElementById('genBtn').textContent='Đang lên plan...';
+  document.getElementById('planProgress').style.display='block';
+  document.getElementById('planOut').innerHTML='';
   document.getElementById('ebox').style.display='none';
 
-  const parts=[];
-  refs.slice(0,4).forEach((img,i)=>{
-    parts.push({inlineData:{mimeType:img.mt,data:img.b64.split(',')[1]}});
-    parts.push({text:`Reference image ${i+1}: match this visual style, colors, mood.`});
-  });
-  parts.push({text:prompt});
+  // ── Step 1: Generate outline ──
+  setProgress(5,'Gemini đang lên outline...');
 
-  const body={
-    contents:[{role:'user',parts}],
-    generationConfig:{responseModalities:['TEXT','IMAGE'],imageConfig:{aspectRatio:aspect}}
-  };
+  const outlinePrompt=`Bạn là chuyên gia content marketing.
 
-  const models=['gemini-2.5-flash-image','gemini-3.1-flash-image-preview'];
-  let lastErr=null;
-  for(const model of models){
-    try{
-      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      const data=await res.json();
-      if(data.error){
-        const msg=data.error.message||'';
-        if(msg.includes('quota')||msg.includes('RESOURCE_EXHAUSTED')||data.error.code===429){
-          lastErr=new Error('QUOTA');continue;
-        }
-        throw new Error(`[${model}] ${msg}`);
-      }
-      const imgPart=data?.candidates?.[0]?.content?.parts?.find(p=>p.inlineData?.mimeType?.startsWith('image/'));
-      if(imgPart) return 'data:'+imgPart.inlineData.mimeType+';base64,'+imgPart.inlineData.data;
-      const tp=data?.candidates?.[0]?.content?.parts?.find(p=>p.text);
-      lastErr=new Error(`[${model}] Không trả về ảnh. ${tp?.text||''}`);
-    }catch(e){if(e.message==='QUOTA'){lastErr=e;continue}throw e}
-  }
-  if(lastErr?.message==='QUOTA'){
-    document.getElementById('wbox').style.display='block';
-    go('setup');
-    throw new Error('Hết quota. Cần bật billing — xem hướng dẫn ở tab Setup.');
-  }
-  throw lastErr||new Error('Không tạo được ảnh.');
-}
+THÔNG TIN THƯƠNG HIỆU:
+${ctx}
 
-// ── CREATE POST ──
-async function createPost(){
-  const topic=g('topic');
-  if(!topic){alert('Nhập chủ đề bài đăng trước!');return}
+Tạo content plan cho ${count} posts trong ${period==='week'?'1 tuần':'1 tháng'}.
+Campaign / chủ đề: ${theme}${campaignDesc?'\nMô tả thêm: '+campaignDesc:''}
+Loại nội dung: ${mix}
+Tần suất: ${freq==='1'?'1 post/ngày':freq==='2'?'2 posts/ngày':freq==='alt'?'cách ngày':'3 posts/tuần'}
 
-  const postType=g('postType'), capLang=g('capLang');
-  const btn=document.getElementById('createBtn');
-  btn.disabled=true;btn.textContent='Đang tạo...';
-  document.getElementById('createOut').style.display='block';
-  document.getElementById('editCard').style.display='none';
-  document.getElementById('imgDlBtn').style.display='none';
+Trả về JSON array với đúng ${count} objects, mỗi object có:
+- day: "Ngày X" hoặc tên ngày (T.Hai, T.Ba... cho tuần; Ngày 1, Ngày 2... cho tháng)
+- type: loại bài (chọn từ các loại phù hợp với campaign)
+- angle: góc nhìn / hướng tiếp cận cụ thể
+- hook_idea: ý tưởng câu hook mở đầu (1 câu)
+- key_message: thông điệp chính muốn truyền tải
 
-  // Reset caption
-  const capEl=document.getElementById('captionOut');
-  capEl.textContent='Gemini đang viết caption...';
-  capEl.classList.add('placeholder');
-  document.getElementById('capDot').className='dot dl';
-  document.getElementById('capSt').textContent='Đang viết caption...';
+Chỉ trả về JSON array, không giải thích thêm.`;
 
-  // Reset image
-  document.getElementById('imgWrap').innerHTML='<div class="iph"><div class="spin"></div><span>Chờ caption xong...</span></div>';
-  document.getElementById('imgDot').className='dot di';
-  document.getElementById('imgSt').textContent='Chờ caption...';
-  curImg='';
-
-  // ── Step 1: Write caption ──
-  const captionPrompt=`Bạn là chuyên gia viết content social media cho thương hiệu.
-
-${brandCtx()}
-
-Viết caption cho bài đăng trên ${g('bp')||'Instagram'} với:
-- Loại nội dung: ${postType}
-- Chủ đề / ý tưởng: ${topic}
-- Ngôn ngữ: ${capLang}
-- Tone: ${g('bv')||'Gần gũi, thân thiện'}
-
-Yêu cầu:
-- Có hook hấp dẫn ở đầu
-- Có emoji phù hợp
-- Có call-to-action cuối
-- Có hashtag (5-10 hashtag)
-- Độ dài phù hợp với platform
-
-Chỉ trả về caption, không giải thích thêm.`;
-
-  let caption='';
+  let outline=[];
   try{
-    caption=await geminiText(captionPrompt);
-    capEl.textContent=caption;
-    capEl.classList.remove('placeholder');
-    document.getElementById('capDot').className='dot dd';
-    document.getElementById('capSt').textContent='✓ Caption xong';
-    document.getElementById('editCaption').value=caption;
-    document.getElementById('editCard').style.display='block';
+    const raw=await callGemini(outlinePrompt);
+    const clean=raw.replace(/```json|```/g,'').trim();
+    outline=JSON.parse(clean);
   }catch(err){
-    capEl.textContent='❌ Lỗi viết caption: '+err.message;
-    capEl.classList.remove('placeholder');
-    document.getElementById('capDot').className='dot de';
-    document.getElementById('capSt').textContent=err.message;
-    btn.disabled=false;btn.textContent='✦ Gemini viết caption + tạo ảnh';
+    if(err.message==='QUOTA'){showQuotaErr();return}
+    // fallback: tự tạo outline
+    for(let i=0;i<count;i++){
+      const t=types[i%types.length];
+      outline.push({day:period==='week'?['T.Hai','T.Ba','T.Tư','T.Năm','T.Sáu','T.Bảy','C.Nhật'][i%7]:`Ngày ${i+1}`,type:t,angle:'',hook_idea:'',key_message:''});
+    }
+  }
+
+  // ── Render cards (no caption yet) ──
+  renderPlanCards(outline,writeCap);
+  setProgress(15,'Outline xong! '+(writeCap?'Đang viết caption...':''));
+
+  if(!writeCap){
+    setProgress(100,'Outline hoàn tất!');
+    setTimeout(()=>document.getElementById('planProgress').style.display='none',1500);
+    document.getElementById('genBtn').disabled=false;
+    document.getElementById('genBtn').textContent='✦ Gemini lên Content Plan';
     return;
   }
 
-  // ── Step 2: Generate image ──
-  document.getElementById('imgWrap').innerHTML='<div class="iph"><div class="spin"></div><span>Gemini đang tạo ảnh...</span></div>';
-  document.getElementById('imgDot').className='dot dl';
-  document.getElementById('imgSt').textContent='Đang tạo ảnh...';
+  // ── Step 2: Write captions sequentially ──
+  for(let i=0;i<outline.length;i++){
+    const post=outline[i];
+    const pct=15+Math.round((i/outline.length)*82);
+    setProgress(pct,`Đang viết caption ${i+1}/${outline.length}: ${post.day}...`);
+    setPostStatus(i,'load');
+    setCaptionLoading(i);
 
-  const stripped=caption.replace(/#\w+/g,'').replace(/\n/g,' ').replace(/[^\x00-\x7F]/g,' ').trim().slice(0,200);
-  const imagePrompt=`Generate a social media image for this post.
-Visual concept from caption: "${stripped}"
-Topic: ${topic}
-Brand: ${g('bn')||'brand'}, ${g('bi')||''}
-${imgPromptExtra()}`;
+    const capPrompt=`Bạn là chuyên gia viết content social media.
 
-  try{
-    const dataUrl=await geminiImage(imagePrompt, sAsp);
-    curImg=dataUrl;
-    document.getElementById('imgWrap').innerHTML='';
-    const img=document.createElement('img');img.className='ir';img.src=dataUrl;img.alt='Generated';
-    document.getElementById('imgWrap').appendChild(img);
-    document.getElementById('imgDlBtn').style.display='inline-block';
-    document.getElementById('imgDot').className='dot dd';
-    document.getElementById('imgSt').textContent='✓ Ảnh xong! Đã lưu vào lịch sử.';
-    addH(caption,dataUrl);
-  }catch(err){
-    document.getElementById('imgWrap').innerHTML=`<div class="iph">❌ ${err.message}</div>`;
-    document.getElementById('imgDot').className='dot de';
-    document.getElementById('imgSt').textContent=err.message;
+THÔNG TIN THƯƠNG HIỆU:
+${ctx}${refCtx}
+
+Viết 1 caption hoàn chỉnh cho bài đăng sau:
+- Ngày: ${post.day}
+- Loại bài: ${post.type}
+- Góc nhìn: ${post.angle||'phù hợp với loại bài'}
+- Ý tưởng hook: ${post.hook_idea||'tự chọn hook phù hợp'}
+- Thông điệp chính: ${post.key_message||theme}
+- Campaign: ${theme}${campaignDesc?'\n- Bối cảnh: '+campaignDesc:''}
+
+Yêu cầu:
+- Viết đúng tone và style của thương hiệu như các caption mẫu
+- Đúng cấu trúc đã chọn
+- Đúng độ dài
+- Có emoji phù hợp
+- Kết thúc bằng CTA phù hợp
+- Có hashtag theo yêu cầu
+
+Chỉ trả về caption, không giải thích.`;
+
+    try{
+      const cap=await callGemini(capPrompt);
+      setCaptionDone(i,cap,post);
+      setPostStatus(i,'done');
+    }catch(err){
+      if(err.message==='QUOTA'){showQuotaErr();break}
+      setCaptionErr(i,'Lỗi: '+err.message);
+      setPostStatus(i,'err');
+    }
   }
 
-  btn.disabled=false;btn.textContent='✦ Tạo lại';
+  setProgress(100,'Hoàn tất! 🎉');
+  setTimeout(()=>document.getElementById('planProgress').style.display='none',2000);
+  document.getElementById('genBtn').disabled=false;
+  document.getElementById('genBtn').textContent='✦ Tạo lại Plan';
 }
 
-async function regenImage(){
-  const cap=g('editCaption');
-  if(!cap)return;
-  document.getElementById('imgWrap').innerHTML='<div class="iph"><div class="spin"></div><span>Đang tạo lại ảnh...</span></div>';
-  document.getElementById('imgDot').className='dot dl';
-  document.getElementById('imgSt').textContent='Đang tạo lại...';
-  document.getElementById('imgDlBtn').style.display='none';
-  document.getElementById('captionOut').textContent=cap;
-  const stripped=cap.replace(/#\w+/g,'').replace(/\n/g,' ').replace(/[^\x00-\x7F]/g,' ').trim().slice(0,200);
-  const imagePrompt=`Generate a social media image. Visual concept: "${stripped}". Brand: ${g('bn')||'brand'}. ${imgPromptExtra()}`;
-  try{
-    const dataUrl=await geminiImage(imagePrompt,sAsp);
-    curImg=dataUrl;
-    document.getElementById('imgWrap').innerHTML='';
-    const img=document.createElement('img');img.className='ir';img.src=dataUrl;
-    document.getElementById('imgWrap').appendChild(img);
-    document.getElementById('imgDlBtn').style.display='inline-block';
-    document.getElementById('imgDot').className='dot dd';
-    document.getElementById('imgSt').textContent='✓ Xong!';
-    addH(cap,dataUrl);
-  }catch(err){
-    document.getElementById('imgWrap').innerHTML=`<div class="iph">❌ ${err.message}</div>`;
-    document.getElementById('imgDot').className='dot de';
-    document.getElementById('imgSt').textContent=err.message;
-  }
+function setProgress(pct,txt){
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressTxt').textContent=txt;
 }
 
-function dlCur(){if(curImg){const a=document.createElement('a');a.href=curImg;a.download='post-'+Date.now()+'.png';document.body.appendChild(a);a.click();document.body.removeChild(a)}}
+function showQuotaErr(){
+  document.getElementById('genBtn').disabled=false;
+  document.getElementById('genBtn').textContent='✦ Gemini lên Content Plan';
+  document.getElementById('planProgress').style.display='none';
+  const eb=document.getElementById('ebox');
+  eb.style.display='block';
+  eb.textContent='⚠️ Hết quota Gemini. Vào tab Brand Profile → kiểm tra API key, hoặc bật billing tại console.cloud.google.com/billing rồi tạo API key mới.';
+}
 
-// ── PLAN ──
-function mkPlan(){
-  const theme=g('wt');if(!theme){alert('Nhập chủ đề tuần trước!');return}
-  const count=parseInt(g('pc'));
-  plan={};selDay=null;
-  DAYS.forEach((day,i)=>{
-    if(i<count) plan[day]={day,type:TYPES[i%TYPES.length],angle:ANGLES[i%ANGLES.length],cap:'',img:null,st:'idle'};
-    else plan[day]={st:'skip'};
+// ── RENDER CARDS ──
+function renderPlanCards(outline,writeCap){
+  const out=document.getElementById('planOut');
+  out.innerHTML=`<div class="plan-grid" id="planGrid"></div>`;
+  const grid=document.getElementById('planGrid');
+  outline.forEach((post,i)=>{
+    const card=document.createElement('div');
+    card.className='post-card';card.id='post-'+i;
+    card.innerHTML=`
+      <div class="post-hd" onclick="toggleCard(${i})">
+        <div class="post-hd-left">
+          <span class="post-day">${post.day}</span>
+          <span class="post-type">${post.type}${post.angle?' · <span style="color:var(--tx3)">'+ post.angle+'</span>':''}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${writeCap?'<span class="post-status ps-idle" id="status-'+i+'"></span>':'<span style="font-size:11px;color:var(--tx3)">▾</span>'}
+        </div>
+      </div>
+      <div class="post-body" id="body-${i}">
+        <div class="post-meta">
+          ${post.type?`<span class="meta-pill">${post.type}</span>`:''}
+          ${post.hook_idea?`<span class="meta-pill" style="color:var(--tx2)">Hook: ${post.hook_idea}</span>`:''}
+        </div>
+        ${writeCap?`
+          <div class="caption-box loading" id="cap-${i}">Đang viết caption...</div>
+          <div class="caption-edit" id="edit-${i}"></div>
+          <div class="post-actions" id="actions-${i}" style="display:none">
+            <button class="btng" onclick="copyCaption(${i})">Copy caption</button>
+            <button class="btng" onclick="editCaption(${i})">Chỉnh sửa</button>
+            <button class="btns" style="font-size:11px;padding:3px 10px" onclick="saveCaption(${i})">Lưu lại</button>
+            <button class="btng" onclick="regenCaption(${i})">↻ Viết lại</button>
+          </div>
+        `:`
+          <div style="font-size:12px;color:var(--tx3);margin-top:10px">
+            Key message: ${post.key_message||'—'}<br>
+            Hook idea: ${post.hook_idea||'—'}
+          </div>
+          <div class="post-actions" style="margin-top:10px">
+            <button class="btns" style="font-size:12px" onclick="writeOneCap(${i})">✦ Viết caption bài này</button>
+          </div>
+          <div class="caption-box" id="cap-${i}" style="display:none"></div>
+          <div class="caption-edit" id="edit-${i}"></div>
+          <div class="post-actions" id="actions-${i}" style="display:none">
+            <button class="btng" onclick="copyCaption(${i})">Copy caption</button>
+            <button class="btng" onclick="editCaption(${i})">Chỉnh sửa</button>
+            <button class="btns" style="font-size:11px;padding:3px 10px" onclick="saveCaption(${i})">Lưu lại</button>
+            <button class="btng" onclick="regenCaption(${i})">↻ Viết lại</button>
+          </div>
+        `}
+      </div>`;
+    grid.appendChild(card);
+    // auto open first 3
+    if(i<3) document.getElementById('body-'+i).classList.add('open');
   });
-  renderPlan();
-  document.getElementById('po').style.display='block';
-  document.getElementById('de').style.display='none';
+
+  // store outline globally
+  window._outline=outline;
 }
 
-function renderPlan(){
-  const wg=document.getElementById('wg');wg.innerHTML='';
-  DAYS.forEach(day=>{
-    const d=plan[day]||{st:'skip'};
-    const t=document.createElement('div');
-    const dotCls=d.st==='done'?'dd':d.st==='load'?'dl':'di';
-    t.className='dt'+(d.st==='skip'?' skip':'')+(selDay===day?' sel':'')+(d.st==='done'?' done':'');
-    t.innerHTML=`<div class="dn">${day}</div><div class="dtp">${d.type||'—'}</div>${d.img?`<img class="dth" src="${d.img}" alt="">`:''}
-      <div><span class="ddot dot ${dotCls}"></span></div>`;
-    if(d.st!=='skip') t.onclick=()=>selD(day);
-    wg.appendChild(t);
-  });
+function toggleCard(i){
+  const body=document.getElementById('body-'+i);
+  body.classList.toggle('open');
 }
 
-function selD(day){
-  selDay=day;const d=plan[day];
-  document.getElementById('eday').textContent=day;
-  document.getElementById('etype').textContent=d.type||'';
-  document.getElementById('ecp').value=d.cap||'';
-  const w=document.getElementById('diw');w.innerHTML='';
-  if(d.img){const img=document.createElement('img');img.className='ir';img.src=d.img;w.appendChild(img)}
-  else{const ph=document.createElement('div');ph.className='iph';ph.style.cssText='aspect-ratio:auto;min-height:80px';ph.textContent='Nhấn "Tạo caption + ảnh" để Gemini xử lý';w.appendChild(ph)}
-  document.getElementById('dsb').style.display='flex';
-  document.getElementById('dd').className='dot '+(d.st==='done'?'dd':'di');
-  document.getElementById('dst').textContent=d.st==='done'?'✓ Đã có caption & ảnh':'Chưa tạo';
-  document.getElementById('de').style.display='block';
-  renderPlan();
+function setPostStatus(i,st){
+  const el=document.getElementById('status-'+i);
+  if(!el)return;
+  el.className='post-status ps-'+st;
 }
 
-async function gDay(){
-  if(!selDay)return;
-  const d=plan[selDay];
-  const theme=g('wt'), lang=g('pl'), asp=g('pa');
-  document.getElementById('gdb').disabled=true;document.getElementById('gdb').textContent='Đang tạo...';
-  d.st='load';renderPlan();
-  document.getElementById('dd').className='dot dl';
-  document.getElementById('dst').textContent='Gemini đang viết caption...';
-  const w=document.getElementById('diw');
-  w.innerHTML='<div class="iph" style="min-height:80px"><div class="spin"></div><span>Đang viết caption...</span></div>';
+function setCaptionLoading(i){
+  const el=document.getElementById('cap-'+i);
+  if(!el)return;
+  el.style.display='';
+  el.className='caption-box loading';
+  el.innerHTML='<span class="spin"></span> Đang viết...';
+}
 
-  // Caption
-  const capPrompt=`${brandCtx()}
-Viết caption ${lang} cho ${g('bp')||'Instagram'} về chủ đề: "${theme}".
-Loại bài: ${d.type}. Góc nhìn: ${d.angle}. Tone: ${g('bv')||'Gần gũi'}.
-Có hook, emoji, CTA, hashtag. Chỉ trả về caption.`;
+function setCaptionDone(i,cap,post){
+  const el=document.getElementById('cap-'+i);
+  if(!el)return;
+  el.className='caption-box';
+  el.textContent=cap;
+  el.dataset.cap=cap;
+  el.dataset.post=JSON.stringify(post||{});
+  const actions=document.getElementById('actions-'+i);
+  if(actions)actions.style.display='flex';
+}
 
-  let cap='';
+function setCaptionErr(i,msg){
+  const el=document.getElementById('cap-'+i);
+  if(!el)return;
+  el.className='caption-box';
+  el.style.color='var(--red)';
+  el.textContent=msg;
+}
+
+// Write single caption
+async function writeOneCap(i){
+  const post=window._outline?.[i];
+  if(!post)return;
+  const ctx=buildCtx(),refCtx=buildRefCtx(),theme=g('theme'),cd=g('campaignDesc');
+  document.getElementById('cap-'+i).style.display='';
+  setCaptionLoading(i);
+  const prompt=`Bạn là chuyên gia viết content.
+THÔNG TIN THƯƠNG HIỆU:\n${ctx}${refCtx}
+Viết caption cho: ${post.day} — ${post.type}${post.angle?' ('+post.angle+')':''}
+Key message: ${post.key_message||theme}
+Hook: ${post.hook_idea||'tự chọn'}
+Campaign: ${theme}${cd?'\nBối cảnh: '+cd:''}
+Đúng tone, style, độ dài, cấu trúc. Chỉ trả về caption.`;
   try{
-    cap=await geminiText(capPrompt);
-    d.cap=cap;
-    document.getElementById('ecp').value=cap;
-    document.getElementById('dst').textContent='✓ Caption xong — đang tạo ảnh...';
-    w.innerHTML='<div class="iph" style="min-height:80px"><div class="spin"></div><span>Đang tạo ảnh...</span></div>';
+    const cap=await callGemini(prompt);
+    setCaptionDone(i,cap,post);
   }catch(err){
-    d.st='idle';
-    w.innerHTML=`<div class="iph" style="min-height:80px">❌ Lỗi caption: ${err.message}</div>`;
-    document.getElementById('dd').className='dot de';document.getElementById('dst').textContent=err.message;
-    document.getElementById('gdb').disabled=false;document.getElementById('gdb').textContent='Tạo caption + ảnh';
-    renderPlan();return;
+    setCaptionErr(i,'Lỗi: '+err.message);
   }
+}
 
-  // Image
-  const stripped=cap.replace(/#\w+/g,'').replace(/\n/g,' ').replace(/[^\x00-\x7F]/g,' ').trim().slice(0,200);
-  const imgPr=`Generate a ${g('bp')||'Instagram'} social media image. Visual concept: "${stripped}". Theme: ${theme}. ${imgPromptExtra()}`;
+async function regenCaption(i){
+  const post=window._outline?.[i];
+  if(!post)return;
+  setPostStatus(i,'load');
+  setCaptionLoading(i);
+  const actions=document.getElementById('actions-'+i);
+  if(actions)actions.style.display='none';
+  const ctx=buildCtx(),refCtx=buildRefCtx(),theme=g('theme'),cd=g('campaignDesc');
+  const prompt=`Viết lại caption MỚI HOÀN TOÀN (khác biệt với lần trước) cho:
+THƯƠNG HIỆU:\n${ctx}${refCtx}
+Bài: ${post.day} — ${post.type}${post.angle?' ('+post.angle+')':''}
+Key message: ${post.key_message||theme}. Campaign: ${theme}${cd?'\n'+cd:''}
+Chỉ trả về caption.`;
   try{
-    const url=await geminiImage(imgPr,asp);
-    d.img=url;d.st='done';
-    w.innerHTML='';const img=document.createElement('img');img.className='ir';img.src=url;w.appendChild(img);
-    document.getElementById('dd').className='dot dd';document.getElementById('dst').textContent='✓ Xong!';
-    addH(cap,url);renderPlan();
+    const cap=await callGemini(prompt);
+    setCaptionDone(i,cap,post);
+    setPostStatus(i,'done');
   }catch(err){
-    d.st='idle';
-    w.innerHTML=`<div class="iph" style="min-height:80px">Caption ✓ — Lỗi ảnh: ${err.message}</div>`;
-    document.getElementById('dd').className='dot de';document.getElementById('dst').textContent=err.message;
-    renderPlan();
+    setCaptionErr(i,'Lỗi: '+err.message);
+    setPostStatus(i,'err');
   }
-  document.getElementById('gdb').disabled=false;document.getElementById('gdb').textContent='Tạo caption + ảnh';
 }
 
-// ── HISTORY ──
-function addH(cap,imgData){
-  hist.unshift({id:Date.now(),date:new Date().toLocaleString('vi-VN'),cap,imgData});
-  if(hist.length>40)hist=hist.slice(0,40);
-  localStorage.setItem('cs9h',JSON.stringify(hist));uhc();
+function editCaption(i){
+  const capEl=document.getElementById('cap-'+i);
+  const editEl=document.getElementById('edit-'+i);
+  if(editEl.style.display==='block'){
+    // save edit
+    capEl.textContent=editEl.value;
+    capEl.dataset.cap=editEl.value;
+    editEl.style.display='none';
+    capEl.style.display='';
+  }else{
+    editEl.value=capEl.textContent;
+    editEl.style.display='block';
+    capEl.style.display='none';
+    editEl.focus();
+  }
 }
-function uhc(){document.getElementById('hc').textContent=hist.length?`(${hist.length})`:''}
 
-function renderH(){
-  const l=document.getElementById('hl');
-  document.getElementById('hs').textContent=`${hist.length} kết quả đã lưu`;
-  if(!hist.length){l.innerHTML=`<div class="empty"><div class="big">🖼️</div>Chưa có ảnh nào.<br>Tạo post ở tab "Tạo Post" hoặc "Lịch tuần".</div>`;return}
+function copyCaption(i){
+  const el=document.getElementById('cap-'+i);
+  const txt=el.dataset.cap||el.textContent;
+  navigator.clipboard.writeText(txt);
+  event.target.textContent='✓ Đã copy!';
+  setTimeout(()=>event.target.textContent='Copy caption',1500);
+}
+
+function saveCaption(i){
+  const el=document.getElementById('cap-'+i);
+  const cap=el.dataset.cap||el.textContent;
+  const post=window._outline?.[i]||{};
+  saved.unshift({id:Date.now(),date:new Date().toLocaleString('vi-VN'),day:post.day||`Post ${i+1}`,type:post.type||'',cap});
+  if(saved.length>100)saved=saved.slice(0,100);
+  localStorage.setItem('cp1_saved',JSON.stringify(saved));
+  uhc();
+  event.target.textContent='✓ Đã lưu!';
+  setTimeout(()=>event.target.textContent='Lưu lại',1500);
+}
+
+// ── SAVED ──
+function uhc(){document.getElementById('hc').textContent=saved.length?`(${saved.length})`:''}
+function renderSaved(){
+  const l=document.getElementById('savedList');
+  document.getElementById('savedCount').textContent=`${saved.length} caption đã lưu`;
+  if(!saved.length){l.innerHTML='<div class="empty"><div class="big">📋</div>Chưa có caption nào được lưu.<br>Tạo plan rồi nhấn "Lưu lại" trên từng caption.</div>';return}
   l.innerHTML='';
-  hist.forEach((item,i)=>{
-    const el=document.createElement('div');el.className='hi';
-    el.innerHTML=`<div class="hr2">
-      ${item.imgData?`<img class="hth" src="${item.imgData}" alt="">`:`<div class="hph">🖼️</div>`}
-      <div style="flex:1;min-width:0">
-        <div class="hcap">${(item.cap||'').replace(/\n/g,' ').slice(0,120)}</div>
-        <div class="hdt">${item.date}</div>
+  saved.forEach((item,i)=>{
+    const el=document.createElement('div');el.className='hist-item';
+    el.innerHTML=`<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="meta-pill" style="background:var(--ad);color:var(--ac)">${item.day}</span>
+        ${item.type?`<span class="meta-pill">${item.type}</span>`:''}
       </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
-        ${item.imgData?`<button class="btng" onclick="dlH(${i})">⬇</button>`:''}
-        <button class="btnd" onclick="rmH(${i})">Xóa</button>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        <button class="btng" onclick="copySaved(${i})">Copy</button>
+        <button class="btnd" onclick="rmSaved(${i})">Xóa</button>
       </div>
-    </div>`;
+    </div>
+    <div class="hist-cap">${item.cap}</div>
+    <div class="hist-meta"><span class="hist-date">${item.date}</span></div>`;
     l.appendChild(el);
   });
 }
-function dlH(i){const it=hist[i];if(!it?.imgData)return;const a=document.createElement('a');a.href=it.imgData;a.download='post-'+it.id+'.png';document.body.appendChild(a);a.click();document.body.removeChild(a)}
-function rmH(i){if(confirm('Xóa?')){hist.splice(i,1);localStorage.setItem('cs9h',JSON.stringify(hist));uhc();renderH()}}
-function clrAll(){if(confirm('Xóa tất cả?')){hist=[];localStorage.removeItem('cs9h');uhc();renderH()}}
-function cpEl(id){navigator.clipboard.writeText(document.getElementById(id).textContent);event.target.textContent='✓';setTimeout(()=>event.target.textContent='Copy',1500)}
+function copySaved(i){navigator.clipboard.writeText(saved[i].cap);event.target.textContent='✓';setTimeout(()=>event.target.textContent='Copy',1500)}
+function rmSaved(i){if(confirm('Xóa caption này?')){saved.splice(i,1);localStorage.setItem('cp1_saved',JSON.stringify(saved));uhc();renderSaved()}}
+function clearSaved(){if(confirm('Xóa tất cả caption đã lưu?')){saved=[];localStorage.removeItem('cp1_saved');uhc();renderSaved()}}
 
-initGrids();ld();
+// ── BOOT ──
+initTagInput('wordInput','wordsUsed',wordsUsed,'wordsUsed');
+initTagInput('hashInput','fixedTags',fixedTags,'fixedTags');
+initTagInput('pillarInput','pillarsRow',pillars,'pillarsRow');
+ld();
 </script>
 </body>
 </html>
