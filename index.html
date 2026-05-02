@@ -18,24 +18,26 @@
 html,body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh}
 body{padding:28px 24px 80px;max-width:780px;margin:0 auto}
 
-/* HEADER */
 .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
 .logo{display:flex;align-items:center;gap:10px}
 .lm{width:34px;height:34px;background:var(--ac);border-radius:9px;display:grid;place-items:center;flex-shrink:0}
 .lm svg{width:18px;height:18px}
 .ln{font-family:'Instrument Serif',serif;font-size:19px;letter-spacing:-.3px}
 .ln em{color:var(--ac);font-style:normal}
-.sp{padding:4px 10px;background:rgba(200,240,96,.13);color:var(--ac);border-radius:20px;font-size:11px;opacity:0;transition:opacity .3s;pointer-events:none}
-.sp.on{opacity:1}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.sync-status{display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:20px;font-size:11px;color:var(--tx3);cursor:pointer;transition:all .2s}
+.sync-status:hover{border-color:var(--bd2);color:var(--tx2)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--tx3);flex-shrink:0;transition:background .3s}
+.sync-dot.ok{background:#6fdf7f}
+.sync-dot.err{background:var(--red)}
+.sync-dot.syncing{background:var(--gold);animation:pu 1s infinite}
 
-/* NAV */
 .nav{display:flex;gap:2px;background:var(--s1);border:1px solid var(--bd);border-radius:13px;padding:4px;margin-bottom:26px}
 .nb{flex:1;padding:8px 6px;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--tx2);cursor:pointer;border-radius:9px;transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
 .nb:hover{color:var(--tx);background:var(--s2)}
 .nb.on{background:var(--s3);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .tab{display:none}.tab.on{display:block}
 
-/* LABELS & CARDS */
 .lbl{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;margin-top:22px}
 .lbl.t0{margin-top:0}
 .sub{font-size:12px;color:var(--tx3);margin-bottom:12px;line-height:1.6}
@@ -44,7 +46,7 @@ body{padding:28px 24px 80px;max-width:780px;margin:0 auto}
 .r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 .f{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
 .f:last-child,.f.mb0{margin-bottom:0}
-.f>label{font-size:11px;color:var(--tx2);font-weight:400}
+.f>label{font-size:11px;color:var(--tx2)}
 input,select,textarea{width:100%;padding:9px 12px;font-size:13px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);color:var(--tx);font-family:'DM Sans',sans-serif;transition:border-color .2s;outline:none}
 input::placeholder,textarea::placeholder{color:var(--tx3)}
 input:focus,select:focus,textarea:focus{border-color:rgba(200,240,96,.4)}
@@ -54,27 +56,25 @@ select option{background:var(--s2)}
 .hint{font-size:11px;color:var(--tx3);margin-top:4px;line-height:1.55}
 .hint a{color:var(--ac);text-decoration:none}
 
-/* BOXES */
 .ibox{background:var(--ad2);border:1px solid rgba(200,240,96,.15);border-radius:var(--rs);padding:12px 14px;font-size:12px;color:var(--tx2);line-height:1.75;margin-bottom:14px}
 .ibox strong{color:var(--ac)}.ibox a{color:var(--ac);text-decoration:none}
+.wbox{background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--rs);padding:11px 14px;font-size:12px;color:var(--gold);line-height:1.7;margin-bottom:12px}
+.wbox a{color:var(--gold);text-decoration:underline}
 .ebox{background:var(--rd);border:1px solid rgba(255,95,87,.2);border-radius:var(--rs);padding:11px 14px;font-size:12px;color:var(--red);line-height:1.7;margin-bottom:12px;display:none}
 
-/* TAGS */
-.trow{display:flex;gap:5px;flex-wrap:wrap;align-items:center;min-height:36px;padding:4px 0;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:6px 10px}
+.trow{display:flex;gap:5px;flex-wrap:wrap;align-items:center;min-height:36px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:6px 10px}
 .tag{padding:3px 9px;font-size:11px;background:var(--s3);border:1px solid var(--bd2);border-radius:20px;display:flex;align-items:center;gap:4px;color:var(--tx2)}
 .tag button{background:none;border:none;cursor:pointer;font-size:12px;color:var(--tx3);padding:0;line-height:1}
 .tag button:hover{color:var(--red)}
 .ti{font-size:12px;border:none;background:transparent;outline:none;color:var(--tx);min-width:80px;font-family:'DM Sans',sans-serif;padding:2px 0;flex:1}
 .ti::placeholder{color:var(--tx3)}
 
-/* TONE PILLS */
 .pill-row{display:flex;gap:6px;flex-wrap:wrap}
 .pill{padding:6px 13px;font-size:12px;border:1px solid var(--bd2);border-radius:20px;cursor:pointer;background:transparent;color:var(--tx2);transition:all .15s;font-family:'DM Sans',sans-serif}
-.pill:hover{border-color:var(--bd2);color:var(--tx)}
+.pill:hover{color:var(--tx)}
 .pill.on{background:var(--ad);color:var(--ac);border-color:rgba(200,240,96,.35)}
 
-/* BUTTONS */
-.btnp{width:100%;padding:12px;font-size:14px;font-weight:500;border-radius:var(--rs);border:none;background:var(--ac);color:#0e0e11;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;margin-bottom:0}
+.btnp{width:100%;padding:12px;font-size:14px;font-weight:500;border-radius:var(--rs);border:none;background:var(--ac);color:#0e0e11;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
 .btnp:hover:not(:disabled){background:var(--ac2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(200,240,96,.2)}
 .btnp:disabled{opacity:.4;cursor:not-allowed}
 .btns{padding:7px 14px;font-size:13px;border-radius:var(--rs);border:1px solid var(--bd2);background:transparent;color:var(--tx2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
@@ -84,53 +84,53 @@ select option{background:var(--s2)}
 .btng:hover{color:var(--tx);border-color:var(--bd2)}
 .btnd{font-size:11px;padding:3px 9px;border:1px solid rgba(255,95,87,.25);border-radius:6px;cursor:pointer;background:transparent;color:var(--red);font-family:'DM Sans',sans-serif}
 .btnd:hover{background:var(--rd)}
-.btn-row{display:flex;gap:8px;margin-top:12px}
-.btn-row .btnp{margin-bottom:0}
 
-/* PLAN OUTPUT */
-.plan-grid{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+/* PLAN */
+.plan-grid{display:flex;flex-direction:column;gap:8px;margin-top:14px}
 .post-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:border-color .2s}
 .post-card:hover{border-color:var(--bd2)}
 .post-hd{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
-.post-hd-left{display:flex;align-items:center;gap:10px}
-.post-day{padding:3px 9px;font-size:11px;font-weight:500;border-radius:6px;background:var(--ad);color:var(--ac)}
-.post-type{font-size:12px;color:var(--tx2)}
-.post-status{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.ps-idle{background:var(--tx3)}
-.ps-load{background:var(--gold);animation:pu 1s infinite}
-.ps-done{background:#6fdf7f}
-.ps-err{background:var(--red)}
+.post-hd-l{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.post-day{padding:3px 9px;font-size:11px;font-weight:500;border-radius:6px;background:var(--ad);color:var(--ac);flex-shrink:0}
+.post-type{font-size:12px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.psdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ps-idle{background:var(--tx3)}.ps-load{background:var(--gold);animation:pu 1s infinite}.ps-done{background:#6fdf7f}.ps-err{background:var(--red)}
 @keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
 .post-body{padding:0 16px 16px;display:none;border-top:1px solid var(--bd)}
 .post-body.open{display:block}
-.caption-box{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:14px;font-size:13px;line-height:1.8;color:var(--tx);white-space:pre-wrap;margin-top:12px;min-height:60px}
-.caption-box.loading{color:var(--tx3);font-style:italic}
-.caption-edit{width:100%;padding:12px;font-size:13px;line-height:1.8;background:var(--s2);border:1px solid rgba(200,240,96,.3);border-radius:var(--rs);color:var(--tx);font-family:'DM Sans',sans-serif;resize:vertical;outline:none;margin-top:12px;display:none}
-.post-meta{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
-.meta-pill{padding:2px 8px;font-size:10px;background:var(--s3);border-radius:4px;color:var(--tx3)}
-.post-actions{display:flex;gap:6px;margin-top:10px}
+.cap-box{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:14px;font-size:13px;line-height:1.8;color:var(--tx);white-space:pre-wrap;margin-top:12px;min-height:60px}
+.cap-box.dim{color:var(--tx3);font-style:italic;display:flex;align-items:center;gap:8px}
+.cap-edit{width:100%;padding:12px;font-size:13px;line-height:1.8;background:var(--s2);border:1px solid rgba(200,240,96,.3);border-radius:var(--rs);color:var(--tx);font-family:'DM Sans',sans-serif;resize:vertical;outline:none;margin-top:12px;display:none}
+.meta-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.mpill{padding:2px 8px;font-size:10px;background:var(--s3);border-radius:4px;color:var(--tx3)}
+.post-acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 
-/* LOADING SPINNER */
-.spin{width:16px;height:16px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
+.spin{width:15px;height:15px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* WEEK/MONTH TABS */
-.period-tabs{display:flex;gap:2px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:3px;margin-bottom:16px;width:fit-content}
-.ptab{padding:6px 16px;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--tx2);cursor:pointer;border-radius:7px;transition:all .2s;font-family:'DM Sans',sans-serif}
-.ptab.on{background:var(--s3);color:var(--tx)}
+.progress-bar{height:3px;background:var(--s3);border-radius:2px;margin:10px 0;overflow:hidden}
+.progress-fill{height:100%;background:var(--ac);border-radius:2px;transition:width .4s}
 
-/* HISTORY */
-.hist-item{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;transition:border-color .2s}
-.hist-item:hover{border-color:var(--bd2)}
-.hist-cap{font-size:13px;color:var(--tx);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
-.hist-meta{display:flex;align-items:center;gap:8px;margin-top:8px}
-.hist-date{font-size:11px;color:var(--tx3)}
-.empty{text-align:center;padding:52px 20px;color:var(--tx3);font-size:13px;line-height:2.2}
-.empty .big{font-size:36px;margin-bottom:6px}
+/* SAVED */
+.si{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:8px}
+.si:hover{border-color:var(--bd2)}
+.si-cap{font-size:13px;color:var(--tx);line-height:1.7;margin-top:8px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;white-space:pre-wrap}
+.empty{text-align:center;padding:48px 20px;color:var(--tx3);font-size:13px;line-height:2.2}
+.empty .big{font-size:32px;margin-bottom:6px}
 
-/* PROGRESS */
-.progress-bar{height:3px;background:var(--s3);border-radius:2px;margin:12px 0;overflow:hidden}
-.progress-fill{height:100%;background:var(--ac);border-radius:2px;transition:width .3s}
+/* SYNC MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;display:none}
+.modal-bg.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:var(--r);padding:24px;width:100%;max-width:480px;margin:16px}
+.modal h3{font-family:'Instrument Serif',serif;font-size:17px;margin-bottom:6px;color:var(--tx)}
+.modal p{font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:16px}
+.modal-acts{display:flex;gap:8px;margin-top:16px}
+.modal-acts .btnp{margin-bottom:0}
+.close-modal{position:absolute;top:0;right:0;width:32px;height:32px;display:grid;place-items:center;cursor:pointer;color:var(--tx3);font-size:18px}
+
+.period-row{display:flex;gap:6px;margin-bottom:14px}
+.period-pill{padding:7px 18px;font-size:12px;font-weight:500;border:1px solid var(--bd2);border-radius:20px;cursor:pointer;background:transparent;color:var(--tx2);transition:all .15s;font-family:'DM Sans',sans-serif}
+.period-pill.on{background:var(--ad);color:var(--ac);border-color:rgba(200,240,96,.35)}
 
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
@@ -138,6 +138,52 @@ select option{background:var(--s2)}
 </head>
 <body>
 
+<!-- SYNC MODAL -->
+<div class="modal-bg" id="syncModal">
+  <div class="modal" style="position:relative">
+    <span class="close-modal" onclick="closeModal()">×</span>
+    <h3>☁ Sync qua thiết bị</h3>
+    <p>Dùng <strong style="color:var(--ac)">Supabase</strong> để lưu trên cloud — miễn phí, không cần thẻ.<br>
+    Chỉ setup 1 lần, sau đó tự động sync khi mở app trên bất kỳ thiết bị nào.</p>
+
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:14px;font-size:12px;color:var(--tx2);line-height:1.9;margin-bottom:16px">
+      <strong style="color:var(--tx)">Cách lấy thông tin Supabase (5 phút):</strong><br>
+      1. Vào <a href="https://supabase.com" target="_blank" style="color:var(--ac)">supabase.com</a> → Đăng nhập / tạo tài khoản<br>
+      2. Nhấn <strong style="color:var(--tx)">New Project</strong> → đặt tên → chọn region → Create<br>
+      3. Vào <strong style="color:var(--tx)">Project Settings → API</strong><br>
+      4. Copy <strong style="color:var(--tx)">Project URL</strong> và <strong style="color:var(--tx)">anon/public key</strong> dán vào dưới<br>
+      5. Vào <strong style="color:var(--tx)">SQL Editor</strong> → chạy câu lệnh tạo bảng bên dưới
+    </div>
+
+    <div style="background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--tx3);font-family:monospace;line-height:1.7;margin-bottom:16px;position:relative">
+      <button class="btng" style="position:absolute;top:6px;right:6px;font-size:10px" onclick="copySQL()">Copy SQL</button>
+      <span id="sqlCode">CREATE TABLE IF NOT EXISTS content_planner (
+  id TEXT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE content_planner ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_access" ON content_planner FOR ALL USING (true);</span>
+    </div>
+
+    <div class="f" style="margin-bottom:10px">
+      <label style="font-size:11px;color:var(--tx2)">Supabase Project URL</label>
+      <input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co"/>
+    </div>
+    <div class="f" style="margin-bottom:0">
+      <label style="font-size:11px;color:var(--tx2)">Supabase Anon Key</label>
+      <input type="password" id="sbKey" placeholder="eyJ..."/>
+    </div>
+
+    <div class="modal-acts">
+      <button class="btnp" onclick="saveSupabase()" style="flex:1">Lưu & Kết nối</button>
+      <button class="btns" onclick="closeModal()">Huỷ</button>
+    </div>
+    <div style="font-size:11px;color:var(--tx3);margin-top:10px;text-align:center" id="sbTestResult"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
 <div class="hdr">
   <div class="logo">
     <div class="lm">
@@ -150,75 +196,65 @@ select option{background:var(--s2)}
     </div>
     <span class="ln">Content<em>Planner</em></span>
   </div>
-  <span class="sp" id="sp">✓ Đã lưu</span>
+  <div class="hdr-r">
+    <div class="sync-status" id="syncBtn" onclick="openModal()">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncTxt">Chưa sync</span>
+    </div>
+  </div>
 </div>
 
 <nav class="nav">
   <button class="nb on" onclick="go('brand')">Brand Profile</button>
-  <button class="nb" onclick="go('plan')">Lên Content Plan</button>
+  <button class="nb" onclick="go('plan')">Content Plan</button>
   <button class="nb" onclick="go('saved')">Đã lưu <span id="hc"></span></button>
 </nav>
 
-<!-- ═══════════════ BRAND PROFILE ═══════════════ -->
+<!-- ═══ BRAND ═══ -->
 <div id="tab-brand" class="tab on">
-
   <div class="ibox">
-    Điền thông tin thương hiệu càng chi tiết càng tốt — Gemini sẽ dùng để viết caption đúng giọng, đúng audience, đúng style. Chỉ cần điền 1 lần, tự động lưu lại.
+    Điền đầy đủ thông tin — Gemini dùng để viết caption đúng giọng, đúng audience, đúng style. Tự động lưu local <strong>và sync cloud</strong> nếu đã kết nối Supabase.
   </div>
 
-  <!-- API KEY -->
   <div class="lbl t0">Gemini API Key</div>
   <div class="card">
     <div class="f mb0">
-      <label>API Key — <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ac);font-size:10px">→ Lấy miễn phí tại aistudio.google.com/apikey</a></label>
-      <input type="password" id="apiKey" placeholder="AIzaSy..." oninput="sv()"/>
-      <div class="hint">Gemini Flash miễn phí. Cần bật billing để dùng ổn định — ~200đ/caption.</div>
+      <label>API Key — <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ac);font-size:10px">→ aistudio.google.com/apikey</a></label>
+      <input type="password" id="apiKey" placeholder="AIzaSy..." oninput="debounceSave()"/>
+      <div class="hint">Gemini Flash ~200đ/caption. Cần bật billing để dùng ổn định.</div>
     </div>
   </div>
 
-  <!-- THÔNG TIN CƠ BẢN -->
   <div class="lbl">Thông tin cơ bản</div>
   <div class="card">
     <div class="r2" style="margin-bottom:13px">
-      <div class="f mb0">
-        <label>Tên thương hiệu / Brand name</label>
-        <input type="text" id="bn" placeholder="Ví dụ: Trương Dáng Hương Academy" oninput="sv()"/>
-      </div>
-      <div class="f mb0">
-        <label>Ngành / lĩnh vực</label>
-        <select id="bi" onchange="sv()">
+      <div class="f mb0"><label>Tên thương hiệu</label><input type="text" id="bn" placeholder="Trương Dáng Hương Academy" oninput="debounceSave()"/></div>
+      <div class="f mb0"><label>Ngành</label>
+        <select id="bi" onchange="debounceSave()">
           <option value="">Chọn ngành...</option>
           <option>Ẩm thực & F&B</option><option>Thời trang & phụ kiện</option>
           <option>Làm đẹp & skincare</option><option>Sức khoẻ & wellness</option>
           <option>Giáo dục & đào tạo</option><option>Công nghệ & phần mềm</option>
           <option>Bất động sản</option><option>Du lịch & lưu trú</option>
           <option>Thể thao & gym</option><option>Nội thất & thiết kế</option>
-          <option>Tài chính & đầu tư</option><option>Dịch vụ cá nhân</option>
-          <option>Personal brand / KOL</option><option>Khác</option>
+          <option>Tài chính & đầu tư</option><option>Personal brand / KOL</option><option>Khác</option>
         </select>
       </div>
     </div>
-    <div class="f" style="margin-bottom:13px">
-      <label>Mô tả thương hiệu</label>
-      <textarea id="bd" rows="3" placeholder="Mô tả ngắn về thương hiệu: bạn làm gì, bán gì, giá trị cốt lõi là gì, điều gì khiến bạn khác biệt so với đối thủ?" oninput="sv()"></textarea>
+    <div class="f"><label>Mô tả thương hiệu</label>
+      <textarea id="bd" rows="3" placeholder="Bạn làm gì, bán gì, giá trị cốt lõi, điểm khác biệt so với đối thủ?" oninput="debounceSave()"></textarea>
     </div>
-    <div class="f mb0">
-      <label>Sản phẩm / dịch vụ chính</label>
-      <textarea id="bprod" rows="2" placeholder="Liệt kê các sản phẩm/dịch vụ chính. Ví dụ: Khóa học làm nước detox, coaching 1-1, workshop cuối tuần..." oninput="sv()"></textarea>
+    <div class="f mb0"><label>Sản phẩm / dịch vụ chính</label>
+      <textarea id="bprod" rows="2" placeholder="Liệt kê sản phẩm/dịch vụ. VD: Khóa học làm nước detox, coaching 1-1, workshop..." oninput="debounceSave()"></textarea>
     </div>
   </div>
 
-  <!-- TARGET AUDIENCE -->
-  <div class="lbl">Target Audience — Khách hàng mục tiêu</div>
+  <div class="lbl">Target Audience</div>
   <div class="card">
     <div class="r2" style="margin-bottom:13px">
-      <div class="f mb0">
-        <label>Nhân khẩu học</label>
-        <input type="text" id="demo" placeholder="Nữ 25-40, sống TP lớn, có con nhỏ..." oninput="sv()"/>
-      </div>
-      <div class="f mb0">
-        <label>Thu nhập / mức sống</label>
-        <select id="income" onchange="sv()">
+      <div class="f mb0"><label>Nhân khẩu học</label><input type="text" id="demo" placeholder="Nữ 25-40, TP lớn, có con nhỏ..." oninput="debounceSave()"/></div>
+      <div class="f mb0"><label>Thu nhập / mức sống</label>
+        <select id="income" onchange="debounceSave()">
           <option value="">Chọn...</option>
           <option>Bình dân (dưới 10tr/tháng)</option>
           <option>Trung bình (10-20tr/tháng)</option>
@@ -228,21 +264,18 @@ select option{background:var(--s2)}
         </select>
       </div>
     </div>
-    <div class="f" style="margin-bottom:13px">
-      <label>Pain points — Vấn đề / nỗi đau của khách hàng</label>
-      <textarea id="pain" rows="2" placeholder="Ví dụ: Bận rộn không có thời gian chăm sóc bản thân, cảm thấy thiếu năng lượng, muốn giảm cân nhưng không biết bắt đầu từ đâu..." oninput="sv()"></textarea>
+    <div class="f"><label>Pain points — Nỗi đau của khách hàng</label>
+      <textarea id="pain" rows="2" placeholder="Bận rộn không có thời gian, thiếu năng lượng, muốn giảm cân nhưng không biết bắt đầu..." oninput="debounceSave()"></textarea>
     </div>
-    <div class="f mb0">
-      <label>Desires — Khách hàng mong muốn điều gì</label>
-      <textarea id="desire" rows="2" placeholder="Ví dụ: Muốn có vóc dáng đẹp, lấy lại tự tin, có nhiều năng lượng hơn, được người xung quanh ngưỡng mộ..." oninput="sv()"></textarea>
+    <div class="f mb0"><label>Desires — Khách hàng mong muốn gì</label>
+      <textarea id="desire" rows="2" placeholder="Muốn có vóc dáng đẹp, lấy lại tự tin, được ngưỡng mộ..." oninput="debounceSave()"></textarea>
     </div>
   </div>
 
-  <!-- BRAND VOICE & TONE -->
-  <div class="lbl">Brand Voice & Tone — Giọng điệu thương hiệu</div>
+  <div class="lbl">Brand Voice & Tone</div>
   <div class="card">
     <div class="f" style="margin-bottom:13px">
-      <label>Chọn tone phù hợp (có thể chọn nhiều)</label>
+      <label>Chọn tone (có thể chọn nhiều)</label>
       <div class="pill-row" id="toneRow">
         <button class="pill" data-v="Gần gũi như bạn bè" onclick="togglePill(this)">Gần gũi như bạn bè</button>
         <button class="pill" data-v="Chuyên nghiệp, tin cậy" onclick="togglePill(this)">Chuyên nghiệp, tin cậy</button>
@@ -258,186 +291,149 @@ select option{background:var(--s2)}
     </div>
     <div class="f" style="margin-bottom:13px">
       <label>Mô tả thêm về giọng điệu</label>
-      <textarea id="voiceDesc" rows="2" placeholder="Ví dụ: Viết như đang nói chuyện 1-1 với bạn thân, thường dùng 'chị em', 'mình', hay kể câu chuyện cá nhân trước rồi mới vào sản phẩm..." oninput="sv()"></textarea>
+      <textarea id="voiceDesc" rows="2" placeholder='VD: Viết như nói chuyện 1-1 với bạn thân, hay dùng "chị em", "mình", kể câu chuyện cá nhân trước khi vào sản phẩm...' oninput="debounceSave()"></textarea>
     </div>
     <div class="f mb0">
-      <label>Những từ / cụm từ THƯỜNG DÙNG</label>
-      <div class="trow" id="wordsUsed">
-        <input class="ti" id="wordInput" placeholder="Nhập → Enter để thêm. Ví dụ: chị em, năng lượng, bứt phá..."/>
-      </div>
+      <label>Từ / cụm từ hay dùng (→ Enter)</label>
+      <div class="trow" id="wordsRow"><input class="ti" id="wordIn" placeholder="chị em, năng lượng, bứt phá..."/></div>
     </div>
   </div>
 
-  <!-- REFERENCE CAPTIONS -->
   <div class="lbl">Reference Captions — Caption mẫu</div>
   <div class="card">
-    <div class="sub">Dán 2-5 caption đã đăng mà bạn thấy hiệu quả nhất. Gemini sẽ học style, cấu trúc và giọng điệu từ đây.</div>
-    <div class="f" style="margin-bottom:13px">
-      <label>Caption mẫu 1 (bắt buộc nếu muốn Gemini viết đúng style)</label>
-      <textarea id="ref1" rows="5" placeholder="Dán caption bạn thích vào đây..." oninput="sv()"></textarea>
-    </div>
-    <div class="f" style="margin-bottom:13px">
-      <label>Caption mẫu 2</label>
-      <textarea id="ref2" rows="5" placeholder="Caption mẫu thứ 2..." oninput="sv()"></textarea>
-    </div>
-    <div class="f mb0">
-      <label>Caption mẫu 3</label>
-      <textarea id="ref3" rows="5" placeholder="Caption mẫu thứ 3..." oninput="sv()"></textarea>
-    </div>
+    <div class="sub">Dán 2-3 caption hiệu quả nhất. Gemini học style, cấu trúc và giọng điệu từ đây — đây là phần quan trọng nhất để Gemini viết đúng.</div>
+    <div class="f"><label>Caption mẫu 1</label><textarea id="ref1" rows="5" placeholder="Dán caption bạn thích..." oninput="debounceSave()"></textarea></div>
+    <div class="f"><label>Caption mẫu 2</label><textarea id="ref2" rows="5" placeholder="Caption mẫu thứ 2..." oninput="debounceSave()"></textarea></div>
+    <div class="f mb0"><label>Caption mẫu 3</label><textarea id="ref3" rows="5" placeholder="Caption mẫu thứ 3..." oninput="debounceSave()"></textarea></div>
   </div>
 
-  <!-- NỀN TẢNG & FORMAT -->
-  <div class="lbl">Nền tảng & Format</div>
+  <div class="lbl">Format & Nền tảng</div>
   <div class="card">
     <div class="r2" style="margin-bottom:13px">
-      <div class="f mb0">
-        <label>Platform chính</label>
-        <select id="platform" onchange="sv()">
+      <div class="f mb0"><label>Platform chính</label>
+        <select id="platform" onchange="debounceSave()">
           <option>Facebook</option><option>Instagram</option><option>TikTok</option>
           <option>LinkedIn</option><option>Threads</option><option>Twitter/X</option>
         </select>
       </div>
-      <div class="f mb0">
-        <label>Độ dài caption ưa thích</label>
-        <select id="capLen" onchange="sv()">
+      <div class="f mb0"><label>Độ dài caption</label>
+        <select id="capLen" onchange="debounceSave()">
           <option value="short">Ngắn (dưới 100 chữ)</option>
           <option value="medium" selected>Vừa (100-250 chữ)</option>
           <option value="long">Dài (250-500 chữ)</option>
-          <option value="vlong">Rất dài (trên 500 chữ, kể chuyện)</option>
+          <option value="vlong">Rất dài (kể chuyện, 500+)</option>
         </select>
       </div>
     </div>
-    <div class="f" style="margin-bottom:13px">
-      <label>Cấu trúc caption thường dùng</label>
-      <select id="capStruct" onchange="sv()">
-        <option value="hook-body-cta">Hook → Nội dung → CTA</option>
-        <option value="story-lesson-cta">Kể chuyện → Bài học → CTA</option>
-        <option value="problem-solution-cta">Vấn đề → Giải pháp → CTA</option>
-        <option value="question-answer-cta">Đặt câu hỏi → Trả lời → CTA</option>
-        <option value="list-cta">Liệt kê (list) → CTA</option>
-        <option value="freeform">Tự do, không có cấu trúc cố định</option>
-      </select>
-    </div>
     <div class="r2" style="margin-bottom:13px">
-      <div class="f mb0">
-        <label>Ngôn ngữ</label>
-        <select id="capLang" onchange="sv()">
+      <div class="f mb0"><label>Cấu trúc caption</label>
+        <select id="capStruct" onchange="debounceSave()">
+          <option value="hook-body-cta">Hook → Nội dung → CTA</option>
+          <option value="story-lesson-cta">Kể chuyện → Bài học → CTA</option>
+          <option value="problem-solution-cta">Vấn đề → Giải pháp → CTA</option>
+          <option value="question-answer-cta">Câu hỏi → Trả lời → CTA</option>
+          <option value="list-cta">Liệt kê → CTA</option>
+          <option value="freeform">Tự do</option>
+        </select>
+      </div>
+      <div class="f mb0"><label>Ngôn ngữ</label>
+        <select id="capLang" onchange="debounceSave()">
           <option>Tiếng Việt</option><option>English</option><option>Song ngữ VI/EN</option>
         </select>
       </div>
-      <div class="f mb0">
-        <label>Số lượng hashtag</label>
-        <select id="hashCount" onchange="sv()">
-          <option value="none">Không dùng hashtag</option>
-          <option value="few">Ít (3-5 hashtag)</option>
-          <option value="medium" selected>Vừa (5-10 hashtag)</option>
-          <option value="many">Nhiều (10-20 hashtag)</option>
+    </div>
+    <div class="r2" style="margin-bottom:13px">
+      <div class="f mb0"><label>Hashtag</label>
+        <select id="hashCount" onchange="debounceSave()">
+          <option value="none">Không dùng</option>
+          <option value="few">Ít (3-5)</option>
+          <option value="medium" selected>Vừa (5-10)</option>
+          <option value="many">Nhiều (10-20)</option>
         </select>
       </div>
-    </div>
-    <div class="f mb0">
-      <label>Hashtag cố định luôn dùng (nhập → Enter)</label>
-      <div class="trow" id="fixedTags">
-        <input class="ti" id="hashInput" placeholder="#TênBrand #Hashtag..."/>
+      <div class="f mb0"><label>Hashtag cố định (→ Enter)</label>
+        <div class="trow" id="hashRow"><input class="ti" id="hashIn" placeholder="#TênBrand #Tag..."/></div>
       </div>
     </div>
   </div>
 
-  <!-- CÁC CHỦ ĐỀ -->
-  <div class="lbl">Trụ cột nội dung (Content Pillars)</div>
+  <div class="lbl">Content Pillars — Trụ cột nội dung</div>
   <div class="card">
-    <div class="sub">Những chủ đề chính bạn thường xuyên đăng. Gemini sẽ đa dạng hóa nội dung xoay quanh các trụ cột này.</div>
-    <div class="f mb0">
-      <label>Các trụ cột nội dung (nhập → Enter)</label>
-      <div class="trow" id="pillarsRow">
-        <input class="ti" id="pillarInput" placeholder="Ví dụ: Kiến thức detox, Câu chuyện khách hàng, Behind the scenes, Tips sức khoẻ..."/>
-      </div>
+    <div class="sub">Các chủ đề chính bạn thường đăng. Gemini sẽ đa dạng hóa nội dung xoay quanh đây.</div>
+    <div class="f mb0"><label>Trụ cột nội dung (→ Enter)</label>
+      <div class="trow" id="pillarsRow"><input class="ti" id="pillarIn" placeholder="Kiến thức detox, Câu chuyện KH, Behind the scenes..."/></div>
     </div>
   </div>
 
-  <!-- LƯU Ý KHÁC -->
   <div class="lbl">Lưu ý khác</div>
   <div class="card">
-    <div class="f" style="margin-bottom:13px">
-      <label>Những điều KHÔNG được đề cập / tránh</label>
-      <textarea id="avoid" rows="2" placeholder="Ví dụ: Không so sánh với đối thủ, không cam kết kết quả tuyệt đối, không dùng từ 'đảm bảo 100%'..." oninput="sv()"></textarea>
+    <div class="f"><label>Những điều TRÁNH nhắc đến</label>
+      <textarea id="avoid" rows="2" placeholder='Không so sánh đối thủ, không cam kết "đảm bảo 100%"...' oninput="debounceSave()"></textarea>
     </div>
-    <div class="f mb0">
-      <label>Thông tin bổ sung khác (USP, câu chuyện thương hiệu...)</label>
-      <textarea id="extra" rows="3" placeholder="Bất kỳ thông tin nào khác bạn muốn Gemini biết để viết caption tốt hơn..." oninput="sv()"></textarea>
+    <div class="f mb0"><label>Thông tin bổ sung (USP, câu chuyện thương hiệu...)</label>
+      <textarea id="extra" rows="3" placeholder="Bất kỳ thông tin nào khác giúp Gemini viết tốt hơn..." oninput="debounceSave()"></textarea>
     </div>
   </div>
 
-  <button class="btnp" onclick="go('plan');sv()">Xong, đến Lên Content Plan →</button>
-
+  <button class="btnp" onclick="go('plan')">Xong → Lên Content Plan</button>
 </div>
 
-<!-- ═══════════════ CONTENT PLAN ═══════════════ -->
+<!-- ═══ PLAN ═══ -->
 <div id="tab-plan" class="tab">
   <div class="ebox" id="ebox"></div>
 
   <div class="card">
-    <div class="r2" style="margin-bottom:13px">
-      <div class="f mb0">
-        <label>Chủ đề / campaign</label>
-        <input type="text" id="theme" placeholder="Ví dụ: Ra mắt sản phẩm mới tháng 5, Tháng detox mùa hè..."/>
-      </div>
-      <div class="f mb0">
-        <label>Thời gian</label>
-        <div class="period-tabs" style="margin-bottom:0;width:100%">
-          <button class="ptab on" style="flex:1" onclick="setPeriod('week',this)">1 tuần (7 posts)</button>
-          <button class="ptab" style="flex:1" onclick="setPeriod('month',this)">1 tháng (30 posts)</button>
-        </div>
-      </div>
+    <div class="f"><label>Chủ đề / Campaign</label>
+      <input type="text" id="theme" placeholder="Ra mắt sản phẩm mới tháng 5, Tháng detox mùa hè..."/>
     </div>
-    <div class="f" style="margin-bottom:13px">
-      <label>Mô tả thêm — campaign này về gì, có sự kiện/ưu đãi gì không?</label>
-      <textarea id="campaignDesc" rows="2" placeholder="Ví dụ: Tuần này tập trung vào sản phẩm Trà Mận Mơ mới ra, có giảm 20% 3 ngày đầu, muốn tạo FOMO và tăng DM..."></textarea>
+    <div class="f" style="margin-bottom:13px"><label>Mô tả thêm</label>
+      <textarea id="campDesc" rows="2" placeholder="Có sự kiện/ưu đãi gì? FOMO? Muốn tăng DM? Tone đặc biệt cho campaign này?"></textarea>
+    </div>
+    <div style="margin-bottom:13px">
+      <div class="f mb0"><label>Thời gian</label></div>
+      <div class="period-row">
+        <button class="period-pill on" data-v="7" onclick="setPeriod(this)">1 tuần (7 posts)</button>
+        <button class="period-pill" data-v="14" onclick="setPeriod(this)">2 tuần (14 posts)</button>
+        <button class="period-pill" data-v="30" onclick="setPeriod(this)">1 tháng (30 posts)</button>
+      </div>
     </div>
     <div class="r3">
-      <div class="f mb0">
-        <label>Loại nội dung ưu tiên</label>
+      <div class="f mb0"><label>Loại nội dung</label>
         <select id="contentMix">
-          <option value="balanced">Cân bằng (đa dạng)</option>
-          <option value="edu">Nặng giáo dục / tips</option>
+          <option value="balanced">Cân bằng</option>
+          <option value="edu">Nặng tips / kiến thức</option>
           <option value="sell">Nặng bán hàng / CTA</option>
           <option value="story">Nặng storytelling</option>
-          <option value="engage">Nặng tương tác / hỏi đáp</option>
+          <option value="engage">Nặng tương tác</option>
         </select>
       </div>
-      <div class="f mb0">
-        <label>Tần suất đăng</label>
-        <select id="freq">
-          <option value="1">1 post/ngày</option>
-          <option value="2">2 posts/ngày</option>
-          <option value="alt">Cách ngày</option>
-          <option value="3week">3 posts/tuần</option>
-        </select>
-      </div>
-      <div class="f mb0">
-        <label>Viết caption luôn?</label>
+      <div class="f mb0"><label>Caption</label>
         <select id="writeCap">
-          <option value="yes">Có, viết caption ngay</option>
-          <option value="outline">Chỉ lên outline trước</option>
+          <option value="yes">Viết caption ngay</option>
+          <option value="outline">Chỉ lên outline</option>
+        </select>
+      </div>
+      <div class="f mb0"><label>Ngôn ngữ</label>
+        <select id="planLang">
+          <option>Tiếng Việt</option><option>English</option><option>Song ngữ</option>
         </select>
       </div>
     </div>
   </div>
 
-  <button class="btnp" id="genBtn" onclick="generatePlan()" style="margin-bottom:12px">✦ Gemini lên Content Plan</button>
+  <button class="btnp" id="genBtn" onclick="genPlan()" style="margin-bottom:12px">✦ Gemini lên Content Plan</button>
 
-  <div id="planProgress" style="display:none">
-    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-    <div style="font-size:12px;color:var(--tx3);text-align:center" id="progressTxt">Đang xử lý...</div>
+  <div id="planProg" style="display:none">
+    <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0"></div></div>
+    <div style="font-size:12px;color:var(--tx3);text-align:center;margin-top:4px" id="progTxt"></div>
   </div>
-
   <div id="planOut"></div>
 </div>
 
-<!-- ═══════════════ SAVED ═══════════════ -->
+<!-- ═══ SAVED ═══ -->
 <div id="tab-saved" class="tab">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-    <span style="font-size:13px;color:var(--tx2)" id="savedCount">0 caption đã lưu</span>
+    <span style="font-size:13px;color:var(--tx2)" id="savedCount">0 caption</span>
     <button class="btnd" onclick="clearSaved()">Xóa tất cả</button>
   </div>
   <div id="savedList"></div>
@@ -446,7 +442,33 @@ select option{background:var(--s2)}
 <script>
 // ── STATE ──
 let selTones=[], wordsUsed=[], fixedTags=[], pillars=[], saved=[];
-let period='week';
+let period=7;
+let sbUrl='', sbKey='', sbConnected=false;
+let saveTimer=null;
+const RECORD_ID='brand_profile_v1';
+const SAVED_ID='saved_captions_v1';
+
+// ── INIT TAG INPUTS ──
+function initTag(inputId, rowId, arr){
+  document.getElementById(inputId).addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&this.value.trim()){arr.push(this.value.trim());this.value='';renderTagRow(rowId,arr,inputId);debounceSave()}
+  });
+}
+function renderTagRow(rowId,arr,inputId){
+  const row=document.getElementById(rowId);
+  Array.from(row.querySelectorAll('.tag')).forEach(t=>t.remove());
+  arr.forEach((t,i)=>{
+    const el=document.createElement('div');el.className='tag';
+    el.innerHTML=`${t}<button onclick="rmTag('${rowId}','${inputId}',${i})">×</button>`;
+    row.insertBefore(el,document.getElementById(inputId));
+  });
+}
+function rmTag(rowId,inputId,i){
+  if(rowId==='wordsRow')wordsUsed.splice(i,1),renderTagRow(rowId,wordsUsed,inputId);
+  else if(rowId==='hashRow')fixedTags.splice(i,1),renderTagRow(rowId,fixedTags,inputId);
+  else if(rowId==='pillarsRow')pillars.splice(i,1),renderTagRow(rowId,pillars,inputId);
+  debounceSave();
+}
 
 // ── NAV ──
 function go(n){
@@ -456,455 +478,415 @@ function go(n){
   document.getElementById('tab-'+n).classList.add('on');
   if(n==='saved')renderSaved();
 }
-function setPeriod(p,btn){
-  period=p;
-  document.querySelectorAll('.period-tabs .ptab').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-}
-
-// ── PILLS ──
 function togglePill(btn){
   btn.classList.toggle('on');
   selTones=Array.from(document.querySelectorAll('#toneRow .pill.on')).map(b=>b.dataset.v);
-  sv();
+  debounceSave();
+}
+function setPeriod(btn){
+  document.querySelectorAll('.period-pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  period=parseInt(btn.dataset.v);
 }
 
-// ── TAG INPUTS ──
-function initTagInput(inputId,rowId,arrRef,saveKey){
-  const inp=document.getElementById(inputId);
-  inp.addEventListener('keydown',function(e){
-    if(e.key==='Enter'&&this.value.trim()){
-      arrRef.push(this.value.trim());this.value='';
-      renderTags(rowId,arrRef,inputId);sv();
-    }
-  });
-}
-function renderTags(rowId,arr,inputId){
-  const row=document.getElementById(rowId);
-  const inp=document.getElementById(inputId);
-  // remove old tags
-  Array.from(row.querySelectorAll('.tag')).forEach(t=>t.remove());
-  arr.forEach((t,i)=>{
-    const el=document.createElement('div');el.className='tag';
-    el.innerHTML=`${t}<button onclick="removeTag('${rowId}','${inputId}',${i})">×</button>`;
-    row.insertBefore(el,inp);
-  });
-}
-function removeTag(rowId,inputId,i){
-  if(rowId==='wordsUsed')wordsUsed.splice(i,1),renderTags(rowId,wordsUsed,inputId);
-  else if(rowId==='fixedTags')fixedTags.splice(i,1),renderTags(rowId,fixedTags,inputId);
-  else if(rowId==='pillarsRow')pillars.splice(i,1),renderTags(rowId,pillars,inputId);
-  sv();
-}
-
-// ── SETTINGS ──
+// ── GETTERS ──
 function g(id){const e=document.getElementById(id);return e?e.value:''}
-function ld(){
-  try{
-    const s=JSON.parse(localStorage.getItem('cp1')||'{}');
-    ['apiKey','bn','bi','bd','bprod','demo','income','pain','desire','voiceDesc',
-     'ref1','ref2','ref3','platform','capLen','capStruct','capLang','hashCount','avoid','extra']
-      .forEach(id=>{if(s[id]&&document.getElementById(id))document.getElementById(id).value=s[id]});
-    if(s.selTones){selTones=s.selTones;selTones.forEach(v=>{const b=document.querySelector(`#toneRow .pill[data-v="${v}"]`);if(b)b.classList.add('on')})}
-    if(s.wordsUsed){wordsUsed=s.wordsUsed;renderTags('wordsUsed',wordsUsed,'wordInput')}
-    if(s.fixedTags){fixedTags=s.fixedTags;renderTags('fixedTags',fixedTags,'hashInput')}
-    if(s.pillars){pillars=s.pillars;renderTags('pillarsRow',pillars,'pillarInput')}
-    saved=JSON.parse(localStorage.getItem('cp1_saved')||'[]');uhc();
-  }catch(e){}
-}
-function sv(){
-  const s={apiKey:g('apiKey'),bn:g('bn'),bi:g('bi'),bd:g('bd'),bprod:g('bprod'),
+
+// ── COLLECT ALL DATA ──
+function collectData(){
+  return {
+    apiKey:g('apiKey'),bn:g('bn'),bi:g('bi'),bd:g('bd'),bprod:g('bprod'),
     demo:g('demo'),income:g('income'),pain:g('pain'),desire:g('desire'),voiceDesc:g('voiceDesc'),
     ref1:g('ref1'),ref2:g('ref2'),ref3:g('ref3'),
     platform:g('platform'),capLen:g('capLen'),capStruct:g('capStruct'),capLang:g('capLang'),
     hashCount:g('hashCount'),avoid:g('avoid'),extra:g('extra'),
-    selTones,wordsUsed,fixedTags,pillars};
-  localStorage.setItem('cp1',JSON.stringify(s));
-  const p=document.getElementById('sp');p.classList.add('on');
-  clearTimeout(window._sv);window._sv=setTimeout(()=>p.classList.remove('on'),2000);
+    selTones,wordsUsed,fixedTags,pillars
+  };
 }
 
-// ── BUILD BRAND CONTEXT ──
-function buildCtx(){
-  const parts=[];
+// ── APPLY DATA TO FORM ──
+function applyData(s){
+  ['apiKey','bn','bi','bd','bprod','demo','income','pain','desire','voiceDesc',
+   'ref1','ref2','ref3','platform','capLen','capStruct','capLang','hashCount','avoid','extra']
+    .forEach(id=>{if(s[id]!=null&&document.getElementById(id))document.getElementById(id).value=s[id]});
+  if(s.selTones){selTones=s.selTones;selTones.forEach(v=>{const b=document.querySelector(`#toneRow .pill[data-v="${v}"]`);if(b)b.classList.add('on')})}
+  if(s.wordsUsed){wordsUsed=s.wordsUsed;renderTagRow('wordsRow',wordsUsed,'wordIn')}
+  if(s.fixedTags){fixedTags=s.fixedTags;renderTagRow('hashRow',fixedTags,'hashIn')}
+  if(s.pillars){pillars=s.pillars;renderTagRow('pillarsRow',pillars,'pillarIn')}
+}
+
+// ── SAVE (debounced) ──
+function debounceSave(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>saveAll(),800);
+}
+async function saveAll(){
+  const data=collectData();
+  // Local
+  localStorage.setItem('cp2',JSON.stringify(data));
+  // Cloud
+  if(sbConnected) await pushToSupabase(RECORD_ID,data);
+}
+
+// ── LOAD ──
+async function loadAll(){
+  // Try cloud first if connected
+  if(sbConnected){
+    setSyncStatus('syncing','Đang tải...');
+    try{
+      const cloudData=await pullFromSupabase(RECORD_ID);
+      if(cloudData){applyData(cloudData);localStorage.setItem('cp2',JSON.stringify(cloudData));setSyncStatus('ok','Đã sync')}
+      else{const local=JSON.parse(localStorage.getItem('cp2')||'{}');if(Object.keys(local).length)applyData(local);}
+    }catch(e){setSyncStatus('err','Lỗi sync');const local=JSON.parse(localStorage.getItem('cp2')||'{}');if(Object.keys(local).length)applyData(local)}
+    // Load saved
+    try{const s=await pullFromSupabase(SAVED_ID);if(s&&Array.isArray(s)){saved=s;uhc()}}catch(e){}
+  } else {
+    const local=JSON.parse(localStorage.getItem('cp2')||'{}');if(Object.keys(local).length)applyData(local);
+    saved=JSON.parse(localStorage.getItem('cp2_saved')||'[]');uhc();
+  }
+}
+
+// ── SUPABASE ──
+function sbHeaders(){return{'Content-Type':'application/json','apikey':sbKey,'Authorization':'Bearer '+sbKey,'Prefer':'resolution=merge-duplicates'}}
+
+async function pushToSupabase(id,data){
+  if(!sbConnected)return;
+  setSyncStatus('syncing','Đang lưu...');
+  try{
+    await fetch(`${sbUrl}/rest/v1/content_planner`,{method:'POST',headers:sbHeaders(),body:JSON.stringify({id,data,updated_at:new Date().toISOString()})});
+    setSyncStatus('ok','Đã sync · '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}));
+  }catch(e){setSyncStatus('err','Lỗi sync')}
+}
+
+async function pullFromSupabase(id){
+  const res=await fetch(`${sbUrl}/rest/v1/content_planner?id=eq.${id}&select=data`,{headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}});
+  const rows=await res.json();
+  return rows?.[0]?.data||null;
+}
+
+async function testSupabase(url,key){
+  const res=await fetch(`${url}/rest/v1/content_planner?limit=1`,{headers:{'apikey':key,'Authorization':'Bearer '+key}});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  return true;
+}
+
+// ── SYNC UI ──
+function setSyncStatus(state,txt){
+  document.getElementById('syncDot').className='sync-dot '+(state==='ok'?'ok':state==='err'?'err':state==='syncing'?'syncing':'');
+  document.getElementById('syncTxt').textContent=txt;
+}
+function openModal(){
+  document.getElementById('sbUrl').value=sbUrl;
+  document.getElementById('sbKey').value=sbKey;
+  document.getElementById('syncModal').classList.add('open');
+}
+function closeModal(){document.getElementById('syncModal').classList.remove('open')}
+async function saveSupabase(){
+  const url=document.getElementById('sbUrl').value.trim().replace(/\/$/,'');
+  const key=document.getElementById('sbKey').value.trim();
+  const res=document.getElementById('sbTestResult');
+  res.textContent='Đang kiểm tra kết nối...';res.style.color='var(--tx3)';
+  try{
+    await testSupabase(url,key);
+    sbUrl=url;sbKey=key;sbConnected=true;
+    localStorage.setItem('cp2_sb',JSON.stringify({url,key}));
+    setSyncStatus('ok','Đã kết nối');
+    res.textContent='✓ Kết nối thành công!';res.style.color='#6fdf7f';
+    // Push current data
+    await saveAll();
+    setTimeout(()=>closeModal(),1200);
+  }catch(e){
+    res.textContent='❌ Lỗi: '+e.message+'. Kiểm tra URL, key, và đã chạy SQL tạo bảng chưa?';
+    res.style.color='var(--red)';
+  }
+}
+function copySQL(){navigator.clipboard.writeText(document.getElementById('sqlCode').textContent);event.target.textContent='Đã copy!';setTimeout(()=>event.target.textContent='Copy SQL',1500)}
+
+// ── BRAND CONTEXT ──
+function brandCtx(){
+  const p=[];
   const bn=g('bn'),bi=g('bi'),bd=g('bd'),bprod=g('bprod');
-  if(bn) parts.push(`Thương hiệu: ${bn}`);
-  if(bi) parts.push(`Ngành: ${bi}`);
-  if(bd) parts.push(`Mô tả: ${bd}`);
-  if(bprod) parts.push(`Sản phẩm/dịch vụ: ${bprod}`);
-
+  if(bn)p.push(`Thương hiệu: ${bn}`);
+  if(bi)p.push(`Ngành: ${bi}`);
+  if(bd)p.push(`Mô tả: ${bd}`);
+  if(bprod)p.push(`Sản phẩm/dịch vụ: ${bprod}`);
   const demo=g('demo'),income=g('income'),pain=g('pain'),desire=g('desire');
-  if(demo||income) parts.push(`Khách hàng: ${[demo,income].filter(Boolean).join(', ')}`);
-  if(pain) parts.push(`Pain points: ${pain}`);
-  if(desire) parts.push(`Mong muốn: ${desire}`);
-
-  if(selTones.length) parts.push(`Tone: ${selTones.join(', ')}`);
-  const vd=g('voiceDesc');if(vd) parts.push(`Giọng điệu: ${vd}`);
-  if(wordsUsed.length) parts.push(`Từ hay dùng: ${wordsUsed.join(', ')}`);
-
-  if(pillars.length) parts.push(`Content pillars: ${pillars.join(', ')}`);
-
+  if(demo||income)p.push(`Khách hàng: ${[demo,income].filter(Boolean).join(', ')}`);
+  if(pain)p.push(`Pain points: ${pain}`);
+  if(desire)p.push(`Mong muốn: ${desire}`);
+  if(selTones.length)p.push(`Tone: ${selTones.join(', ')}`);
+  const vd=g('voiceDesc');if(vd)p.push(`Giọng điệu: ${vd}`);
+  if(wordsUsed.length)p.push(`Từ hay dùng: ${wordsUsed.join(', ')}`);
+  if(pillars.length)p.push(`Content pillars: ${pillars.join(', ')}`);
   const platform=g('platform'),capLen=g('capLen'),capStruct=g('capStruct'),capLang=g('capLang');
-  if(platform) parts.push(`Platform: ${platform}`);
-  const lenMap={short:'ngắn (dưới 100 chữ)',medium:'vừa (100-250 chữ)',long:'dài (250-500 chữ)',vlong:'rất dài (trên 500 chữ)'};
-  if(capLen) parts.push(`Độ dài caption: ${lenMap[capLen]||capLen}`);
-  const structMap={'hook-body-cta':'Hook → Nội dung → CTA','story-lesson-cta':'Kể chuyện → Bài học → CTA','problem-solution-cta':'Vấn đề → Giải pháp → CTA','question-answer-cta':'Đặt câu hỏi → Trả lời → CTA','list-cta':'Liệt kê → CTA','freeform':'Tự do'};
-  if(capStruct) parts.push(`Cấu trúc: ${structMap[capStruct]||capStruct}`);
-  if(capLang) parts.push(`Ngôn ngữ: ${capLang}`);
-
-  const hashCount=g('hashCount');
-  const hashMap={none:'không dùng hashtag',few:'3-5 hashtag',medium:'5-10 hashtag',many:'10-20 hashtag'};
-  if(hashCount) parts.push(`Hashtag: ${hashMap[hashCount]||hashCount}`);
-  if(fixedTags.length) parts.push(`Hashtag cố định: ${fixedTags.join(' ')}`);
-
-  const avoid=g('avoid');if(avoid) parts.push(`Tránh: ${avoid}`);
-  const extra=g('extra');if(extra) parts.push(`Thông tin thêm: ${extra}`);
-
-  return parts.join('\n');
+  if(platform)p.push(`Platform: ${platform}`);
+  const lenMap={short:'ngắn <100 chữ',medium:'vừa 100-250 chữ',long:'dài 250-500 chữ',vlong:'rất dài 500+ chữ'};
+  if(capLen)p.push(`Độ dài: ${lenMap[capLen]||capLen}`);
+  const structMap={'hook-body-cta':'Hook→Nội dung→CTA','story-lesson-cta':'Kể chuyện→Bài học→CTA','problem-solution-cta':'Vấn đề→Giải pháp→CTA','question-answer-cta':'Câu hỏi→Trả lời→CTA','list-cta':'Liệt kê→CTA','freeform':'Tự do'};
+  if(capStruct)p.push(`Cấu trúc: ${structMap[capStruct]||capStruct}`);
+  if(capLang)p.push(`Ngôn ngữ: ${capLang}`);
+  const hashMap={none:'không hashtag',few:'3-5 hashtag',medium:'5-10 hashtag',many:'10-20 hashtag'};
+  const hc=g('hashCount');if(hc)p.push(`Hashtag: ${hashMap[hc]||hc}`);
+  if(fixedTags.length)p.push(`Hashtag cố định: ${fixedTags.join(' ')}`);
+  const avoid=g('avoid');if(avoid)p.push(`Tránh: ${avoid}`);
+  const extra=g('extra');if(extra)p.push(`Thêm: ${extra}`);
+  return p.join('\n');
 }
-
-function buildRefCtx(){
+function refCtx(){
   const refs=[g('ref1'),g('ref2'),g('ref3')].filter(Boolean);
-  if(!refs.length) return '';
-  return `\n\nCACH VIẾT THAM KHẢO (học style, cấu trúc, giọng điệu từ các caption này):\n${refs.map((r,i)=>`--- Caption mẫu ${i+1} ---\n${r}`).join('\n\n')}`;
+  if(!refs.length)return'';
+  return`\n\nCAPTION MẪU (học style/cấu trúc/giọng điệu):\n${refs.map((r,i)=>`--- Mẫu ${i+1} ---\n${r}`).join('\n\n')}`;
 }
 
-// ── GEMINI TEXT ──
+// ── GEMINI ──
 async function callGemini(prompt){
   const key=g('apiKey');
-  if(!key) throw new Error('Chưa có API key — vào tab Brand Profile để nhập.');
+  if(!key) throw new Error('Chưa có API key');
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],
-      generationConfig:{temperature:0.9}})
+    body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.9}})
   });
   const data=await res.json();
   if(data.error){
-    const msg=data.error.message||JSON.stringify(data.error);
-    if(msg.includes('quota')||data.error.code===429) throw new Error('QUOTA');
-    throw new Error(msg);
+    const m=data.error.message||'';
+    if(m.includes('quota')||data.error.code===429)throw new Error('QUOTA');
+    throw new Error(m);
   }
   return data.candidates?.[0]?.content?.parts?.[0]?.text||'';
 }
 
-// ── POST TYPES BY MIX ──
-const POST_TYPES_MAP={
-  balanced:['Giới thiệu sản phẩm','Tip / kiến thức hữu ích','Behind the scenes','Câu chuyện khách hàng','Câu hỏi tương tác','Khuyến mãi / ưu đãi','Câu chuyện thương hiệu'],
-  edu:['Tip / kiến thức hữu ích','Giải thích khái niệm','Top 5 / danh sách','Myth vs Fact','FAQ','Case study','How-to hướng dẫn'],
-  sell:['Giới thiệu sản phẩm','Social proof / testimonial','Khuyến mãi / ưu đãi','FOMO / limited offer','Before & After','Objection handling','Direct CTA'],
+// ── POST TYPES ──
+const MIX={
+  balanced:['Giới thiệu sản phẩm','Tip / kiến thức','Behind the scenes','Câu chuyện khách hàng','Câu hỏi tương tác','Khuyến mãi / ưu đãi','Câu chuyện thương hiệu'],
+  edu:['Tip / kiến thức','Giải thích khái niệm','Top 5 / danh sách','Myth vs Fact','FAQ','How-to hướng dẫn','Case study'],
+  sell:['Giới thiệu sản phẩm','Social proof','Khuyến mãi','FOMO / limited offer','Before & After','Objection handling','Direct CTA'],
   story:['Câu chuyện cá nhân','Hành trình thương hiệu','Câu chuyện khách hàng','Bài học rút ra','Thất bại & bứt dậy','Khoảnh khắc đáng nhớ','Tại sao tôi làm điều này'],
-  engage:['Câu hỏi cho followers','This or That','Poll / khảo sát','Chia sẻ quan điểm','Tag một người','Thử thách / challenge','Ý kiến của bạn thế nào?'],
+  engage:['Câu hỏi cho followers','This or That','Chia sẻ quan điểm','Tag một người','Thử thách','Ý kiến của bạn','Poll / khảo sát'],
 };
+const DAYS7=['T.Hai','T.Ba','T.Tư','T.Năm','T.Sáu','T.Bảy','C.Nhật'];
+
+function dayLabel(i,count){
+  if(count===7)return DAYS7[i%7];
+  if(count===14)return`Tuần ${Math.floor(i/7)+1} — ${DAYS7[i%7]}`;
+  return`Ngày ${i+1}`;
+}
 
 // ── GENERATE PLAN ──
-async function generatePlan(){
-  const key=g('apiKey');
-  if(!key){alert('Vui lòng nhập Gemini API key ở tab Brand Profile!');go('brand');return}
+async function genPlan(){
+  if(!g('apiKey')){alert('Nhập API key ở tab Brand Profile!');go('brand');return}
   const theme=g('theme');
-  if(!theme){alert('Nhập chủ đề / campaign trước!');return}
-
+  if(!theme){alert('Nhập chủ đề campaign!');return}
   const writeCap=g('writeCap')==='yes';
-  const count=period==='week'?7:30;
+  const count=period;
   const mix=g('contentMix');
-  const types=POST_TYPES_MAP[mix]||POST_TYPES_MAP.balanced;
-  const ctx=buildCtx();
-  const refCtx=buildRefCtx();
-  const campaignDesc=g('campaignDesc');
-  const freq=g('freq');
+  const types=MIX[mix]||MIX.balanced;
+  const ctx=brandCtx();
+  const rCtx=refCtx();
+  const campDesc=g('campDesc');
+  const planLang=g('planLang');
 
-  document.getElementById('genBtn').disabled=true;
-  document.getElementById('genBtn').textContent='Đang lên plan...';
-  document.getElementById('planProgress').style.display='block';
+  document.getElementById('genBtn').disabled=true;document.getElementById('genBtn').textContent='Đang xử lý...';
+  document.getElementById('planProg').style.display='block';
   document.getElementById('planOut').innerHTML='';
   document.getElementById('ebox').style.display='none';
-
-  // ── Step 1: Generate outline ──
   setProgress(5,'Gemini đang lên outline...');
 
+  // OUTLINE
   const outlinePrompt=`Bạn là chuyên gia content marketing.
 
 THÔNG TIN THƯƠNG HIỆU:
 ${ctx}
 
-Tạo content plan cho ${count} posts trong ${period==='week'?'1 tuần':'1 tháng'}.
-Campaign / chủ đề: ${theme}${campaignDesc?'\nMô tả thêm: '+campaignDesc:''}
-Loại nội dung: ${mix}
-Tần suất: ${freq==='1'?'1 post/ngày':freq==='2'?'2 posts/ngày':freq==='alt'?'cách ngày':'3 posts/tuần'}
+Lên content plan cho ${count} posts. Campaign: "${theme}"${campDesc?'\nBối cảnh: '+campDesc:''}
+Ngôn ngữ: ${planLang}. Loại nội dung: ${mix}.
 
-Trả về JSON array với đúng ${count} objects, mỗi object có:
-- day: "Ngày X" hoặc tên ngày (T.Hai, T.Ba... cho tuần; Ngày 1, Ngày 2... cho tháng)
-- type: loại bài (chọn từ các loại phù hợp với campaign)
-- angle: góc nhìn / hướng tiếp cận cụ thể
-- hook_idea: ý tưởng câu hook mở đầu (1 câu)
-- key_message: thông điệp chính muốn truyền tải
+Trả về JSON array đúng ${count} objects:
+{"day":"${count===7?'T.Hai':'Ngày 1'}","type":"loại bài","angle":"góc nhìn cụ thể","hook":"ý tưởng câu hook (1 câu)","key_msg":"thông điệp chính"}
 
-Chỉ trả về JSON array, không giải thích thêm.`;
+Chỉ JSON, không giải thích.`;
 
   let outline=[];
   try{
     const raw=await callGemini(outlinePrompt);
-    const clean=raw.replace(/```json|```/g,'').trim();
-    outline=JSON.parse(clean);
-  }catch(err){
-    if(err.message==='QUOTA'){showQuotaErr();return}
-    // fallback: tự tạo outline
-    for(let i=0;i<count;i++){
-      const t=types[i%types.length];
-      outline.push({day:period==='week'?['T.Hai','T.Ba','T.Tư','T.Năm','T.Sáu','T.Bảy','C.Nhật'][i%7]:`Ngày ${i+1}`,type:t,angle:'',hook_idea:'',key_message:''});
-    }
+    outline=JSON.parse(raw.replace(/```json|```/g,'').trim());
+  }catch(e){
+    if(e.message==='QUOTA'){showQuotaErr();return}
+    // fallback outline
+    for(let i=0;i<count;i++)outline.push({day:dayLabel(i,count),type:types[i%types.length],angle:'',hook:'',key_msg:theme});
   }
 
-  // ── Render cards (no caption yet) ──
-  renderPlanCards(outline,writeCap);
-  setProgress(15,'Outline xong! '+(writeCap?'Đang viết caption...':''));
+  renderCards(outline,writeCap);
+  setProgress(15,writeCap?`Outline xong! Đang viết caption 1/${count}...`:'Outline xong!');
 
   if(!writeCap){
     setProgress(100,'Outline hoàn tất!');
-    setTimeout(()=>document.getElementById('planProgress').style.display='none',1500);
-    document.getElementById('genBtn').disabled=false;
-    document.getElementById('genBtn').textContent='✦ Gemini lên Content Plan';
+    setTimeout(()=>document.getElementById('planProg').style.display='none',1500);
+    document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').textContent='✦ Gemini lên Content Plan';
     return;
   }
 
-  // ── Step 2: Write captions sequentially ──
+  // WRITE CAPTIONS
   for(let i=0;i<outline.length;i++){
     const post=outline[i];
-    const pct=15+Math.round((i/outline.length)*82);
-    setProgress(pct,`Đang viết caption ${i+1}/${outline.length}: ${post.day}...`);
-    setPostStatus(i,'load');
-    setCaptionLoading(i);
+    setProgress(15+Math.round((i/outline.length)*82),`Đang viết caption ${i+1}/${outline.length}: ${post.day}...`);
+    setPS(i,'load');setCapLoading(i);
 
     const capPrompt=`Bạn là chuyên gia viết content social media.
 
-THÔNG TIN THƯƠNG HIỆU:
-${ctx}${refCtx}
+THƯƠNG HIỆU:
+${ctx}${rCtx}
 
-Viết 1 caption hoàn chỉnh cho bài đăng sau:
+Viết 1 caption hoàn chỉnh:
 - Ngày: ${post.day}
-- Loại bài: ${post.type}
-- Góc nhìn: ${post.angle||'phù hợp với loại bài'}
-- Ý tưởng hook: ${post.hook_idea||'tự chọn hook phù hợp'}
-- Thông điệp chính: ${post.key_message||theme}
-- Campaign: ${theme}${campaignDesc?'\n- Bối cảnh: '+campaignDesc:''}
+- Loại: ${post.type}
+- Góc nhìn: ${post.angle||'phù hợp'}
+- Hook idea: ${post.hook||'tự chọn'}
+- Thông điệp: ${post.key_msg||theme}
+- Campaign: ${theme}${campDesc?'\n- Bối cảnh: '+campDesc:''}
 
-Yêu cầu:
-- Viết đúng tone và style của thương hiệu như các caption mẫu
-- Đúng cấu trúc đã chọn
-- Đúng độ dài
-- Có emoji phù hợp
-- Kết thúc bằng CTA phù hợp
-- Có hashtag theo yêu cầu
-
+Viết đúng tone/style như caption mẫu. Đúng cấu trúc, độ dài, có emoji, CTA, hashtag.
 Chỉ trả về caption, không giải thích.`;
 
     try{
       const cap=await callGemini(capPrompt);
-      setCaptionDone(i,cap,post);
-      setPostStatus(i,'done');
-    }catch(err){
-      if(err.message==='QUOTA'){showQuotaErr();break}
-      setCaptionErr(i,'Lỗi: '+err.message);
-      setPostStatus(i,'err');
+      setCapDone(i,cap,post);setPS(i,'done');
+    }catch(e){
+      if(e.message==='QUOTA'){showQuotaErr();break}
+      setCapErr(i,'Lỗi: '+e.message);setPS(i,'err');
     }
   }
 
   setProgress(100,'Hoàn tất! 🎉');
-  setTimeout(()=>document.getElementById('planProgress').style.display='none',2000);
-  document.getElementById('genBtn').disabled=false;
-  document.getElementById('genBtn').textContent='✦ Tạo lại Plan';
+  setTimeout(()=>document.getElementById('planProg').style.display='none',2000);
+  document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').textContent='✦ Tạo lại Plan';
 }
 
 function setProgress(pct,txt){
-  document.getElementById('progressFill').style.width=pct+'%';
-  document.getElementById('progressTxt').textContent=txt;
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=txt;
 }
-
 function showQuotaErr(){
-  document.getElementById('genBtn').disabled=false;
-  document.getElementById('genBtn').textContent='✦ Gemini lên Content Plan';
-  document.getElementById('planProgress').style.display='none';
-  const eb=document.getElementById('ebox');
-  eb.style.display='block';
-  eb.textContent='⚠️ Hết quota Gemini. Vào tab Brand Profile → kiểm tra API key, hoặc bật billing tại console.cloud.google.com/billing rồi tạo API key mới.';
+  document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').textContent='✦ Gemini lên Content Plan';
+  document.getElementById('planProg').style.display='none';
+  const eb=document.getElementById('ebox');eb.style.display='block';
+  eb.textContent='⚠️ Hết quota Gemini. Kiểm tra API key hoặc bật billing tại console.cloud.google.com/billing.';
 }
 
 // ── RENDER CARDS ──
-function renderPlanCards(outline,writeCap){
+function renderCards(outline,writeCap){
   const out=document.getElementById('planOut');
-  out.innerHTML=`<div class="plan-grid" id="planGrid"></div>`;
-  const grid=document.getElementById('planGrid');
-  outline.forEach((post,i)=>{
-    const card=document.createElement('div');
-    card.className='post-card';card.id='post-'+i;
-    card.innerHTML=`
+  out.innerHTML='<div class="plan-grid" id="planGrid"></div>';
+  window._outline=outline;
+  outline.forEach((p,i)=>{
+    const c=document.createElement('div');c.className='post-card';c.id='pc-'+i;
+    c.innerHTML=`
       <div class="post-hd" onclick="toggleCard(${i})">
-        <div class="post-hd-left">
-          <span class="post-day">${post.day}</span>
-          <span class="post-type">${post.type}${post.angle?' · <span style="color:var(--tx3)">'+ post.angle+'</span>':''}</span>
+        <div class="post-hd-l">
+          <span class="post-day">${p.day}</span>
+          <span class="post-type">${p.type}${p.angle?` · <em style="color:var(--tx3);font-style:normal">${p.angle}</em>`:''}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          ${writeCap?'<span class="post-status ps-idle" id="status-'+i+'"></span>':'<span style="font-size:11px;color:var(--tx3)">▾</span>'}
-        </div>
+        ${writeCap?`<span class="psdot ps-idle" id="ps-${i}"></span>`:'<span style="font-size:11px;color:var(--tx3)">▾</span>'}
       </div>
-      <div class="post-body" id="body-${i}">
-        <div class="post-meta">
-          ${post.type?`<span class="meta-pill">${post.type}</span>`:''}
-          ${post.hook_idea?`<span class="meta-pill" style="color:var(--tx2)">Hook: ${post.hook_idea}</span>`:''}
+      <div class="post-body${i<2?' open':''}" id="pb-${i}">
+        <div class="meta-row">
+          ${p.hook?`<span class="mpill">Hook: ${p.hook}</span>`:''}
+          ${p.key_msg?`<span class="mpill">💡 ${p.key_msg}</span>`:''}
         </div>
         ${writeCap?`
-          <div class="caption-box loading" id="cap-${i}">Đang viết caption...</div>
-          <div class="caption-edit" id="edit-${i}"></div>
-          <div class="post-actions" id="actions-${i}" style="display:none">
-            <button class="btng" onclick="copyCaption(${i})">Copy caption</button>
-            <button class="btng" onclick="editCaption(${i})">Chỉnh sửa</button>
-            <button class="btns" style="font-size:11px;padding:3px 10px" onclick="saveCaption(${i})">Lưu lại</button>
-            <button class="btng" onclick="regenCaption(${i})">↻ Viết lại</button>
+          <div class="cap-box dim" id="cap-${i}"><span class="spin"></span> Đang viết...</div>
+          <textarea class="cap-edit" id="edit-${i}"></textarea>
+          <div class="post-acts" id="acts-${i}" style="display:none">
+            <button class="btng" onclick="copyC(${i})">Copy</button>
+            <button class="btng" onclick="editC(${i})">Chỉnh sửa</button>
+            <button class="btns" style="font-size:11px;padding:3px 12px" onclick="saveC(${i})">Lưu lại</button>
+            <button class="btng" onclick="regenC(${i})">↻ Viết lại</button>
           </div>
         `:`
-          <div style="font-size:12px;color:var(--tx3);margin-top:10px">
-            Key message: ${post.key_message||'—'}<br>
-            Hook idea: ${post.hook_idea||'—'}
+          <div class="post-acts" style="margin-top:10px">
+            <button class="btns" style="font-size:12px" onclick="writeOne(${i})">✦ Viết caption bài này</button>
           </div>
-          <div class="post-actions" style="margin-top:10px">
-            <button class="btns" style="font-size:12px" onclick="writeOneCap(${i})">✦ Viết caption bài này</button>
-          </div>
-          <div class="caption-box" id="cap-${i}" style="display:none"></div>
-          <div class="caption-edit" id="edit-${i}"></div>
-          <div class="post-actions" id="actions-${i}" style="display:none">
-            <button class="btng" onclick="copyCaption(${i})">Copy caption</button>
-            <button class="btng" onclick="editCaption(${i})">Chỉnh sửa</button>
-            <button class="btns" style="font-size:11px;padding:3px 10px" onclick="saveCaption(${i})">Lưu lại</button>
-            <button class="btng" onclick="regenCaption(${i})">↻ Viết lại</button>
+          <div class="cap-box" id="cap-${i}" style="display:none"></div>
+          <textarea class="cap-edit" id="edit-${i}"></textarea>
+          <div class="post-acts" id="acts-${i}" style="display:none">
+            <button class="btng" onclick="copyC(${i})">Copy</button>
+            <button class="btng" onclick="editC(${i})">Chỉnh sửa</button>
+            <button class="btns" style="font-size:11px;padding:3px 12px" onclick="saveC(${i})">Lưu lại</button>
+            <button class="btng" onclick="regenC(${i})">↻ Viết lại</button>
           </div>
         `}
       </div>`;
-    grid.appendChild(card);
-    // auto open first 3
-    if(i<3) document.getElementById('body-'+i).classList.add('open');
+    document.getElementById('planGrid').appendChild(c);
   });
-
-  // store outline globally
-  window._outline=outline;
 }
 
-function toggleCard(i){
-  const body=document.getElementById('body-'+i);
-  body.classList.toggle('open');
+function toggleCard(i){document.getElementById('pb-'+i).classList.toggle('open')}
+function setPS(i,st){const e=document.getElementById('ps-'+i);if(e)e.className='psdot ps-'+st}
+function setCapLoading(i){
+  const e=document.getElementById('cap-'+i);if(!e)return;
+  e.style.display='';e.className='cap-box dim';e.innerHTML='<span class="spin"></span> Đang viết caption...';
+}
+function setCapDone(i,cap,post){
+  const e=document.getElementById('cap-'+i);if(!e)return;
+  e.className='cap-box';e.textContent=cap;e.dataset.cap=cap;e.dataset.post=JSON.stringify(post||{});
+  e.style.display='';
+  const a=document.getElementById('acts-'+i);if(a)a.style.display='flex';
+}
+function setCapErr(i,msg){
+  const e=document.getElementById('cap-'+i);if(!e)return;
+  e.className='cap-box';e.style.color='var(--red)';e.textContent=msg;
 }
 
-function setPostStatus(i,st){
-  const el=document.getElementById('status-'+i);
-  if(!el)return;
-  el.className='post-status ps-'+st;
+async function writeOne(i){
+  const p=window._outline?.[i];if(!p)return;
+  const capEl=document.getElementById('cap-'+i);capEl.style.display='';
+  setCapLoading(i);
+  const prompt=`${brandCtx()}${refCtx()}\nViết caption: ${p.day} — ${p.type} (${p.angle||''})\nKey message: ${p.key_msg||g('theme')}\nCampaign: ${g('theme')}${g('campDesc')?'\n'+g('campDesc'):''}\nChỉ trả về caption.`;
+  try{const cap=await callGemini(prompt);setCapDone(i,cap,p)}
+  catch(e){setCapErr(i,'Lỗi: '+e.message)}
 }
 
-function setCaptionLoading(i){
-  const el=document.getElementById('cap-'+i);
-  if(!el)return;
-  el.style.display='';
-  el.className='caption-box loading';
-  el.innerHTML='<span class="spin"></span> Đang viết...';
-}
-
-function setCaptionDone(i,cap,post){
-  const el=document.getElementById('cap-'+i);
-  if(!el)return;
-  el.className='caption-box';
-  el.textContent=cap;
-  el.dataset.cap=cap;
-  el.dataset.post=JSON.stringify(post||{});
-  const actions=document.getElementById('actions-'+i);
-  if(actions)actions.style.display='flex';
-}
-
-function setCaptionErr(i,msg){
-  const el=document.getElementById('cap-'+i);
-  if(!el)return;
-  el.className='caption-box';
-  el.style.color='var(--red)';
-  el.textContent=msg;
-}
-
-// Write single caption
-async function writeOneCap(i){
-  const post=window._outline?.[i];
-  if(!post)return;
-  const ctx=buildCtx(),refCtx=buildRefCtx(),theme=g('theme'),cd=g('campaignDesc');
-  document.getElementById('cap-'+i).style.display='';
-  setCaptionLoading(i);
-  const prompt=`Bạn là chuyên gia viết content.
-THÔNG TIN THƯƠNG HIỆU:\n${ctx}${refCtx}
-Viết caption cho: ${post.day} — ${post.type}${post.angle?' ('+post.angle+')':''}
-Key message: ${post.key_message||theme}
-Hook: ${post.hook_idea||'tự chọn'}
-Campaign: ${theme}${cd?'\nBối cảnh: '+cd:''}
-Đúng tone, style, độ dài, cấu trúc. Chỉ trả về caption.`;
-  try{
-    const cap=await callGemini(prompt);
-    setCaptionDone(i,cap,post);
-  }catch(err){
-    setCaptionErr(i,'Lỗi: '+err.message);
-  }
-}
-
-async function regenCaption(i){
-  const post=window._outline?.[i];
-  if(!post)return;
-  setPostStatus(i,'load');
-  setCaptionLoading(i);
-  const actions=document.getElementById('actions-'+i);
-  if(actions)actions.style.display='none';
-  const ctx=buildCtx(),refCtx=buildRefCtx(),theme=g('theme'),cd=g('campaignDesc');
-  const prompt=`Viết lại caption MỚI HOÀN TOÀN (khác biệt với lần trước) cho:
-THƯƠNG HIỆU:\n${ctx}${refCtx}
-Bài: ${post.day} — ${post.type}${post.angle?' ('+post.angle+')':''}
-Key message: ${post.key_message||theme}. Campaign: ${theme}${cd?'\n'+cd:''}
+async function regenC(i){
+  const p=window._outline?.[i];if(!p)return;
+  setPS(i,'load');setCapLoading(i);
+  const a=document.getElementById('acts-'+i);if(a)a.style.display='none';
+  const prompt=`Viết lại caption HOÀN TOÀN MỚI (khác lần trước) cho:
+${brandCtx()}${refCtx()}
+Bài: ${p.day} — ${p.type} (${p.angle||''}). Key: ${p.key_msg||g('theme')}. Campaign: ${g('theme')}
 Chỉ trả về caption.`;
-  try{
-    const cap=await callGemini(prompt);
-    setCaptionDone(i,cap,post);
-    setPostStatus(i,'done');
-  }catch(err){
-    setCaptionErr(i,'Lỗi: '+err.message);
-    setPostStatus(i,'err');
-  }
+  try{const cap=await callGemini(prompt);setCapDone(i,cap,p);setPS(i,'done')}
+  catch(e){setCapErr(i,'Lỗi: '+e.message);setPS(i,'err')}
 }
 
-function editCaption(i){
+function editC(i){
   const capEl=document.getElementById('cap-'+i);
   const editEl=document.getElementById('edit-'+i);
   if(editEl.style.display==='block'){
-    // save edit
-    capEl.textContent=editEl.value;
-    capEl.dataset.cap=editEl.value;
-    editEl.style.display='none';
-    capEl.style.display='';
+    capEl.textContent=editEl.value;capEl.dataset.cap=editEl.value;
+    editEl.style.display='none';capEl.style.display='';
+    event.target.textContent='Chỉnh sửa';
   }else{
-    editEl.value=capEl.textContent;
-    editEl.style.display='block';
-    capEl.style.display='none';
-    editEl.focus();
+    editEl.value=capEl.textContent;editEl.style.display='block';capEl.style.display='none';
+    editEl.focus();event.target.textContent='✓ Lưu chỉnh sửa';
   }
 }
 
-function copyCaption(i){
-  const el=document.getElementById('cap-'+i);
-  const txt=el.dataset.cap||el.textContent;
-  navigator.clipboard.writeText(txt);
-  event.target.textContent='✓ Đã copy!';
-  setTimeout(()=>event.target.textContent='Copy caption',1500);
+function copyC(i){
+  const e=document.getElementById('cap-'+i);
+  navigator.clipboard.writeText(e.dataset.cap||e.textContent);
+  event.target.textContent='✓ Đã copy!';setTimeout(()=>event.target.textContent='Copy',1500);
 }
 
-function saveCaption(i){
-  const el=document.getElementById('cap-'+i);
-  const cap=el.dataset.cap||el.textContent;
-  const post=window._outline?.[i]||{};
-  saved.unshift({id:Date.now(),date:new Date().toLocaleString('vi-VN'),day:post.day||`Post ${i+1}`,type:post.type||'',cap});
+async function saveC(i){
+  const e=document.getElementById('cap-'+i);
+  const p=window._outline?.[i]||{};
+  const cap=e.dataset.cap||e.textContent;
+  const item={id:Date.now(),date:new Date().toLocaleString('vi-VN'),day:p.day||`Post ${i+1}`,type:p.type||'',cap};
+  saved.unshift(item);
   if(saved.length>100)saved=saved.slice(0,100);
-  localStorage.setItem('cp1_saved',JSON.stringify(saved));
+  localStorage.setItem('cp2_saved',JSON.stringify(saved));
+  if(sbConnected) await pushToSupabase(SAVED_ID,saved);
   uhc();
-  event.target.textContent='✓ Đã lưu!';
-  setTimeout(()=>event.target.textContent='Lưu lại',1500);
+  event.target.textContent='✓ Đã lưu!';setTimeout(()=>event.target.textContent='Lưu lại',1500);
 }
 
 // ── SAVED ──
@@ -912,34 +894,46 @@ function uhc(){document.getElementById('hc').textContent=saved.length?`(${saved.
 function renderSaved(){
   const l=document.getElementById('savedList');
   document.getElementById('savedCount').textContent=`${saved.length} caption đã lưu`;
-  if(!saved.length){l.innerHTML='<div class="empty"><div class="big">📋</div>Chưa có caption nào được lưu.<br>Tạo plan rồi nhấn "Lưu lại" trên từng caption.</div>';return}
+  if(!saved.length){l.innerHTML='<div class="empty"><div class="big">📋</div>Chưa có caption nào.<br>Nhấn "Lưu lại" trên từng caption trong Content Plan.</div>';return}
   l.innerHTML='';
   saved.forEach((item,i)=>{
-    const el=document.createElement('div');el.className='hist-item';
-    el.innerHTML=`<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span class="meta-pill" style="background:var(--ad);color:var(--ac)">${item.day}</span>
-        ${item.type?`<span class="meta-pill">${item.type}</span>`:''}
+    const el=document.createElement('div');el.className='si';
+    el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <span class="mpill" style="background:var(--ad);color:var(--ac)">${item.day}</span>
+        ${item.type?`<span class="mpill">${item.type}</span>`:''}
+        <span style="font-size:10px;color:var(--tx3)">${item.date}</span>
       </div>
       <div style="display:flex;gap:5px;flex-shrink:0">
         <button class="btng" onclick="copySaved(${i})">Copy</button>
         <button class="btnd" onclick="rmSaved(${i})">Xóa</button>
       </div>
     </div>
-    <div class="hist-cap">${item.cap}</div>
-    <div class="hist-meta"><span class="hist-date">${item.date}</span></div>`;
+    <div class="si-cap">${item.cap}</div>`;
     l.appendChild(el);
   });
 }
 function copySaved(i){navigator.clipboard.writeText(saved[i].cap);event.target.textContent='✓';setTimeout(()=>event.target.textContent='Copy',1500)}
-function rmSaved(i){if(confirm('Xóa caption này?')){saved.splice(i,1);localStorage.setItem('cp1_saved',JSON.stringify(saved));uhc();renderSaved()}}
-function clearSaved(){if(confirm('Xóa tất cả caption đã lưu?')){saved=[];localStorage.removeItem('cp1_saved');uhc();renderSaved()}}
+async function rmSaved(i){
+  saved.splice(i,1);localStorage.setItem('cp2_saved',JSON.stringify(saved));
+  if(sbConnected) await pushToSupabase(SAVED_ID,saved);
+  uhc();renderSaved();
+}
+async function clearSaved(){
+  if(confirm('Xóa tất cả?')){saved=[];localStorage.removeItem('cp2_saved');
+  if(sbConnected) await pushToSupabase(SAVED_ID,[]);uhc();renderSaved()}
+}
 
 // ── BOOT ──
-initTagInput('wordInput','wordsUsed',wordsUsed,'wordsUsed');
-initTagInput('hashInput','fixedTags',fixedTags,'fixedTags');
-initTagInput('pillarInput','pillarsRow',pillars,'pillarsRow');
-ld();
+// Load Supabase config
+const sbConf=JSON.parse(localStorage.getItem('cp2_sb')||'{}');
+if(sbConf.url&&sbConf.key){sbUrl=sbConf.url;sbKey=sbConf.key;sbConnected=true;setSyncStatus('syncing','Đang kết nối...')}
+else setSyncStatus('','Chưa sync');
+
+initTag('wordIn','wordsRow',wordsUsed);
+initTag('hashIn','hashRow',fixedTags);
+initTag('pillarIn','pillarsRow',pillars);
+loadAll();
 </script>
 </body>
 </html>
