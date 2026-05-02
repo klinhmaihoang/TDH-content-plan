@@ -222,12 +222,24 @@ CREATE POLICY "public_access" ON content_planner FOR ALL USING (true);</span>
     Điền thông tin cơ bản — AI dùng để viết đúng giọng, đúng audience. Tự động lưu local.
   </div>
 
-  <div class="lbl t0">Gemini API Key</div>
+  <div class="lbl t0">Gemini API Key & Model</div>
   <div class="card">
-    <div class="f mb0">
+    <div class="f" style="margin-bottom:10px">
       <label>API Key — <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ac);font-size:10px">→ Lấy miễn phí tại đây</a></label>
       <input type="password" id="apiKey" placeholder="AIzaSy..." oninput="debounceSave()"/>
-      <div class="hint">Dùng <strong style="color:var(--ac)">gemini-2.5-flash</strong> — free tier, không cần billing. Lấy key tại <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a></div>
+    </div>
+    <div class="f mb0">
+      <label>Model</label>
+      <select id="geminiModel" onchange="debounceSave()">
+        <optgroup label="🟢 Free tier (khuyên dùng)">
+          <option value="gemini-2.5-flash" selected>gemini-2.5-flash — Free, 5 RPM / 250 RPD</option>
+        </optgroup>
+        <optgroup label="💳 Trả phí (khi free hết quota)">
+          <option value="gemini-2.5-pro">gemini-2.5-pro — Tốt nhất, ~$3.5/1M tokens</option>
+          <option value="gemini-2.0-flash">gemini-2.0-flash — Nhanh, rẻ ~$0.1/1M tokens</option>
+        </optgroup>
+      </select>
+      <div class="hint">Free tier reset lúc <strong style="color:var(--tx)">2 giờ sáng giờ VN</strong> mỗi ngày. Khi hết quota → đổi sang model trả phí hoặc chờ reset.</div>
     </div>
   </div>
 
@@ -386,6 +398,8 @@ CREATE POLICY "public_access" ON content_planner FOR ALL USING (true);</span>
         </div>
       </div>
       <div class="period-row">
+        <button class="period-pill" data-v="1" onclick="setPeriod(this)">1 ngày</button>
+        <button class="period-pill" data-v="3" onclick="setPeriod(this)">3 ngày</button>
         <button class="period-pill on" data-v="7" onclick="setPeriod(this)">1 tuần · 7 ngày</button>
         <button class="period-pill" data-v="14" onclick="setPeriod(this)">2 tuần · 14 ngày</button>
         <button class="period-pill" data-v="30" onclick="setPeriod(this)">1 tháng · 30 ngày</button>
@@ -529,7 +543,7 @@ function updateCampaign(i,k,v){campaigns[i][k]=v}
 function debounceSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveAll(),800)}
 function collectData(){
   return{
-    apiKey:g('apiKey'),bn:g('bn'),bi:g('bi'),bd:g('bd'),
+    apiKey:g('apiKey'),geminiModel:g('geminiModel'),bn:g('bn'),bi:g('bi'),bd:g('bd'),
     audience:g('audience'),extra:g('extra'),
     platform:g('platform'),capLen:g('capLen'),
     myPost1:g('myPost1'),myPost2:g('myPost2'),myPost3:g('myPost3'),
@@ -537,7 +551,7 @@ function collectData(){
   };
 }
 function applyData(s){
-  ['apiKey','bn','bi','bd','audience','extra','platform','capLen','myPost1','myPost2','myPost3']
+  ['apiKey','geminiModel','bn','bi','bd','audience','extra','platform','capLen','myPost1','myPost2','myPost3']
     .forEach(id=>{if(s[id]!=null&&document.getElementById(id))document.getElementById(id).value=s[id]});
   if(s.selTones){selTones=s.selTones;selTones.forEach(v=>{const b=document.querySelector(`#toneRow .pill[data-v="${v}"]`);if(b)b.classList.add('on')})}
   if(s.kolBlocks&&s.kolBlocks.length){kolBlocks=s.kolBlocks;renderKolBlocks()}
@@ -645,14 +659,16 @@ function refCtx(){
 async function callGemini(prompt){
   const key=g('apiKey');
   if(!key)throw new Error('Chưa có API key');
-  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
+  const model=g('geminiModel')||'gemini-2.5-flash';
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,{
     method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.9}})
   });
   const data=await res.json();
   if(data.error){
     const m=data.error.message||'';
-    if(m.includes('quota')||data.error.code===429)throw new Error('QUOTA');
+    const code=data.error.code;
+    if(code===429||m.toLowerCase().includes('quota')||m.toLowerCase().includes('rate'))throw new Error('QUOTA');
     throw new Error(m);
   }
   return data.candidates?.[0]?.content?.parts?.[0]?.text||'';
@@ -671,6 +687,8 @@ function dayLabel(i,days,ppd){
   ppd=ppd||1;
   const dayIdx=Math.floor(i/ppd);
   const postNum=ppd>1?` #${(i%ppd)+1}`:'';
+  if(days===1)return`Hôm nay${postNum}`;
+  if(days===3)return`Ngày ${dayIdx+1}${postNum}`;
   if(days===7)return DAYS7[dayIdx%7]+postNum;
   if(days===14)return`Tuần ${Math.floor(dayIdx/7)+1} — ${DAYS7[dayIdx%7]}${postNum}`;
   return`Ngày ${dayIdx+1}${postNum}`;
@@ -743,7 +761,8 @@ Chỉ JSON.`;
   }
 
   renderCards(outline,writeCap);
-  setProgress(15,writeCap?`Outline xong! Đang viết ${outline.length} captions...`:'Outline xong!');
+  const estMin=Math.ceil(outline.length*13/60);
+  setProgress(15,writeCap?`Outline xong! Đang viết ${outline.length} captions (~${estMin} phút)...`:'Outline xong!');
 
   if(!writeCap){
     setProgress(100,'Outline hoàn tất!');
@@ -756,6 +775,8 @@ Chỉ JSON.`;
     const post=outline[i];
     setProgress(15+Math.round((i/outline.length)*82),`Đang viết caption ${i+1}/${outline.length}...`);
     setPS(i,'load');setCapLoading(i);
+    // Free tier = 5 RPM → cần 13s delay giữa mỗi request
+    if(i>0) await new Promise(r=>setTimeout(r,13000));
     const capPrompt=`Bạn là chuyên gia viết content social media.
 THƯƠNG HIỆU:\n${ctx}${rCtx}
 
@@ -773,7 +794,19 @@ Chỉ trả về caption, không giải thích.`;
       const cap=await callGemini(capPrompt);
       setCapDone(i,cap,post);setPS(i,'done');
     }catch(e){
-      if(e.message==='QUOTA'){showQuotaErr();break}
+      if(e.message==='QUOTA'){
+        // Rate limited — wait 15s and retry once
+        setCapErr(i,'⏳ Đang chờ rate limit...');
+        await new Promise(r=>setTimeout(r,15000));
+        try{
+          const cap=await callGemini(capPrompt);
+          setCapDone(i,cap,post);setPS(i,'done');
+        }catch(e2){
+          if(e2.message==='QUOTA'){showQuotaErr();break}
+          setCapErr(i,'Lỗi: '+e2.message);setPS(i,'err');
+        }
+        continue;
+      }
       setCapErr(i,'Lỗi: '+e.message);setPS(i,'err');
     }
   }
@@ -791,7 +824,7 @@ function showQuotaErr(){
   document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').textContent='✦ Gemini lên Content Plan';
   document.getElementById('planProg').style.display='none';
   const eb=document.getElementById('ebox');eb.style.display='block';
-  eb.textContent='⚠️ Hết quota Gemini. Kiểm tra API key hoặc bật billing tại console.cloud.google.com/billing.';
+  eb.innerHTML='⚠️ Hết quota hoặc rate limit. <strong>Đổi model sang gemini-2.5-pro hoặc gemini-2.0-flash</strong> trong tab Brand để tiếp tục, hoặc chờ reset lúc 2 giờ sáng giờ VN.';
 }
 
 // ── RENDER CARDS ──
