@@ -967,11 +967,14 @@ function editC(i){
 }
 function copyC(i){
   const e=document.getElementById('cap-'+i);
+  const btn=event.target;
   navigator.clipboard.writeText(e.dataset.cap||e.textContent);
-  event.target.textContent='✓ Đã copy!';setTimeout(()=>event.target.textContent='Copy',1500);
+  btn.textContent='✓ Đã copy!';setTimeout(()=>btn.textContent='Copy',1500);
 }
 async function saveC(i){
   const e=document.getElementById('cap-'+i);
+  const btn=event.target;
+  btn.disabled=true;btn.textContent='Đang lưu...';
   const p=window._outline?.[i]||{};
   const cap=e.dataset.cap||e.textContent;
   const item={id:Date.now(),date:new Date().toLocaleString('vi-VN'),day:p.day||`Post ${i+1}`,type:p.type||'',campaign:p.campaign||'',cap};
@@ -980,7 +983,8 @@ async function saveC(i){
   localStorage.setItem('cp3_saved',JSON.stringify(saved));
   if(sbConnected) await pushToSupabase(SAVED_ID,saved);
   uhc();
-  event.target.textContent='✓ Đã lưu!';setTimeout(()=>event.target.textContent='Lưu lại',1500);
+  btn.disabled=false;btn.textContent='✓ Đã lưu!';
+  setTimeout(()=>btn.textContent='Lưu lại',1500);
 }
 
 // ── SAVED ──
@@ -1021,7 +1025,7 @@ function toggleSeeMore(i){
   const ex=ce.classList.toggle('expanded');
   btn.textContent=ex?'Thu gọn ↑':'Xem thêm ↓';
 }
-function copySaved(i){navigator.clipboard.writeText(saved[i].cap);event.target.textContent='✓';setTimeout(()=>event.target.textContent='Copy',1500)}
+function copySaved(i){const btn=event.target;navigator.clipboard.writeText(saved[i].cap);btn.textContent='✓';setTimeout(()=>btn.textContent='Copy',1500)}
 async function rmSaved(i){
   saved.splice(i,1);
   localStorage.setItem('cp3_saved',JSON.stringify(saved));
