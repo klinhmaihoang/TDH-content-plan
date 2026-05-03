@@ -1074,13 +1074,37 @@ async function clearSaved(){
   }
 }
 
+// ── DEFAULTS (điền key của bạn vào đây — ai mở app cũng dùng được ngay) ──
+const DEFAULT_GEMINI_KEY = '';   // VD: 'AIzaSyXXXXXXXXXXXXXXXXX'
+const DEFAULT_MODEL      = 'gemini-2.5-flash';
+const DEFAULT_SB_URL     = '';   // VD: 'https://xxxx.supabase.co'
+const DEFAULT_SB_KEY     = '';   // VD: 'eyJhbGci...'
+
 // ── BOOT ──
+// Supabase: ưu tiên localStorage (user đã nhập tay), fallback về default
 const sbConf=JSON.parse(localStorage.getItem('cp3_sb')||'{}');
-if(sbConf.url&&sbConf.key){sbUrl=sbConf.url;sbKey=sbConf.key;sbConnected=true;setSyncStatus('syncing','Đang kết nối...')}
-else setSyncStatus('','Chưa sync');
+const _sbUrl=sbConf.url||DEFAULT_SB_URL;
+const _sbKey=sbConf.key||DEFAULT_SB_KEY;
+if(_sbUrl&&_sbKey){
+  sbUrl=_sbUrl;sbKey=_sbKey;sbConnected=true;
+  // Lưu vào localStorage luôn để lần sau không cần xử lý lại
+  localStorage.setItem('cp3_sb',JSON.stringify({url:_sbUrl,key:_sbKey}));
+  setSyncStatus('syncing','Đang kết nối...');
+} else setSyncStatus('','Chưa sync');
 
 renderKolBlocks();
 loadAll();
+
+// Sau khi load xong, điền default key nếu chưa có
+setTimeout(()=>{
+  if(!g('apiKey')&&DEFAULT_GEMINI_KEY){
+    document.getElementById('apiKey').value=DEFAULT_GEMINI_KEY;
+    debounceSave();
+  }
+  if(!g('geminiModel')&&DEFAULT_MODEL){
+    document.getElementById('geminiModel').value=DEFAULT_MODEL;
+  }
+},600);
 </script>
 </body>
 </html>
