@@ -1,1110 +1,1156 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Content Planner</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
-<style>
-:root{
-  --bg:#0e0e11;--s1:#16161a;--s2:#1e1e24;--s3:#26262e;
-  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);
-  --tx:#f0eff4;--tx2:#8e8d9a;--tx3:#55545f;
-  --ac:#c8f060;--ac2:#a8d040;--ad:rgba(200,240,96,.12);--ad2:rgba(200,240,96,.05);
-  --red:#ff5f57;--rd:rgba(255,95,87,.12);--gold:#f5c842;
-  --r:14px;--rs:8px;
+import { useState, useRef, useEffect } from "react";
+import * as XLSX from "xlsx";
+
+// ===== SUPABASE CONFIG =====
+const SUPABASE_URL = "https://aleijrjqfrortenufhzn.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZWlqcmpxZnJvcnRlbnVmaHpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NjAwNjUsImV4cCI6MjA5NDMzNjA2NX0.I-UQyj-lFfJehTtj8HCwQ3Vdb1uznL8fuYcTJYIb5Po";
+
+async function sbFetch(path, options = {}) {
+  const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + SUPABASE_KEY,
+      "Prefer": "return=representation",
+      ...(options.headers || {}),
+    },
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error("Supabase error: " + err);
+  }
+  return res.json();
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh}
-body{padding:24px 20px 80px;max-width:720px;margin:0 auto}
 
-.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-.logo{display:flex;align-items:center;gap:10px}
-.lm{width:32px;height:32px;background:var(--ac);border-radius:9px;display:grid;place-items:center;flex-shrink:0}
-.lm svg{width:17px;height:17px}
-.ln{font-family:'Instrument Serif',serif;font-size:18px;letter-spacing:-.3px}
-.ln em{color:var(--ac);font-style:normal}
-.sync-status{display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:20px;font-size:11px;color:var(--tx3);cursor:pointer;transition:all .2s}
-.sync-status:hover{border-color:var(--bd2);color:var(--tx2)}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--tx3);flex-shrink:0;transition:background .3s}
-.sync-dot.ok{background:#6fdf7f}.sync-dot.err{background:var(--red)}.sync-dot.syncing{background:var(--gold);animation:pu 1s infinite}
+async function savePlanToSupabase(planData, platform, freq, numWeeks) {
+  // 1. Insert plan
+  const [plan] = await sbFetch("content_plans", {
+    method: "POST",
+    body: JSON.stringify({ theme: planData.month_theme, platform, freq, num_weeks: numWeeks }),
+  });
 
-.nav{display:flex;gap:2px;background:var(--s1);border:1px solid var(--bd);border-radius:13px;padding:4px;margin-bottom:22px}
-.nb{flex:1;padding:8px 6px;font-size:12px;font-weight:500;border:none;background:transparent;color:var(--tx2);cursor:pointer;border-radius:9px;transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
-.nb:hover{color:var(--tx);background:var(--s2)}
-.nb.on{background:var(--s3);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.35)}
-.tab{display:none}.tab.on{display:block}
+  // 2. Insert all posts
+  const posts = [];
+  for (const w of planData.weeks || []) {
+    for (const p of w.posts || []) {
+      posts.push({
+        plan_id: plan.id,
+        week_number: w.week,
+        week_title: w.title,
+        day: p.day,
+        pillar: p.pillar,
+        topic: p.topic,
+        platform: p.platform,
+        format: p.format,
+        status: p.status || "Chưa làm",
+      });
+    }
+  }
+  await sbFetch("content_posts", {
+    method: "POST",
+    body: JSON.stringify(posts),
+  });
+  return plan.id;
+}
 
-.lbl{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;margin-top:20px}
-.lbl.t0{margin-top:0}
-.sub{font-size:12px;color:var(--tx3);margin-bottom:10px;line-height:1.6}
-.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:10px}
-.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.f{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
-.f:last-child,.f.mb0{margin-bottom:0}
-.f>label{font-size:11px;color:var(--tx2)}
-input,select,textarea{width:100%;padding:9px 12px;font-size:13px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);color:var(--tx);font-family:'DM Sans',sans-serif;transition:border-color .2s;outline:none}
-input::placeholder,textarea::placeholder{color:var(--tx3)}
-input:focus,select:focus,textarea:focus{border-color:rgba(200,240,96,.4)}
-input[type=password]{letter-spacing:.05em}
-textarea{resize:vertical;line-height:1.65}
-select option{background:var(--s2)}
-.hint{font-size:11px;color:var(--tx3);margin-top:3px;line-height:1.5}
-.hint a{color:var(--ac);text-decoration:none}
+async function loadSavedPlans() {
+  return sbFetch("content_plans?select=*&order=created_at.desc&limit=10");
+}
 
-.ibox{background:var(--ad2);border:1px solid rgba(200,240,96,.15);border-radius:var(--rs);padding:11px 14px;font-size:12px;color:var(--tx2);line-height:1.75;margin-bottom:12px}
-.ibox strong{color:var(--ac)}
-.ebox{background:var(--rd);border:1px solid rgba(255,95,87,.2);border-radius:var(--rs);padding:11px 14px;font-size:12px;color:var(--red);line-height:1.7;margin-bottom:12px;display:none}
+async function loadPlanPosts(planId) {
+  return sbFetch("content_posts?plan_id=eq." + planId + "&order=week_number.asc,id.asc");
+}
 
-.pill-row{display:flex;gap:6px;flex-wrap:wrap}
-.pill{padding:5px 12px;font-size:12px;border:1px solid var(--bd2);border-radius:20px;cursor:pointer;background:transparent;color:var(--tx2);transition:all .15s;font-family:'DM Sans',sans-serif}
-.pill:hover{color:var(--tx)}
-.pill.on{background:var(--ad);color:var(--ac);border-color:rgba(200,240,96,.35)}
+async function updatePostStatus(postId, status) {
+  return sbFetch("content_posts?id=eq." + postId, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}
 
-.btnp{width:100%;padding:12px;font-size:14px;font-weight:500;border-radius:var(--rs);border:none;background:var(--ac);color:#0e0e11;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-.btnp:hover:not(:disabled){background:var(--ac2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(200,240,96,.2)}
-.btnp:disabled{opacity:.4;cursor:not-allowed}
-.btns{padding:7px 14px;font-size:13px;border-radius:var(--rs);border:1px solid var(--bd2);background:transparent;color:var(--tx2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-.btns:hover:not(:disabled){color:var(--tx);background:var(--s2)}
-.btng{font-size:11px;padding:3px 9px;border:1px solid var(--bd);border-radius:6px;cursor:pointer;background:transparent;color:var(--tx3);font-family:'DM Sans',sans-serif;transition:all .15s}
-.btng:hover{color:var(--tx);border-color:var(--bd2)}
-.btnd{font-size:11px;padding:3px 9px;border:1px solid rgba(255,95,87,.25);border-radius:6px;cursor:pointer;background:transparent;color:var(--red);font-family:'DM Sans',sans-serif}
-.btnd:hover{background:var(--rd)}
+const TABS = [
+  { id: "hook", label: "🪝 Hook Generator", icon: "🪝" },
+  { id: "caption", label: "✍️ Caption Builder", icon: "✍️" },
+  { id: "script", label: "🎬 Script TikTok", icon: "🎬" },
+  { id: "plan", label: "📅 Content Plan", icon: "📅" },
+  { id: "sop", label: "📋 SOP & Checklist", icon: "📋" },
+];
 
-/* KOL PASTE */
-.kol-block{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:12px;margin-bottom:8px;position:relative}
-.kol-block-num{font-size:10px;color:var(--tx3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
-.kol-add-btn{width:100%;padding:8px;font-size:12px;border:1px dashed var(--bd2);border-radius:var(--rs);cursor:pointer;background:transparent;color:var(--tx3);font-family:'DM Sans',sans-serif;transition:all .15s;margin-bottom:0}
-.kol-add-btn:hover{color:var(--ac);border-color:rgba(200,240,96,.3)}
+const AUDIENCES = [
+  "Học viên muốn khởi nghiệp pha chế",
+  "Người đang mở quán trà sữa / trà trái cây",
+  "Người yêu thích đồ uống, tự làm tại nhà",
+  "Tất cả đối tượng",
+];
 
-/* PLAN */
-.plan-grid{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.post-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:border-color .2s}
-.post-card:hover{border-color:var(--bd2)}
-.post-hd{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
-.post-hd-l{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
-.post-day{padding:3px 9px;font-size:11px;font-weight:500;border-radius:6px;background:var(--ad);color:var(--ac);flex-shrink:0}
-.post-type{font-size:12px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.post-camp{font-size:10px;color:var(--ac);background:rgba(200,240,96,.08);border:1px solid rgba(200,240,96,.15);border-radius:4px;padding:1px 6px;flex-shrink:0}
-.psdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.ps-idle{background:var(--tx3)}.ps-load{background:var(--gold);animation:pu 1s infinite}.ps-done{background:#6fdf7f}.ps-err{background:var(--red)}
-@keyframes pu{0%,100%{opacity:1}50%{opacity:.3}}
-.post-body{padding:0 16px 14px;display:none;border-top:1px solid var(--bd)}
-.post-body.open{display:block}
-.cap-box{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:13px;font-size:13px;line-height:1.8;color:var(--tx);white-space:pre-wrap;margin-top:10px;min-height:50px}
-.cap-box.dim{color:var(--tx3);font-style:italic;display:flex;align-items:center;gap:8px}
-.cap-edit{width:100%;padding:11px 12px;font-size:13px;line-height:1.8;background:var(--s2);border:1px solid rgba(200,240,96,.3);border-radius:var(--rs);color:var(--tx);font-family:'DM Sans',sans-serif;resize:vertical;outline:none;margin-top:10px;display:none}
-.meta-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
-.mpill{padding:2px 7px;font-size:10px;background:var(--s3);border-radius:4px;color:var(--tx3)}
-.post-acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+const PLATFORMS = ["Facebook", "TikTok", "Instagram", "Facebook + TikTok"];
+const GOALS = [
+  "Chia sẻ kiến thức & mẹo nghề",
+  "R&D & ra công thức mới",
+  "Truyền cảm hứng & câu chuyện cá nhân",
+  "Tăng tương tác (engagement)",
+  "Giới thiệu khoá học / promo",
+];
+const DURATIONS = ["30 giây", "60 giây", "90 giây"];
+const STYLES = ["Chia sẻ kiến thức", "Kể chuyện cá nhân", "Hướng dẫn step-by-step", "Review sản phẩm R&D"];
+const FREQUENCIES = ["1 bài/ngày", "2 bài/ngày", "5 bài/tuần", "3 bài/tuần"];
 
-.spin{width:14px;height:14px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
+function CopyButton({ text }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }}
+      style={{
+        display: "inline-flex", alignItems: "center", gap: 6,
+        padding: "6px 14px", borderRadius: 8, border: "1.5px solid #d97706",
+        background: copied ? "#d97706" : "transparent",
+        color: copied ? "#fff" : "#d97706",
+        fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all .2s",
+      }}
+    >
+      {copied ? "✓ Đã copy!" : "Copy"}
+    </button>
+  );
+}
 
-.progress-bar{height:3px;background:var(--s3);border-radius:2px;margin:10px 0;overflow:hidden}
-.progress-fill{height:100%;background:var(--ac);border-radius:2px;transition:width .4s}
-
-/* PERIOD */
-.period-row{display:flex;gap:6px;flex-wrap:wrap}
-.period-pill{padding:7px 16px;font-size:12px;font-weight:500;border:1px solid var(--bd2);border-radius:20px;cursor:pointer;background:transparent;color:var(--tx2);transition:all .15s;font-family:'DM Sans',sans-serif}
-.period-pill.on{background:var(--ad);color:var(--ac);border-color:rgba(200,240,96,.35)}
-
-/* THEME MODE */
-.tmode-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.tmode-pill{padding:6px 14px;font-size:12px;border:1px solid var(--bd2);border-radius:20px;cursor:pointer;background:transparent;color:var(--tx2);transition:all .15s;font-family:'DM Sans',sans-serif}
-.tmode-pill.on{background:var(--ad);color:var(--ac);border-color:rgba(200,240,96,.35)}
-
-/* CAMPAIGN BLOCK */
-.camp-block{background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:12px;margin-bottom:8px;position:relative}
-.camp-num{font-size:10px;color:var(--tx3);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.add-btn{width:100%;padding:8px;font-size:12px;border:1px dashed var(--bd2);border-radius:var(--rs);cursor:pointer;background:transparent;color:var(--tx3);font-family:'DM Sans',sans-serif;transition:all .15s;margin-bottom:10px}
-.add-btn:hover{color:var(--ac);border-color:rgba(200,240,96,.3)}
-
-/* SAVED */
-.si{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:8px;transition:border-color .2s}
-.si:hover{border-color:var(--bd2)}
-.si-cap{font-size:13px;color:var(--tx);line-height:1.75;margin-top:8px;white-space:pre-wrap;overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical}
-.si-cap.expanded{display:block}
-.see-more-btn{font-size:11px;color:var(--ac);background:none;border:none;cursor:pointer;padding:5px 0 0;font-family:'DM Sans',sans-serif;display:none}
-.see-more-btn:hover{text-decoration:underline}
-.empty{text-align:center;padding:48px 20px;color:var(--tx3);font-size:13px;line-height:2.2}
-.empty .big{font-size:32px;margin-bottom:6px}
-
-/* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:100}
-.modal-bg.open{display:flex}
-.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:var(--r);padding:22px;width:100%;max-width:460px;margin:16px;position:relative}
-.modal h3{font-family:'Instrument Serif',serif;font-size:17px;margin-bottom:5px}
-.modal p{font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:14px}
-.close-modal{position:absolute;top:10px;right:14px;cursor:pointer;color:var(--tx3);font-size:18px;background:none;border:none;line-height:1}
-
-/* AI EDIT BOX */
-.ai-edit-box{background:var(--s2);border:1px solid rgba(200,240,96,.25);border-radius:var(--rs);padding:10px;margin-top:8px;display:none}
-.ai-edit-box textarea{margin-bottom:8px;border-color:var(--bd)}
-.ai-edit-actions{display:flex;gap:6px}
-
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
-</style>
-</head>
-<body>
-
-<!-- SYNC MODAL -->
-<div class="modal-bg" id="syncModal">
-  <div class="modal">
-    <button class="close-modal" onclick="closeModal()">×</button>
-    <h3>☁ Sync qua thiết bị</h3>
-    <p>Dùng <strong style="color:var(--ac)">Supabase</strong> để lưu cloud — miễn phí.<br>
-    Sau khi kết nối: <strong style="color:var(--tx)">API key, toàn bộ thông tin brand và caption đã lưu</strong> sẽ tự động sync giữa mọi thiết bị.</p>
-    <div style="background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.2);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--gold);line-height:1.7;margin-bottom:12px">
-      ⚠️ <strong>Lưu ý:</strong> Supabase URL & Key này cần nhập <strong>1 lần mỗi thiết bị mới</strong> (lưu trong máy đó). Sau đó mọi thứ còn lại tự động sync.
+function Spinner() {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", padding: "2rem 0" }}>
+      <div style={{
+        width: 32, height: 32, border: "3px solid #f3e8d0",
+        borderTop: "3px solid #d97706", borderRadius: "50%",
+        animation: "spin 0.8s linear infinite",
+      }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--rs);padding:12px;font-size:12px;color:var(--tx2);line-height:1.9;margin-bottom:14px">
-      1. Vào <a href="https://supabase.com" target="_blank" style="color:var(--ac)">supabase.com</a> → tạo project<br>
-      2. <strong style="color:var(--tx)">Project Settings → API</strong> → copy URL & anon key<br>
-      3. <strong style="color:var(--tx)">SQL Editor</strong> → chạy SQL bên dưới
-    </div>
-    <div style="background:var(--bg);border:1px solid var(--bd);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--tx3);font-family:monospace;line-height:1.7;margin-bottom:14px;position:relative">
-      <button class="btng" style="position:absolute;top:6px;right:6px;font-size:10px" onclick="copySQL()">Copy SQL</button>
-      <span id="sqlCode">CREATE TABLE IF NOT EXISTS content_planner (
-  id TEXT PRIMARY KEY,
-  data JSONB NOT NULL,
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-ALTER TABLE content_planner ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "public_access" ON content_planner FOR ALL USING (true);</span>
-    </div>
-    <div class="f" style="margin-bottom:10px">
-      <label style="font-size:11px;color:var(--tx2)">Supabase Project URL</label>
-      <input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co"/>
-    </div>
-    <div class="f" style="margin-bottom:0">
-      <label style="font-size:11px;color:var(--tx2)">Supabase Anon Key</label>
-      <input type="password" id="sbKey" placeholder="eyJ..."/>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:14px">
-      <button class="btnp" onclick="saveSupabase()" style="flex:1">Lưu & Kết nối</button>
-      <button class="btns" onclick="closeModal()">Huỷ</button>
-    </div>
-    <div style="font-size:11px;color:var(--tx3);margin-top:8px;text-align:center" id="sbTestResult"></div>
-  </div>
-</div>
+  );
+}
 
-<!-- MAIN -->
-<div class="hdr">
-  <div class="logo">
-    <div class="lm">
-      <svg viewBox="0 0 18 18" fill="none">
-        <rect x="2" y="2" width="6" height="6" rx="1.5" fill="#0e0e11"/>
-        <rect x="10" y="2" width="6" height="6" rx="1.5" fill="#0e0e11" opacity=".6"/>
-        <rect x="2" y="10" width="6" height="6" rx="1.5" fill="#0e0e11" opacity=".6"/>
-        <rect x="10" y="10" width="6" height="6" rx="1.5" fill="#0e0e11" opacity=".3"/>
-      </svg>
-    </div>
-    <span class="ln">Content<em>Planner</em></span>
-  </div>
-  <div class="sync-status" id="syncBtn" onclick="openModal()">
-    <span class="sync-dot" id="syncDot"></span>
-    <span id="syncTxt">Chưa sync</span>
-  </div>
-</div>
+async function callClaude(systemPrompt, userPrompt) {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userPrompt }],
+    }),
+  });
+  const data = await res.json();
+  const text = data.content?.map(b => b.text || "").join("") || "";
+  const clean = text.replace(/```json|```/g, "").trim();
+  try { return JSON.parse(clean); } catch { return { raw: text }; }
+}
 
-<nav class="nav">
-  <button class="nb on" onclick="go('brand')">Brand</button>
-  <button class="nb" onclick="go('ref')">Nội dung mẫu</button>
-  <button class="nb" onclick="go('plan')">Content Plan</button>
-  <button class="nb" onclick="go('saved')">Đã lưu <span id="hc"></span></button>
-</nav>
+// ===== HOOK GENERATOR =====
+function HookGenerator() {
+  const [topic, setTopic] = useState("");
+  const [platform, setPlatform] = useState("Facebook");
+  const [audience, setAudience] = useState(AUDIENCES[0]);
+  const [hooks, setHooks] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-<!-- ═══ BRAND ═══ -->
-<div id="tab-brand" class="tab on">
-  <div class="ibox">
-    Điền thông tin cơ bản — AI dùng để viết đúng giọng, đúng audience. Tự động lưu local.
-  </div>
+  async function generate() {
+    if (!topic.trim()) { setError("Vui lòng nhập chủ đề!"); return; }
+    setError(""); setLoading(true); setHooks(null);
+    try {
+      const sys = `Bạn là chuyên gia content viral tiếng Việt, viết thay cho cô Trương Dáng Hương — giáo viên pha chế trà trái cây, trà sữa và R&D sáng tạo tại Việt Nam. Tone: chuyên nghiệp nhưng thân gần như người chị/cô, viết ngôi thứ nhất (cô/mình). Luôn trả về JSON hợp lệ, không có markdown fences.`;
+      const usr = `Chủ đề: ${topic}\nNền tảng: ${platform}\nĐối tượng: ${audience}\n\nTạo 5 hook mở đầu KHÁC NHAU theo 5 công thức:\n1. Số liệu / sự thật bất ngờ về pha chế\n2. Câu hỏi gây tò mò cho người học/mở quán\n3. Phủ định quan niệm sai lầm phổ biến\n4. Lời hứa kết quả cụ thể\n5. Story mở đầu từ kinh nghiệm thực tế của cô Hương\n\nMỗi hook tối đa 2 dòng. Viết tiếng Việt tự nhiên, không sáo rỗng.\nTrả về JSON: {"hooks": [{"type": "...", "text": "..."}]}`;
+      const result = await callClaude(sys, usr);
+      setHooks(result.hooks || []);
+    } catch { setError("Có lỗi xảy ra, vui lòng thử lại."); }
+    setLoading(false);
+  }
 
-  <div class="lbl t0">Gemini API Key & Model</div>
-  <div class="card">
-    <div class="f" style="margin-bottom:10px">
-      <label>API Key — <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--ac);font-size:10px">→ Lấy miễn phí tại đây</a></label>
-      <input type="password" id="apiKey" placeholder="AIzaSy..." oninput="debounceSave()"/>
-    </div>
-    <div class="f mb0">
-      <label>Model</label>
-      <select id="geminiModel" onchange="debounceSave()">
-        <optgroup label="🟢 Free tier (khuyên dùng)">
-          <option value="gemini-2.5-flash" selected>gemini-2.5-flash — Free, 5 RPM / 250 RPD</option>
-        </optgroup>
-        <optgroup label="💳 Trả phí (khi free hết quota)">
-          <option value="gemini-2.5-pro">gemini-2.5-pro — Tốt nhất, ~$3.5/1M tokens</option>
-          <option value="gemini-2.0-flash">gemini-2.0-flash — Nhanh, rẻ ~$0.1/1M tokens</option>
-        </optgroup>
-      </select>
-      <div class="hint">Free tier reset lúc <strong style="color:var(--tx)">2 giờ sáng giờ VN</strong> mỗi ngày. Khi hết quota → đổi sang model trả phí hoặc chờ reset.</div>
-    </div>
-  </div>
+  const hookTypes = ["Số liệu bất ngờ", "Câu hỏi tò mò", "Phủ định sai lầm", "Lời hứa kết quả", "Story thực tế"];
+  const hookColors = ["#7c3aed", "#0891b2", "#d97706", "#059669", "#dc2626"];
 
-  <div class="lbl">Thương hiệu</div>
-  <div class="card">
-    <div class="r2" style="margin-bottom:12px">
-      <div class="f mb0"><label>Tên thương hiệu</label><input type="text" id="bn" placeholder="VD: Trương Dáng Hương Academy" oninput="debounceSave()"/></div>
-      <div class="f mb0"><label>Ngành</label>
-        <select id="bi" onchange="debounceSave()">
-          <option value="">Chọn ngành...</option>
-          <option>Ẩm thực & F&B</option><option>Thời trang & phụ kiện</option>
-          <option>Làm đẹp & skincare</option><option>Sức khoẻ & wellness</option>
-          <option>Giáo dục & đào tạo</option><option>Công nghệ & phần mềm</option>
-          <option>Bất động sản</option><option>Du lịch & lưu trú</option>
-          <option>Thể thao & gym</option><option>Nội thất & thiết kế</option>
-          <option>Tài chính & đầu tư</option><option>Personal brand / KOL</option><option>Khác</option>
-        </select>
-      </div>
-    </div>
-    <div class="f mb0">
-      <label>Mô tả ngắn — bạn làm gì, bán gì, điểm khác biệt</label>
-      <textarea id="bd" rows="3" placeholder="VD: Dạy làm nước detox, coaching 1-1 giảm cân lành mạnh cho phụ nữ sau sinh. Khác biệt: không ăn kiêng cực đoan, tập trung thay đổi mindset..." oninput="debounceSave()"></textarea>
-    </div>
-  </div>
-
-  <div class="lbl">Khách hàng & Tone</div>
-  <div class="card">
-    <div class="f">
-      <label>Khách hàng — họ là ai, đang gặp gì, muốn gì</label>
-      <textarea id="audience" rows="3" placeholder="VD: Nữ 25-40 tuổi, có con nhỏ, bận rộn, tự ti vì tăng cân sau sinh. Muốn lấy lại vóc dáng, tự tin hơn nhưng không có thời gian tập gym..." oninput="debounceSave()"></textarea>
-    </div>
-    <div class="f mb0">
-      <label>Tone — chọn 1-3 cái phù hợp nhất</label>
-      <div class="pill-row" id="toneRow" style="margin-top:4px">
-        <button class="pill" data-v="Gần gũi như bạn bè" onclick="togglePill(this)">Gần gũi</button>
-        <button class="pill" data-v="Chuyên nghiệp, tin cậy" onclick="togglePill(this)">Chuyên nghiệp</button>
-        <button class="pill" data-v="Truyền cảm hứng, động lực" onclick="togglePill(this)">Truyền cảm hứng</button>
-        <button class="pill" data-v="Hài hước, vui vẻ" onclick="togglePill(this)">Hài hước</button>
-        <button class="pill" data-v="Sang trọng, cao cấp" onclick="togglePill(this)">Sang trọng</button>
-        <button class="pill" data-v="Giáo dục, chia sẻ kiến thức" onclick="togglePill(this)">Giáo dục</button>
-        <button class="pill" data-v="Thẳng thắn, trực tiếp" onclick="togglePill(this)">Thẳng thắn</button>
-        <button class="pill" data-v="Nhẹ nhàng, tinh tế" onclick="togglePill(this)">Nhẹ nhàng</button>
-        <button class="pill" data-v="Cảm xúc, chạm đến lòng người" onclick="togglePill(this)">Cảm xúc</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="lbl">Format</div>
-  <div class="card">
-    <div class="r2" style="margin-bottom:0">
-      <div class="f mb0"><label>Platform</label>
-        <select id="platform" onchange="debounceSave()">
-          <option>Facebook</option><option>Instagram</option><option>TikTok</option>
-          <option>LinkedIn</option><option>Threads</option><option>Twitter/X</option>
-        </select>
-      </div>
-      <div class="f mb0"><label>Độ dài caption</label>
-        <select id="capLen" onchange="debounceSave()">
-          <option value="short">Ngắn (dưới 100 chữ)</option>
-          <option value="medium" selected>Vừa (100-250 chữ)</option>
-          <option value="long">Dài (250-500 chữ)</option>
-          <option value="vlong">Rất dài (500+, kể chuyện)</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <div class="f" style="margin-top:4px">
-    <label style="font-size:11px;color:var(--tx2)">Lưu ý thêm (không bắt buộc) — tránh nhắc gì, USP đặc biệt, thông tin khác</label>
-    <textarea id="extra" rows="2" placeholder="VD: Không so sánh đối thủ, không cam kết giảm X kg..." oninput="debounceSave()"></textarea>
-  </div>
-
-  <button class="btnp" onclick="go('ref')" style="margin-top:8px">Tiếp → Nội dung mẫu</button>
-</div>
-
-<!-- ═══ REF ═══ -->
-<div id="tab-ref" class="tab">
-  <div class="ibox">
-    Paste <strong>nội dung mẫu</strong> — AI học trực tiếp từ đây. Mục quan trọng nhất để AI viết đúng giọng.
-  </div>
-
-  <div class="lbl t0">Facebook của bạn</div>
-  <div class="card">
-    <div class="sub">Paste 2-3 bài bạn đã đăng và thấy ổn nhất. AI sẽ bắt chước đúng cách bạn đang viết.</div>
-    <div class="f"><label>Bài của bạn #1</label>
-      <textarea id="myPost1" rows="5" placeholder="Copy bài từ FB của bạn dán vào đây..." oninput="debounceSave()"></textarea>
-    </div>
-    <div class="f"><label>Bài của bạn #2</label>
-      <textarea id="myPost2" rows="5" placeholder="Bài thứ 2..." oninput="debounceSave()"></textarea>
-    </div>
-    <div class="f mb0"><label>Bài của bạn #3 (không bắt buộc)</label>
-      <textarea id="myPost3" rows="4" placeholder="Bài thứ 3..." oninput="debounceSave()"></textarea>
-    </div>
-  </div>
-
-  <div class="lbl">KOL / KOC tham khảo</div>
-  <div class="card">
-    <div class="sub">Paste bài viral của KOL/KOC bạn thấy hay. AI học hook, cấu trúc và kỹ thuật viết của họ.</div>
-    <div id="kolBlocks"></div>
-    <button class="kol-add-btn" onclick="addKolBlock()">+ Thêm bài KOL</button>
-  </div>
-
-  <button class="btnp" onclick="go('plan')" style="margin-top:8px">Tiếp → Lên Content Plan</button>
-</div>
-
-<!-- ═══ PLAN ═══ -->
-<div id="tab-plan" class="tab">
-  <div class="ebox" id="ebox"></div>
-
-  <div class="card">
-    <!-- THEME MODE -->
-    <div class="f" style="margin-bottom:14px">
-      <label>Chế độ chủ đề</label>
-      <div class="tmode-row" id="themeModeRow">
-        <button class="tmode-pill on" data-v="single" onclick="setThemeMode(this)">1 Campaign</button>
-        <button class="tmode-pill" data-v="multi" onclick="setThemeMode(this)">Đa chủ đề xoay vòng</button>
-        <button class="tmode-pill" data-v="monthly" onclick="setThemeMode(this)">1 tháng / 2 campaign</button>
-      </div>
-    </div>
-
-    <!-- SINGLE -->
-    <div id="singleCamp">
-      <div class="f"><label>Chủ đề / Campaign</label>
-        <input type="text" id="theme" placeholder="VD: Ra mắt detox tháng 5, Mùa hè bứt phá..."/>
-      </div>
-      <div class="f mb0"><label>Mô tả thêm (không bắt buộc)</label>
-        <textarea id="campDesc" rows="2" placeholder="Có ưu đãi gì? Muốn tăng DM? Sự kiện đặc biệt?"></textarea>
-      </div>
-    </div>
-
-    <!-- MULTI THEME -->
-    <div id="multiTheme" style="display:none">
-      <div class="sub">2-4 chủ đề xoay vòng trong tuần/tháng. AI phân bổ đều, không lặp chủ đề liên tiếp.</div>
-      <div id="multiThemeList"></div>
-      <button class="add-btn" onclick="addTheme()">+ Thêm chủ đề</button>
-    </div>
-
-    <!-- MONTHLY 2 CAMPAIGNS -->
-    <div id="monthlyCamp" style="display:none">
-      <div class="sub">Chia tháng thành 2 campaign. Mỗi campaign chạy số ngày riêng.</div>
-      <div id="campList"></div>
-      <button class="add-btn" id="addCampBtn" onclick="addCampaign()">+ Thêm campaign (tối đa 2)</button>
-    </div>
-
-    <!-- PERIOD & OPTIONS -->
-    <div style="margin-top:14px;margin-bottom:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <label style="font-size:11px;color:var(--tx2)">Thời gian</label>
-        <div style="display:flex;align-items:center;gap:8px">
-          <label style="font-size:11px;color:var(--tx2)">Post / ngày</label>
-          <select id="postsPerDay" style="width:auto;padding:5px 10px;font-size:12px">
-            <option value="1" selected>1 post</option>
-            <option value="2">2 posts</option>
-            <option value="3">3 posts</option>
-          </select>
+  return (
+    <div>
+      <p style={{ color: "#78716c", fontSize: 15, marginBottom: 24 }}>
+        Sinh 5 hook mở đầu viral theo 5 công thức khác nhau — chỉ cần nhập chủ đề.
+      </p>
+      <div style={{ display: "grid", gap: 16, marginBottom: 20 }}>
+        <div>
+          <label style={labelStyle}>Chủ đề bài viết *</label>
+          <input
+            style={inputStyle}
+            placeholder="VD: Cách pha trà trái cây giữ màu đẹp, 3 lỗi khi mở quán..."
+            value={topic} onChange={e => setTopic(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && generate()}
+          />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div>
+            <label style={labelStyle}>Nền tảng</label>
+            <select style={selectStyle} value={platform} onChange={e => setPlatform(e.target.value)}>
+              {PLATFORMS.map(p => <option key={p}>{p}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>Đối tượng</label>
+            <select style={selectStyle} value={audience} onChange={e => setAudience(e.target.value)}>
+              {AUDIENCES.map(a => <option key={a}>{a}</option>)}
+            </select>
+          </div>
         </div>
       </div>
-      <div class="period-row">
-        <button class="period-pill" data-v="1" onclick="setPeriod(this)">1 ngày</button>
-        <button class="period-pill" data-v="3" onclick="setPeriod(this)">3 ngày</button>
-        <button class="period-pill on" data-v="7" onclick="setPeriod(this)">1 tuần · 7 ngày</button>
-        <button class="period-pill" data-v="14" onclick="setPeriod(this)">2 tuần · 14 ngày</button>
-        <button class="period-pill" data-v="30" onclick="setPeriod(this)">1 tháng · 30 ngày</button>
-      </div>
+      {error && <p style={{ color: "#dc2626", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+      <button style={btnPrimary} onClick={generate} disabled={loading}>
+        {loading ? "Đang tạo..." : "🪝 Tạo 5 Hook Viral"}
+      </button>
+
+      {loading && <Spinner />}
+
+      {hooks && hooks.length > 0 && (
+        <div style={{ marginTop: 28 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#1c1917" }}>Kết quả — {hooks.length} Hook</h3>
+            <CopyButton text={hooks.map((h, i) => `${i + 1}. [${h.type}]\n${h.text}`).join("\n\n")} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {hooks.map((h, i) => (
+              <div key={i} style={{
+                background: "#fffbeb", border: "1.5px solid #fde68a",
+                borderLeft: `4px solid ${hookColors[i % hookColors.length]}`,
+                borderRadius: 10, padding: "14px 16px",
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                  <div style={{ flex: 1 }}>
+                    <span style={{
+                      display: "inline-block", marginBottom: 8, fontSize: 11, fontWeight: 700,
+                      color: hookColors[i % hookColors.length], textTransform: "uppercase", letterSpacing: 0.5,
+                    }}>
+                      {hookTypes[i] || h.type}
+                    </span>
+                    <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: "#1c1917", whiteSpace: "pre-wrap" }}>
+                      {h.text}
+                    </p>
+                  </div>
+                  <CopyButton text={h.text} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
 
-    <div class="r2">
-      <div class="f mb0"><label>Loại nội dung</label>
-        <select id="contentMix">
-          <option value="balanced">Cân bằng</option>
-          <option value="edu">Nặng tips / kiến thức</option>
-          <option value="sell">Nặng bán hàng / CTA</option>
-          <option value="story">Nặng storytelling</option>
-          <option value="engage">Nặng tương tác</option>
-        </select>
+// ===== CAPTION BUILDER =====
+function CaptionBuilder() {
+  const [topic, setTopic] = useState("");
+  const [goal, setGoal] = useState(GOALS[0]);
+  const [audience, setAudience] = useState(AUDIENCES[0]);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [charCount, setCharCount] = useState(0);
+
+  async function generate() {
+    if (!topic.trim()) { setError("Vui lòng nhập chủ đề!"); return; }
+    setError(""); setLoading(true); setResult(null);
+    try {
+      const sys = `Bạn viết caption Facebook thay cho cô Trương Dáng Hương — giáo viên pha chế trà trái cây, trà sữa, R&D sáng tạo. Tone: chuyên nghiệp nhưng thân gần, ngôi thứ nhất (cô/mình), không sáo rỗng. Luôn trả về JSON hợp lệ duy nhất, không markdown fences.`;
+      const usr = `Chủ đề: ${topic}\nMục tiêu: ${goal}\nĐối tượng: ${audience}\n\nViết caption Facebook hoàn chỉnh:\n- Hook 2 dòng đầu gây tò mò hoặc kể chuyện\n- Body 3-4 điểm giá trị thực tế từ kinh nghiệm pha chế\n- CTA rõ ràng 1 câu\n- 8-10 hashtag mix tiếng Việt + tiếng Anh\n\nTrả về JSON: {"caption":"...","hashtags":[...],"char_count":...}`;
+      const data = await callClaude(sys, usr);
+      setResult(data);
+      setCharCount(data.caption?.length || 0);
+    } catch { setError("Có lỗi xảy ra, vui lòng thử lại."); }
+    setLoading(false);
+  }
+
+  return (
+    <div>
+      <p style={{ color: "#78716c", fontSize: 15, marginBottom: 24 }}>
+        Tạo caption Facebook/Instagram đầy đủ: hook → nội dung → CTA → hashtag.
+      </p>
+      <div style={{ display: "grid", gap: 16, marginBottom: 20 }}>
+        <div>
+          <label style={labelStyle}>Chủ đề bài viết *</label>
+          <input style={inputStyle} placeholder="VD: R&D thất bại 5 lần trước khi ra công thức trà dâu..." value={topic} onChange={e => setTopic(e.target.value)} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div>
+            <label style={labelStyle}>Mục tiêu content</label>
+            <select style={selectStyle} value={goal} onChange={e => setGoal(e.target.value)}>
+              {GOALS.map(g => <option key={g}>{g}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>Đối tượng</label>
+            <select style={selectStyle} value={audience} onChange={e => setAudience(e.target.value)}>
+              {AUDIENCES.map(a => <option key={a}>{a}</option>)}
+            </select>
+          </div>
+        </div>
       </div>
-      <div class="f mb0"><label>Caption</label>
-        <select id="writeCap">
-          <option value="yes">Viết caption ngay</option>
-          <option value="outline">Chỉ lên outline</option>
-        </select>
+      {error && <p style={{ color: "#dc2626", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+      <button style={btnPrimary} onClick={generate} disabled={loading}>
+        {loading ? "Đang viết..." : "✍️ Tạo Caption"}
+      </button>
+
+      {loading && <Spinner />}
+
+      {result && (
+        <div style={{ marginTop: 28 }}>
+          <div style={{ background: "#fffbeb", border: "1.5px solid #fde68a", borderRadius: 12, padding: 20, marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#1c1917" }}>Caption</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ fontSize: 12, color: "#78716c" }}>{result.caption?.length || charCount} ký tự</span>
+                <CopyButton text={result.caption || ""} />
+              </div>
+            </div>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: "#292524", whiteSpace: "pre-wrap" }}>
+              {result.caption}
+            </p>
+          </div>
+          {result.hashtags?.length > 0 && (
+            <div style={{ background: "#f0fdf4", border: "1.5px solid #bbf7d0", borderRadius: 12, padding: "14px 16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#166534" }}>Hashtag ({result.hashtags.length})</h3>
+                <CopyButton text={result.hashtags.join(" ")} />
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {result.hashtags.map((tag, i) => (
+                  <span key={i} style={{
+                    background: "#dcfce7", color: "#166534", borderRadius: 6,
+                    padding: "4px 10px", fontSize: 13, fontWeight: 500,
+                  }}>{tag}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== SCRIPT TIKTOK =====
+function ScriptTikTok() {
+  const [topic, setTopic] = useState("");
+  const [duration, setDuration] = useState("60 giây");
+  const [style, setStyle] = useState(STYLES[0]);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function generate() {
+    if (!topic.trim()) { setError("Vui lòng nhập chủ đề!"); return; }
+    setError(""); setLoading(true); setResult(null);
+    try {
+      const sys = `Bạn viết script TikTok thay cho cô Trương Dáng Hương — giáo viên pha chế trà trái cây, trà sữa, R&D sáng tạo. Tone: chuyên nghiệp nhưng thân gần, ngôi thứ nhất, nói chuyện tự nhiên trước camera. Luôn trả về JSON hợp lệ duy nhất, không markdown fences.`;
+      const usr = `Chủ đề: ${topic}\nThời lượng: ${duration}\nPhong cách: ${style}\n\nViết script theo khung thời gian (0-3s hook, 3-10s vấn đề, 10-50s giải pháp, 50s+ CTA).\nMỗi segment có: thời gian, lời thoại tự nhiên (nói trước camera), và gợi ý hành động/cảnh quay.\nTrả về JSON: {"title":"...","segments":[{"time":"0-3s","script":"...","action":"..."}],"tips":"..."}`;
+      const data = await callClaude(sys, usr);
+      setResult(data);
+    } catch { setError("Có lỗi xảy ra, vui lòng thử lại."); }
+    setLoading(false);
+  }
+
+  const segColors = ["#7c3aed", "#0891b2", "#d97706", "#059669", "#dc2626"];
+
+  return (
+    <div>
+      <p style={{ color: "#78716c", fontSize: 15, marginBottom: 24 }}>
+        Tạo script TikTok/Reels theo khung thời gian chuẩn — từ hook đến CTA.
+      </p>
+      <div style={{ display: "grid", gap: 16, marginBottom: 20 }}>
+        <div>
+          <label style={labelStyle}>Chủ đề video *</label>
+          <input style={inputStyle} placeholder="VD: 3 lỗi pha trà trái cây khiến mất vị tươi..." value={topic} onChange={e => setTopic(e.target.value)} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div>
+            <label style={labelStyle}>Thời lượng</label>
+            <select style={selectStyle} value={duration} onChange={e => setDuration(e.target.value)}>
+              {DURATIONS.map(d => <option key={d}>{d}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>Phong cách</label>
+            <select style={selectStyle} value={style} onChange={e => setStyle(e.target.value)}>
+              {STYLES.map(s => <option key={s}>{s}</option>)}
+            </select>
+          </div>
+        </div>
       </div>
+      {error && <p style={{ color: "#dc2626", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+      <button style={btnPrimary} onClick={generate} disabled={loading}>
+        {loading ? "Đang viết script..." : "🎬 Viết Script TikTok"}
+      </button>
+
+      {loading && <Spinner />}
+
+      {result && (
+        <div style={{ marginTop: 28 }}>
+          {result.title && (
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#1c1917" }}>Script: {result.title}</h3>
+              <CopyButton text={result.segments?.map(s => `[${s.time}]\n${s.script}\n→ ${s.action}`).join("\n\n") || ""} />
+            </div>
+          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {result.segments?.map((seg, i) => (
+              <div key={i} style={{
+                background: "#fafaf9", border: "1.5px solid #e7e5e4",
+                borderLeft: `4px solid ${segColors[i % segColors.length]}`,
+                borderRadius: 10, padding: "14px 16px",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                  <span style={{
+                    background: segColors[i % segColors.length], color: "#fff",
+                    fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 5,
+                  }}>{seg.time}</span>
+                </div>
+                <p style={{ margin: "0 0 8px", fontSize: 14, lineHeight: 1.6, color: "#1c1917", fontWeight: 500 }}>
+                  🎤 {seg.script}
+                </p>
+                {seg.action && (
+                  <p style={{ margin: 0, fontSize: 13, color: "#78716c", fontStyle: "italic" }}>
+                    📹 {seg.action}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+          {result.tips && (
+            <div style={{ background: "#eff6ff", border: "1.5px solid #bfdbfe", borderRadius: 10, padding: "12px 16px", marginTop: 16 }}>
+              <p style={{ margin: 0, fontSize: 13, color: "#1e40af" }}>
+                💡 <strong>Gợi ý thêm:</strong> {result.tips}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
-  </div>
-
-  <button class="btnp" id="genBtn" onclick="genPlan()" style="margin-bottom:10px">✦ Gemini lên Content Plan</button>
-
-  <div id="planProg" style="display:none">
-    <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0"></div></div>
-    <div style="font-size:12px;color:var(--tx3);text-align:center;margin-top:4px" id="progTxt"></div>
-  </div>
-  <div id="planOut"></div>
-</div>
-
-<!-- ═══ SAVED ═══ -->
-<div id="tab-saved" class="tab">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-    <span style="font-size:13px;color:var(--tx2)" id="savedCount">0 caption</span>
-    <button class="btnd" onclick="clearSaved()">Xóa tất cả</button>
-  </div>
-  <div id="savedList"></div>
-</div>
-
-<script>
-// ── STATE ──
-let selTones=[], saved=[];
-let period=7;
-let sbUrl='', sbKey='', sbConnected=false;
-let saveTimer=null;
-const RECORD_ID='brand_profile_v3';
-const SAVED_ID='saved_captions_v3';
-
-// Multi-theme state
-let themeMode='single';
-let multiThemes=[{id:1,text:'',desc:''}];
-let campaigns=[{id:1,text:'',desc:'',days:15},{id:2,text:'',desc:'',days:15}];
-
-// KOL blocks
-let kolBlocks=[{id:1,text:'',label:''}];
-
-// ── NAV ──
-function go(n){
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.querySelector(`.nb[onclick="go('${n}')"]`).classList.add('on');
-  document.getElementById('tab-'+n).classList.add('on');
-  if(n==='saved')renderSaved();
-}
-function togglePill(btn){
-  btn.classList.toggle('on');
-  selTones=Array.from(document.querySelectorAll('#toneRow .pill.on')).map(b=>b.dataset.v);
-  debounceSave();
-}
-function setPeriod(btn){
-  document.querySelectorAll('.period-pill').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');period=parseInt(btn.dataset.v);
+  );
 }
 
-// ── GETTERS ──
-function g(id){const e=document.getElementById(id);return e?e.value:''}
-
-// ── KOL BLOCKS ──
-function renderKolBlocks(){
-  const c=document.getElementById('kolBlocks');c.innerHTML='';
-  kolBlocks.forEach((k,i)=>{
-    const d=document.createElement('div');d.className='kol-block';
-    d.innerHTML=`<div class="kol-block-num">
-      <span>KOL/KOC #${i+1}</span>
-      ${kolBlocks.length>1?`<button class="btnd" onclick="removeKolBlock(${i})">Xóa</button>`:''}
-    </div>
-    <textarea rows="5" placeholder="Paste bài viral của KOL/KOC vào đây — caption, nội dung, hook..." oninput="updateKolBlock(${i},this.value)" style="margin-bottom:0">${k.text||''}</textarea>`;
-    c.appendChild(d);
-  });
-}
-function addKolBlock(){
-  if(kolBlocks.length>=5){alert('Tối đa 5 bài KOL');return}
-  kolBlocks.push({id:Date.now(),text:'',label:''});renderKolBlocks();
-}
-function removeKolBlock(i){kolBlocks.splice(i,1);if(!kolBlocks.length)kolBlocks.push({id:Date.now(),text:''});renderKolBlocks()}
-function updateKolBlock(i,v){kolBlocks[i].text=v;debounceSave()}
-
-// ── MULTI-THEME ──
-function setThemeMode(btn){
-  document.querySelectorAll('#themeModeRow .tmode-pill').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');themeMode=btn.dataset.v;
-  document.getElementById('singleCamp').style.display=themeMode==='single'?'':'none';
-  document.getElementById('multiTheme').style.display=themeMode==='multi'?'':'none';
-  document.getElementById('monthlyCamp').style.display=themeMode==='monthly'?'':'none';
-  if(themeMode==='multi')renderMultiThemes();
-  if(themeMode==='monthly')renderCampaigns();
-}
-function renderMultiThemes(){
-  const list=document.getElementById('multiThemeList');list.innerHTML='';
-  multiThemes.forEach((t,i)=>{
-    const d=document.createElement('div');d.className='camp-block';
-    d.innerHTML=`<div class="camp-num"><span>Chủ đề ${i+1}</span>${multiThemes.length>1?`<button class="btnd" onclick="removeTheme(${i})">Xóa</button>`:''}</div>
-    <input type="text" placeholder="VD: Tips & Kiến thức, Câu chuyện KH, Bán hàng..." value="${t.text||''}" oninput="updateTheme(${i},'text',this.value)" style="margin-bottom:0"/>`;
-    list.appendChild(d);
-  });
-}
-function addTheme(){if(multiThemes.length>=4){alert('Tối đa 4 chủ đề');return}multiThemes.push({id:Date.now(),text:''});renderMultiThemes()}
-function removeTheme(i){multiThemes.splice(i,1);if(!multiThemes.length)multiThemes.push({id:Date.now(),text:''});renderMultiThemes()}
-function updateTheme(i,k,v){multiThemes[i][k]=v}
-function renderCampaigns(){
-  const list=document.getElementById('campList');list.innerHTML='';
-  campaigns.forEach((c,i)=>{
-    const d=document.createElement('div');d.className='camp-block';
-    d.innerHTML=`<div class="camp-num"><span>Campaign ${i+1}</span>${campaigns.length>1?`<button class="btnd" onclick="removeCampaign(${i})">Xóa</button>`:''}</div>
-    <input type="text" placeholder="Tên campaign..." value="${c.text||''}" oninput="updateCampaign(${i},'text',this.value)" style="margin-bottom:8px"/>
-    <div style="display:flex;align-items:center;gap:8px"><label style="font-size:11px;color:var(--tx3);white-space:nowrap">Số posts:</label>
-    <input type="number" min="3" max="20" value="${c.days||15}" style="width:70px" oninput="updateCampaign(${i},'days',parseInt(this.value)||15)"/></div>`;
-    list.appendChild(d);
-  });
-  document.getElementById('addCampBtn').style.display=campaigns.length>=2?'none':'block';
-}
-function addCampaign(){if(campaigns.length>=2)return;campaigns.push({id:Date.now(),text:'',days:15});renderCampaigns()}
-function removeCampaign(i){campaigns.splice(i,1);if(!campaigns.length)campaigns.push({id:Date.now(),text:'',days:15});renderCampaigns()}
-function updateCampaign(i,k,v){campaigns[i][k]=v}
-
-// ── SAVE / LOAD ──
-function debounceSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveAll(),800)}
-function collectData(){
-  return{
-    apiKey:g('apiKey'),geminiModel:g('geminiModel'),bn:g('bn'),bi:g('bi'),bd:g('bd'),
-    audience:g('audience'),extra:g('extra'),
-    platform:g('platform'),capLen:g('capLen'),
-    myPost1:g('myPost1'),myPost2:g('myPost2'),myPost3:g('myPost3'),
-    kolBlocks,selTones
-  };
-}
-function applyData(s){
-  ['apiKey','geminiModel','bn','bi','bd','audience','extra','platform','capLen','myPost1','myPost2','myPost3']
-    .forEach(id=>{if(s[id]!=null&&document.getElementById(id))document.getElementById(id).value=s[id]});
-  if(s.selTones){selTones=s.selTones;selTones.forEach(v=>{const b=document.querySelector(`#toneRow .pill[data-v="${v}"]`);if(b)b.classList.add('on')})}
-  if(s.kolBlocks&&s.kolBlocks.length){kolBlocks=s.kolBlocks;renderKolBlocks()}
-}
-async function saveAll(){
-  const data=collectData();
-  localStorage.setItem('cp3',JSON.stringify(data));
-  if(sbConnected) await pushToSupabase(RECORD_ID,data);
-}
-async function loadAll(){
-  // Always load local first for instant display
-  const lc=JSON.parse(localStorage.getItem('cp3')||'{}');
-  if(Object.keys(lc).length)applyData(lc);
-  const ls=JSON.parse(localStorage.getItem('cp3_saved')||'[]');
-  if(ls.length){saved=ls;uhc();}
-
-  if(!sbConnected)return;
-
-  // Then fetch cloud and override
-  setSyncStatus('syncing','Đang tải từ cloud...');
-  try{
-    const cd=await pullFromSupabase(RECORD_ID);
-    if(cd){applyData(cd);localStorage.setItem('cp3',JSON.stringify(cd));}
-    // Always pull saved captions separately
-    const cs=await pullFromSupabase(SAVED_ID);
-    if(cs&&Array.isArray(cs)&&cs.length){
-      saved=cs;localStorage.setItem('cp3_saved',JSON.stringify(cs));uhc();
-    }
-    setSyncStatus('ok','Đã sync');
-  }catch(e){setSyncStatus('err','Lỗi sync — dùng dữ liệu local');}
-}
-
-// ── SUPABASE ──
-function sbHeaders(){return{'Content-Type':'application/json','apikey':sbKey,'Authorization':'Bearer '+sbKey,'Prefer':'resolution=merge-duplicates'}}
-async function pushToSupabase(id,data){
-  if(!sbConnected)return;setSyncStatus('syncing','Đang lưu...');
-  try{
-    await fetch(`${sbUrl}/rest/v1/content_planner`,{method:'POST',headers:sbHeaders(),body:JSON.stringify({id,data,updated_at:new Date().toISOString()})});
-    setSyncStatus('ok','Đã sync · '+new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'}));
-  }catch(e){setSyncStatus('err','Lỗi sync')}
-}
-async function pullFromSupabase(id){
-  const res=await fetch(`${sbUrl}/rest/v1/content_planner?id=eq.${id}&select=data`,{headers:{'apikey':sbKey,'Authorization':'Bearer '+sbKey}});
-  const rows=await res.json();return rows?.[0]?.data||null;
-}
-async function testSupabase(url,key){
-  const res=await fetch(`${url}/rest/v1/content_planner?limit=1`,{headers:{'apikey':key,'Authorization':'Bearer '+key}});
-  if(!res.ok)throw new Error('HTTP '+res.status);return true;
-}
-function setSyncStatus(state,txt){
-  document.getElementById('syncDot').className='sync-dot '+(state==='ok'?'ok':state==='err'?'err':state==='syncing'?'syncing':'');
-  document.getElementById('syncTxt').textContent=txt;
-}
-function openModal(){document.getElementById('sbUrl').value=sbUrl;document.getElementById('sbKey').value=sbKey;document.getElementById('syncModal').classList.add('open')}
-function closeModal(){document.getElementById('syncModal').classList.remove('open')}
-async function saveSupabase(){
-  const url=document.getElementById('sbUrl').value.trim().replace(/\/$/,'');
-  const key=document.getElementById('sbKey').value.trim();
-  const res=document.getElementById('sbTestResult');
-  res.textContent='Đang kiểm tra...';res.style.color='var(--tx3)';
-  try{
-    await testSupabase(url,key);sbUrl=url;sbKey=key;sbConnected=true;
-    localStorage.setItem('cp3_sb',JSON.stringify({url,key}));setSyncStatus('ok','Đã kết nối');
-    res.textContent='✓ Kết nối thành công! Đang đồng bộ...';res.style.color='#6fdf7f';
-    // Push brand profile + saved captions lên cloud
-    await saveAll();
-    if(saved.length) await pushToSupabase(SAVED_ID,saved);
-    res.textContent='✓ Kết nối & đồng bộ thành công!';
-    setTimeout(()=>closeModal(),1400);
-  }catch(e){res.textContent='❌ Lỗi: '+e.message;res.style.color='var(--red)'}
-}
-function copySQL(){navigator.clipboard.writeText(document.getElementById('sqlCode').textContent);event.target.textContent='Đã copy!';setTimeout(()=>event.target.textContent='Copy SQL',1500)}
-
-// ── BUILD CONTEXT ──
-function brandCtx(){
-  const p=[];
-  const bn=g('bn'),bi=g('bi'),bd=g('bd');
-  if(bn)p.push(`Thương hiệu: ${bn}`);
-  if(bi)p.push(`Ngành: ${bi}`);
-  if(bd)p.push(`Về thương hiệu: ${bd}`);
-  const aud=g('audience');if(aud)p.push(`Khách hàng: ${aud}`);
-  if(selTones.length)p.push(`Tone: ${selTones.join(', ')}`);
-  const platform=g('platform');if(platform)p.push(`Platform: ${platform}`);
-  const lenMap={short:'ngắn <100 chữ',medium:'vừa 100-250 chữ',long:'dài 250-500 chữ',vlong:'rất dài 500+'};
-  const cl=g('capLen');if(cl)p.push(`Độ dài caption: ${lenMap[cl]||cl}`);
-  const ex=g('extra');if(ex)p.push(`Lưu ý: ${ex}`);
-  return p.join('\n');
-}
-function refCtx(){
-  const myPosts=[g('myPost1'),g('myPost2'),g('myPost3')].filter(Boolean);
-  const kolPosts=kolBlocks.map(k=>k.text).filter(Boolean);
-  let out='';
-  if(myPosts.length){
-    out+=`\n\nBÀI CỦA CHỦ THƯƠNG HIỆU (học chính xác giọng điệu, cách viết, cách mở bài, kết bài này):\n`;
-    out+=myPosts.map((r,i)=>`--- Bài ${i+1} ---\n${r}`).join('\n\n');
-  }
-  if(kolPosts.length){
-    out+=`\n\nBÀI VIRAL CỦA KOL/KOC THAM KHẢO (học kỹ thuật hook, cấu trúc, cách tạo tương tác):\n`;
-    out+=kolPosts.map((r,i)=>`--- KOL ${i+1} ---\n${r}`).join('\n\n');
-  }
-  return out;
-}
-
-// ── GEMINI ──
-async function callGemini(prompt){
-  const key=g('apiKey');
-  if(!key)throw new Error('Chưa có API key');
-  const model=g('geminiModel')||'gemini-2.5-flash';
-  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.9}})
-  });
-  const data=await res.json();
-  if(data.error){
-    const m=data.error.message||'';
-    const code=data.error.code;
-    if(code===429||m.toLowerCase().includes('quota')||m.toLowerCase().includes('rate'))throw new Error('QUOTA');
-    throw new Error(m);
-  }
-  return data.candidates?.[0]?.content?.parts?.[0]?.text||'';
-}
-
-// ── POST TYPES ──
-const MIX={
-  balanced:['Giới thiệu sản phẩm','Tip / kiến thức','Behind the scenes','Câu chuyện khách hàng','Câu hỏi tương tác','Khuyến mãi / ưu đãi','Câu chuyện thương hiệu'],
-  edu:['Tip / kiến thức','Giải thích khái niệm','Top 5 / danh sách','Myth vs Fact','FAQ','How-to','Case study'],
-  sell:['Giới thiệu sản phẩm','Social proof','Khuyến mãi','FOMO / limited offer','Before & After','Objection handling','Direct CTA'],
-  story:['Câu chuyện cá nhân','Hành trình thương hiệu','Câu chuyện khách hàng','Bài học rút ra','Thất bại & bứt dậy','Khoảnh khắc đáng nhớ','Tại sao tôi làm điều này'],
-  engage:['Câu hỏi cho followers','This or That','Chia sẻ quan điểm','Tag một người','Thử thách','Ý kiến của bạn','Poll / khảo sát'],
+// ===== WEEK BOARD CALENDAR =====
+const PILLAR_THEME = {
+  "Kiến thức": { bg: "#dbeafe", border: "#93c5fd", text: "#1e3a8a", dot: "#3b82f6" },
+  "R&D":        { bg: "#dcfce7", border: "#86efac", text: "#14532d", dot: "#22c55e" },
+  "Cảm hứng":   { bg: "#f3e8ff", border: "#d8b4fe", text: "#581c87", dot: "#a855f7" },
+  "Engagement": { bg: "#ffedd5", border: "#fdba74", text: "#7c2d12", dot: "#f97316" },
+  "Khoá học":   { bg: "#fee2e2", border: "#fca5a5", text: "#7f1d1d", dot: "#ef4444" },
 };
-const DAYS7=['T.Hai','T.Ba','T.Tư','T.Năm','T.Sáu','T.Bảy','C.Nhật'];
-function dayLabel(i,days,ppd){
-  ppd=ppd||1;
-  const dayIdx=Math.floor(i/ppd);
-  const postNum=ppd>1?` #${(i%ppd)+1}`:'';
-  if(days===1)return`Hôm nay${postNum}`;
-  if(days===3)return`Ngày ${dayIdx+1}${postNum}`;
-  if(days===7)return DAYS7[dayIdx%7]+postNum;
-  if(days===14)return`Tuần ${Math.floor(dayIdx/7)+1} — ${DAYS7[dayIdx%7]}${postNum}`;
-  return`Ngày ${dayIdx+1}${postNum}`;
+
+function getPillarTheme(pillar = "") {
+  for (const [key, theme] of Object.entries(PILLAR_THEME)) {
+    if (pillar.includes(key)) return theme;
+  }
+  return { bg: "#f5f5f4", border: "#d6d3d1", text: "#292524", dot: "#a8a29e" };
 }
 
-// ── GENERATE PLAN ──
-async function genPlan(){
-  if(!g('apiKey')){alert('Nhập API key ở tab Brand!');go('brand');return}
-  if(themeMode==='single'&&!g('theme')){alert('Nhập chủ đề campaign!');return}
-  if(themeMode==='multi'&&!multiThemes.some(t=>t.text.trim())){alert('Nhập ít nhất 1 chủ đề!');return}
-  if(themeMode==='monthly'&&!campaigns.some(c=>c.text.trim())){alert('Nhập ít nhất 1 campaign!');return}
+function WeekBoard({ week, getPillarStyle }) {
+  const [selected, setSelected] = useState(null);
+  const posts = week.posts || [];
 
-  const writeCap=g('writeCap')==='yes';
-  const postsPerDay=parseInt(g('postsPerDay'))||1;
-  const count=period*postsPerDay;
-  const mix=g('contentMix');
-  const ctx=brandCtx();
-  const rCtx=refCtx();
+  return (
+    <div style={{ background: "#fff", border: "1px solid #e7e5e4", borderRadius: 14, overflow: "hidden" }}>
+      {/* Week header */}
+      <div style={{
+        background: "linear-gradient(90deg, #92400e 0%, #d97706 100%)",
+        padding: "10px 18px", display: "flex", justifyContent: "space-between", alignItems: "center",
+      }}>
+        <span style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>
+          Tuần {week.week} — {week.title}
+        </span>
+        <span style={{
+          background: "rgba(255,255,255,0.2)", color: "#fef3c7",
+          fontSize: 11, fontWeight: 600, padding: "2px 10px", borderRadius: 10,
+        }}>{posts.length} bài</span>
+      </div>
 
-  document.getElementById('genBtn').disabled=true;document.getElementById('genBtn').textContent='Đang xử lý...';
-  document.getElementById('planProg').style.display='block';
-  document.getElementById('planOut').innerHTML='';
-  document.getElementById('ebox').style.display='none';
-  setProgress(5,'Đang lên outline...');
+      {/* Day cards grid */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${Math.min(posts.length, 4)}, minmax(0, 1fr))`,
+        gap: 10, padding: 14,
+      }}>
+        {posts.map((post, i) => {
+          const t = getPillarTheme(post.pillar);
+          const isSelected = selected === i;
+          return (
+            <div
+              key={i}
+              onClick={() => setSelected(isSelected ? null : i)}
+              style={{
+                background: t.bg,
+                border: `1.5px solid ${isSelected ? t.dot : t.border}`,
+                borderRadius: 10, padding: "10px 12px",
+                cursor: "pointer", transition: "all .15s",
+                boxShadow: isSelected ? `0 0 0 3px ${t.dot}33` : "none",
+              }}
+            >
+              {/* Day label */}
+              <div style={{
+                fontSize: 11, fontWeight: 800, color: t.dot,
+                textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6,
+              }}>{post.day}</div>
 
-  let outlinePrompt='';
-  const ppd=postsPerDay>1?` (${postsPerDay} posts/ngày, mỗi ngày ${postsPerDay} bài với loại/góc nhìn khác nhau)`:'' ;
-  if(themeMode==='single'){
-    const theme=g('theme'),cd=g('campDesc');
-    outlinePrompt=`Bạn là chuyên gia content marketing.
-THƯƠNG HIỆU:\n${ctx}
-Lên content plan ${count} posts${ppd}. Campaign: "${theme}"${cd?'\nBối cảnh: '+cd:''}
-Loại nội dung: ${mix}.
-Trả về JSON array đúng ${count} objects:
-{"day":"${period===7?'T.Hai':'Ngày 1'}${postsPerDay>1?' #1':''}","type":"loại bài","angle":"góc nhìn cụ thể","hook":"hook idea 1 câu","key_msg":"thông điệp chính","campaign":"${theme}"}
-Chỉ JSON, không giải thích.`;
-  } else if(themeMode==='multi'){
-    const themes=multiThemes.filter(t=>t.text.trim());
-    outlinePrompt=`Bạn là chuyên gia content marketing.
-THƯƠNG HIỆU:\n${ctx}
-Lên content plan ${count} posts${ppd} với ${themes.length} chủ đề xoay vòng:
-${themes.map((t,i)=>`Chủ đề ${i+1}: ${t.text}`).join('\n')}
-Phân bổ đều, không lặp chủ đề liên tiếp. Loại nội dung: ${mix}.
-Trả về JSON array đúng ${count} objects:
-{"day":"${period===7?'T.Hai':'Ngày 1'}${postsPerDay>1?' #1':''}","type":"loại bài","angle":"góc nhìn cụ thể","hook":"hook idea","key_msg":"thông điệp","campaign":"tên chủ đề áp dụng"}
-Chỉ JSON.`;
-  } else {
-    const camps=campaigns.filter(c=>c.text.trim());
-    outlinePrompt=`Bạn là chuyên gia content marketing.
-THƯƠNG HIỆU:\n${ctx}
-Lên content plan chia thành ${camps.length} campaign${ppd}:
-${camps.map((c,i)=>`Campaign ${i+1}: "${c.text}" (${c.days*postsPerDay} posts)`).join('\n')}
-Loại nội dung: ${mix}.
-Trả về JSON array đúng ${camps.reduce((a,c)=>a+c.days*postsPerDay,0)} objects:
-{"day":"Ngày 1${postsPerDay>1?' #1':''}","type":"loại bài","angle":"góc nhìn","hook":"hook idea","key_msg":"thông điệp","campaign":"tên campaign"}
-Chỉ JSON.`;
-  }
+              {/* Topic */}
+              <p style={{
+                margin: "0 0 8px", fontSize: 12, fontWeight: 600,
+                color: t.text, lineHeight: 1.4,
+                display: "-webkit-box", WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical", overflow: "hidden",
+              }}>{post.topic}</p>
 
-  const types=MIX[mix]||MIX.balanced;
-  let outline=[];
-  try{
-    const raw=await callGemini(outlinePrompt);
-    outline=JSON.parse(raw.replace(/```json|```/g,'').trim());
-  }catch(e){
-    if(e.message==='QUOTA'){showQuotaErr();return}
-    for(let i=0;i<count;i++){
-      const camp=themeMode==='single'?g('theme'):themeMode==='multi'?multiThemes[Math.floor(i/postsPerDay)%multiThemes.length]?.text:'Campaign';
-      outline.push({day:dayLabel(i,period,postsPerDay),type:types[i%types.length],angle:'',hook:'',key_msg:camp,campaign:camp});
-    }
-  }
+              {/* Bottom tags */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 700, color: t.dot,
+                  background: "rgba(255,255,255,0.6)", borderRadius: 4,
+                  padding: "1px 6px", display: "inline-block",
+                }}>{post.format}</span>
+                <span style={{ fontSize: 10, color: t.text, opacity: 0.7 }}>{post.platform}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-  renderCards(outline,writeCap);
-  const estMin=Math.ceil(outline.length*13/60);
-  setProgress(15,writeCap?`Outline xong! Đang viết ${outline.length} captions (~${estMin} phút)...`:'Outline xong!');
+      {/* Detail panel — shows when a card is selected */}
+      {selected !== null && posts[selected] && (() => {
+        const p = posts[selected];
+        const t = getPillarTheme(p.pillar);
+        return (
+          <div style={{
+            margin: "0 14px 14px",
+            background: "#fffbeb", border: `1.5px solid ${t.border}`,
+            borderRadius: 10, padding: "14px 16px",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+              <div>
+                <span style={{
+                  fontSize: 11, fontWeight: 700, color: t.dot,
+                  background: t.bg, borderRadius: 4, padding: "2px 8px", marginRight: 6,
+                }}>{p.day}</span>
+                <span style={{
+                  fontSize: 11, fontWeight: 600, color: t.text,
+                  background: t.bg, borderRadius: 4, padding: "2px 8px",
+                }}>{p.pillar}</span>
+              </div>
+              <button onClick={() => setSelected(null)} style={{
+                background: "none", border: "none", fontSize: 16,
+                cursor: "pointer", color: "#78716c", lineHeight: 1,
+              }}>✕</button>
+            </div>
+            <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700, color: "#1c1917", lineHeight: 1.5 }}>
+              {p.topic}
+            </p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <span style={{
+                fontSize: 12, padding: "3px 10px", borderRadius: 6,
+                background: "#f5f5f4", color: "#57534e", fontWeight: 600,
+              }}>📹 {p.format}</span>
+              <span style={{
+                fontSize: 12, padding: "3px 10px", borderRadius: 6,
+                background: "#f5f5f4", color: "#57534e", fontWeight: 600,
+              }}>📲 {p.platform}</span>
+              <span style={{
+                fontSize: 12, padding: "3px 10px", borderRadius: 6,
+                background: "#fef3c7", color: "#92400e", fontWeight: 600,
+              }}>⏰ Trạng thái: {p.status || "Chưa làm"}</span>
+            </div>
+          </div>
+        );
+      })()}
+    </div>
+  );
+}
 
-  if(!writeCap){
-    setProgress(100,'Outline hoàn tất!');
-    setTimeout(()=>document.getElementById('planProg').style.display='none',1500);
-    document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').textContent='✦ Gemini lên Content Plan';
-    return;
-  }
+// ===== CONTENT PLAN =====
+function ContentPlan() {
+  const [theme, setTheme] = useState("");
+  const [platform, setPlatform] = useState("Facebook + TikTok");
+  const [freq, setFreq] = useState("1 bài/ngày");
+  const [numWeeks, setNumWeeks] = useState(2);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
+  const [savedPlanId, setSavedPlanId] = useState(null);
+  const [savedPlans, setSavedPlans] = useState([]);
+  const [loadingPlans, setLoadingPlans] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
-  for(let i=0;i<outline.length;i++){
-    const post=outline[i];
-    setProgress(15+Math.round((i/outline.length)*82),`Đang viết caption ${i+1}/${outline.length}...`);
-    setPS(i,'load');setCapLoading(i);
-    // Free tier = 5 RPM → cần 13s delay giữa mỗi request
-    if(i>0) await new Promise(r=>setTimeout(r,13000));
-    const capPrompt=`Bạn là chuyên gia viết content social media.
-THƯƠNG HIỆU:\n${ctx}${rCtx}
+  async function generate() {
+    if (!theme.trim()) { setError("Vui lòng nhập chủ đề tháng!"); return; }
+    setError(""); setLoading(true); setResult(null);
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 4000,
+          system: `Bạn là content strategist chuyên ngành đồ uống và dạy pha chế. Viết kế hoạch cho cô Trương Dáng Hương. Content pillars: Kiến thức & Mẹo nghề (35%), R&D & Công thức mới (25%), Câu chuyện / Cảm hứng (20%), Engagement (10%), Khoá học / Promo (10%). Chỉ trả về JSON thuần, không có markdown, không có text thêm vào trước hoặc sau JSON.`,
+          messages: [{
+            role: "user",
+            content: `Chu de lon: "${theme}"
+Nen tang: ${platform}
+So tuan: ${numWeeks}
+So bai/tuan: ${freq}
 
-Viết 1 caption hoàn chỉnh:
-- Ngày: ${post.day}
-- Loại: ${post.type}
-- Góc nhìn: ${post.angle||'phù hợp'}
-- Hook idea: ${post.hook||'tự chọn'}
-- Thông điệp: ${post.key_msg||''}
-- Campaign/Chủ đề: ${post.campaign||''}
+Yeu cau quan trong:
+- Moi tuan PHAI co chu de con KHAC NHAU, xoay quanh "${theme}" theo goc do moi — tranh lap lai de nguoi xem khong chan
+- Vi du cach chia: tuan 1 "Nguyen lieu & chon tra nen", tuan 2 "Ky thuat pha che", tuan 3 "Cong thuc R&D moi"
+- Moi tuan co ${freq === "3 bài/tuần" ? 3 : freq === "5 bài/tuần" ? 5 : 7} bai
+- topic phai cu the, hap dan, phu hop giao vien pha che
+- Can bang 5 pillars: Kien thuc & Meo nghe 35%, R&D & Cong thuc moi 25%, Cau chuyen / Cam hung 20%, Engagement 10%, Khoa hoc / Promo 10%
 
-Viết ĐÚNG giọng/style như bài mẫu của chủ thương hiệu. Có hook mạnh, emoji, CTA, hashtag.
-Chỉ trả về caption, không giải thích.`;
-    try{
-      const cap=await callGemini(capPrompt);
-      setCapDone(i,cap,post);setPS(i,'done');
-    }catch(e){
-      if(e.message==='QUOTA'){
-        // Rate limited — wait 15s and retry once
-        setCapErr(i,'⏳ Đang chờ rate limit...');
-        await new Promise(r=>setTimeout(r,15000));
-        try{
-          const cap=await callGemini(capPrompt);
-          setCapDone(i,cap,post);setPS(i,'done');
-        }catch(e2){
-          if(e2.message==='QUOTA'){showQuotaErr();break}
-          setCapErr(i,'Lỗi: '+e2.message);setPS(i,'err');
-        }
-        continue;
+Tra ve JSON (khong them gi khac):
+{"month_theme":"${theme}","weeks":[{"week":1,"title":"Chu de con tuan 1","posts":[{"day":"Thu 2","pillar":"Kien thuc & Meo nghe","topic":"Vi du chu de cu the","platform":"${platform}","format":"Video","status":"Chua lam"}]}]}`
+          }],
+        }),
+      });
+      const raw = await res.json();
+      const text = (raw.content || []).map(b => b.text || "").join("").trim();
+      // Strip any markdown fences
+      const cleaned = text.replace(/^```[a-z]*\n?/i, "").replace(/\n?```$/i, "").trim();
+      const data = JSON.parse(cleaned);
+      if (!data.weeks || !Array.isArray(data.weeks)) throw new Error("weeks missing");
+      setResult(data);
+      // Auto-save to Supabase
+      try {
+        setSaving(true); setSaveMsg("☁️ Đang tự động lưu...");
+        const planId = await savePlanToSupabase(data, platform, freq, numWeeks);
+        setSavedPlanId(planId);
+        setSaveMsg("✅ Đã tự động lưu vào Supabase!");
+        setTimeout(() => setSaveMsg(""), 3000);
+      } catch (saveErr) {
+        setSaveMsg("⚠️ Tạo xong nhưng lưu thất bại: " + saveErr.message);
+      } finally {
+        setSaving(false);
       }
-      setCapErr(i,'Lỗi: '+e.message);setPS(i,'err');
+    } catch (e) {
+      setError("Có lỗi khi tạo content plan. Vui lòng thử lại.");
+      console.error(e);
+    }
+    setLoading(false);
+  }
+
+  async function openHistory() {
+    setShowHistory(true);
+    setLoadingPlans(true);
+    try {
+      const plans = await loadSavedPlans();
+      setSavedPlans(plans);
+    } catch (e) {
+      console.error(e);
+    }
+    setLoadingPlans(false);
+  }
+
+  async function loadPlan(planId) {
+    try {
+      const posts = await loadPlanPosts(planId);
+      // Reconstruct weeks from posts
+      const weeksMap = {};
+      posts.forEach(p => {
+        const key = p.week_number;
+        if (!weeksMap[key]) weeksMap[key] = { week: p.week_number, title: p.week_title, posts: [] };
+        weeksMap[key].posts.push({ day: p.day, pillar: p.pillar, topic: p.topic, platform: p.platform, format: p.format, status: p.status, _id: p.id });
+      });
+      const plan = savedPlans.find(p => p.id === planId);
+      setResult({ month_theme: plan?.theme || "Plan đã lưu", weeks: Object.values(weeksMap).sort((a,b) => a.week - b.week) });
+      setShowHistory(false);
+    } catch (e) {
+      console.error(e);
     }
   }
 
-  setProgress(100,'Hoàn tất! 🎉');
-  setTimeout(()=>document.getElementById('planProg').style.display='none',2000);
-  document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').textContent='✦ Tạo lại Plan';
-}
+  function exportExcel() {
+    if (!result) return;
+    setExporting(true);
+    try {
+      const wb = XLSX.utils.book_new();
 
-function setProgress(pct,txt){
-  document.getElementById('progFill').style.width=pct+'%';
-  document.getElementById('progTxt').textContent=txt;
-}
-function showQuotaErr(){
-  document.getElementById('genBtn').disabled=false;document.getElementById('genBtn').textContent='✦ Gemini lên Content Plan';
-  document.getElementById('planProg').style.display='none';
-  const eb=document.getElementById('ebox');eb.style.display='block';
-  eb.innerHTML='⚠️ Hết quota hoặc rate limit. <strong>Đổi model sang gemini-2.5-pro hoặc gemini-2.0-flash</strong> trong tab Brand để tiếp tục, hoặc chờ reset lúc 2 giờ sáng giờ VN.';
-}
+      // ── Sheet 1: Overview ──
+      const overviewData = [
+        ["MASTER CONTENT PLAN — CÔ TRƯƠNG DÁNG HƯƠNG"],
+        [],
+        ["Chủ đề tháng", result.month_theme],
+        ["Nền tảng", platform],
+        ["Tần suất", freq],
+        ["Tạo ngày", new Date().toLocaleDateString("vi-VN")],
+        [],
+        ["CONTENT PILLARS", "TỶ LỆ", "VÍ DỤ"],
+        ["🍵 Kiến thức & Mẹo nghề", "35%", "5 lỗi pha trà trái cây · Cách chọn nguyên liệu"],
+        ["🔬 R&D & Công thức mới", "25%", "Hậu trường thử công thức · Ra mắt món mới"],
+        ["💫 Câu chuyện / Cảm hứng", "20%", "Hành trình học pha chế · Học viên thành công"],
+        ["💬 Engagement", "10%", "Poll: Trà trái cây hay trà sữa?"],
+        ["📚 Khoá học / Promo", "10%", "Giới thiệu lớp học · Ưu đãi đăng ký"],
+      ];
+      const wsOverview = XLSX.utils.aoa_to_sheet(overviewData);
+      wsOverview["!cols"] = [{ wch: 32 }, { wch: 14 }, { wch: 48 }];
+      XLSX.utils.book_append_sheet(wb, wsOverview, "📌 Overview");
 
-// ── RENDER CARDS ──
-function renderCards(outline,writeCap){
-  const out=document.getElementById('planOut');
-  out.innerHTML='<div class="plan-grid" id="planGrid"></div>';
-  window._outline=outline;
-  outline.forEach((p,i)=>{
-    const c=document.createElement('div');c.className='post-card';c.id='pc-'+i;
-    const showCamp=p.campaign&&themeMode!=='single';
-    c.innerHTML=`
-      <div class="post-hd" onclick="toggleCard(${i})">
-        <div class="post-hd-l">
-          <span class="post-day">${p.day}</span>
-          ${showCamp?`<span class="post-camp">${p.campaign}</span>`:''}
-          <span class="post-type">${p.type}${p.angle?` · <em style="color:var(--tx3);font-style:normal;font-size:11px">${p.angle}</em>`:''}</span>
-        </div>
-        ${writeCap?`<span class="psdot ps-idle" id="ps-${i}"></span>`:'<span style="font-size:11px;color:var(--tx3)">▾</span>'}
+      // ── Sheet 2: Lịch đăng (all posts flat) ──
+      const calHeader = ["Tuần", "Thứ / Ngày", "Pillar", "Chủ đề bài", "Nền tảng", "Format", "Caption Draft", "Hashtag", "Trạng thái"];
+      const calRows = [calHeader];
+      result.weeks?.forEach(w => {
+        w.posts?.forEach(p => {
+          calRows.push([
+            `Tuần ${w.week}: ${w.title}`,
+            p.day,
+            p.pillar,
+            p.topic,
+            p.platform,
+            p.format,
+            p.caption_draft || "",
+            "",
+            p.status || "Chưa làm",
+          ]);
+        });
+      });
+      const wsCal = XLSX.utils.aoa_to_sheet(calRows);
+      wsCal["!cols"] = [{ wch: 22 }, { wch: 14 }, { wch: 26 }, { wch: 46 }, { wch: 18 }, { wch: 14 }, { wch: 40 }, { wch: 30 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, wsCal, "📅 Lịch đăng");
+
+      // ── Sheet 3: Theo tuần (1 sheet per week) ──
+      result.weeks?.forEach(w => {
+        const rows = [
+          [`TUẦN ${w.week}: ${w.title}`],
+          [],
+          ["Thứ / Ngày", "Pillar", "Chủ đề bài", "Nền tảng", "Format", "Ghi chú / Caption Draft", "Trạng thái"],
+        ];
+        w.posts?.forEach(p => {
+          rows.push([p.day, p.pillar, p.topic, p.platform, p.format, p.caption_draft || "", p.status || "Chưa làm"]);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws["!cols"] = [{ wch: 14 }, { wch: 26 }, { wch: 46 }, { wch: 16 }, { wch: 14 }, { wch: 40 }, { wch: 14 }];
+        XLSX.utils.book_append_sheet(wb, ws, `Tuần ${w.week}`);
+      });
+
+      // ── Sheet 4: Tracker số liệu ──
+      const trackerHeader = ["Ngày đăng", "Chủ đề", "Nền tảng", "Format", "Like", "Comment", "Share", "Reach", "View", "Ghi chú"];
+      const trackerRows = [trackerHeader];
+      result.weeks?.forEach(w => {
+        w.posts?.forEach(p => {
+          trackerRows.push([p.day, p.topic, p.platform, p.format, "", "", "", "", "", ""]);
+        });
+      });
+      const wsTracker = XLSX.utils.aoa_to_sheet(trackerRows);
+      wsTracker["!cols"] = [{ wch: 14 }, { wch: 40 }, { wch: 14 }, { wch: 14 }, { wch: 8 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 24 }];
+      XLSX.utils.book_append_sheet(wb, wsTracker, "📊 Tracker số liệu");
+
+      const safeName = (result.month_theme || "content-plan").replace(/[^a-zA-Z0-9À-ỹ\s]/g, "").replace(/\s+/g, "-").substring(0, 40);
+      XLSX.writeFile(wb, `content-plan-co-huong-${safeName}.xlsx`);
+    } catch (e) {
+      console.error(e);
+    }
+    setExporting(false);
+  }
+
+  const pillarColors = {
+    "Kiến thức & Mẹo nghề": { bg: "#eff6ff", text: "#1e40af", border: "#bfdbfe" },
+    "Kiến thức": { bg: "#eff6ff", text: "#1e40af", border: "#bfdbfe" },
+    "R&D & Công thức mới": { bg: "#f0fdf4", text: "#166534", border: "#bbf7d0" },
+    "R&D": { bg: "#f0fdf4", text: "#166534", border: "#bbf7d0" },
+    "Câu chuyện / Cảm hứng": { bg: "#fdf4ff", text: "#7e22ce", border: "#e9d5ff" },
+    "Câu chuyện": { bg: "#fdf4ff", text: "#7e22ce", border: "#e9d5ff" },
+    "Engagement": { bg: "#fff7ed", text: "#c2410c", border: "#fed7aa" },
+    "Khoá học / Promo": { bg: "#fef2f2", text: "#991b1b", border: "#fecaca" },
+    "Khoá học": { bg: "#fef2f2", text: "#991b1b", border: "#fecaca" },
+  };
+
+  function getPillarStyle(pillar) {
+    for (const [key, style] of Object.entries(pillarColors)) {
+      if (pillar?.includes(key)) return style;
+    }
+    return { bg: "#f5f5f4", text: "#44403c", border: "#d6d3d1" };
+  }
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <p style={{ margin: 0, color: "#78716c", fontSize: 15 }}>
+          Nhập chủ đề lớn + chọn số tuần — AI tự chia chủ đề con mỗi tuần.
+        </p>
+        <button onClick={openHistory} style={{
+          display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap",
+          padding: "8px 16px", borderRadius: 8, border: "1.5px solid #e7e5e4",
+          background: "#fff", color: "#57534e", fontSize: 13, fontWeight: 600, cursor: "pointer",
+        }}>📂 Lịch sử lưu</button>
       </div>
-      <div class="post-body${i<2?' open':''}" id="pb-${i}">
-        <div class="meta-row">
-          ${p.hook?`<span class="mpill">🪝 ${p.hook}</span>`:''}
-          ${p.key_msg?`<span class="mpill">💡 ${p.key_msg}</span>`:''}
+
+      {showHistory && (
+        <div style={{ background: "#fff", border: "1.5px solid #e7e5e4", borderRadius: 12, padding: 16, marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#1c1917" }}>📂 Content Plans đã lưu</h4>
+            <button onClick={() => setShowHistory(false)} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#78716c" }}>✕</button>
+          </div>
+          {loadingPlans ? <Spinner /> : savedPlans.length === 0 ? (
+            <p style={{ color: "#78716c", fontSize: 13, textAlign: "center", padding: "16px 0" }}>Chưa có plan nào được lưu.</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {savedPlans.map(p => (
+                <div key={p.id} onClick={() => loadPlan(p.id)} style={{
+                  display: "flex", justifyContent: "space-between", alignItems: "center",
+                  padding: "10px 14px", background: "#fafaf9", border: "1px solid #e7e5e4",
+                  borderRadius: 8, cursor: "pointer",
+                }}>
+                  <div>
+                    <p style={{ margin: "0 0 2px", fontSize: 14, fontWeight: 600, color: "#1c1917" }}>{p.theme}</p>
+                    <p style={{ margin: 0, fontSize: 12, color: "#78716c" }}>{p.num_weeks} tuần · {p.platform} · {new Date(p.created_at).toLocaleDateString("vi-VN")}</p>
+                  </div>
+                  <span style={{ fontSize: 12, color: "#d97706", fontWeight: 600 }}>Xem →</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        ${writeCap?`
-          <div class="cap-box dim" id="cap-${i}"><span class="spin"></span> Đang viết...</div>
-          <textarea class="cap-edit" id="edit-${i}"></textarea>
-          <div class="ai-edit-box" id="aiedit-${i}">
-            <textarea id="aiprompt-${i}" rows="2" placeholder="VD: Viết ngắn lại, thêm emoji hơn, đổi hook mạnh hơn, thêm CTA cuối..."></textarea>
-            <div class="ai-edit-actions">
-              <button class="btnp" style="flex:1;padding:7px;font-size:12px" onclick="aiEditC(${i})">✦ AI chỉnh sửa</button>
-              <button class="btns" style="font-size:12px" onclick="closeAiEdit(${i})">Huỷ</button>
+      )}
+
+      <div style={{ display: "grid", gap: 16, marginBottom: 20 }}>
+        <div>
+          <label style={labelStyle}>Chủ đề *</label>
+          <input style={inputStyle} placeholder="VD: Mùa hè - Trà trái cây tươi mát, Tháng khai giảng mới..." value={theme} onChange={e => setTheme(e.target.value)} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div>
+            <label style={labelStyle}>Nền tảng</label>
+            <select style={selectStyle} value={platform} onChange={e => setPlatform(e.target.value)}>
+              {PLATFORMS.map(p => <option key={p}>{p}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>Tần suất đăng</label>
+            <select style={selectStyle} value={freq} onChange={e => setFreq(e.target.value)}>
+              {FREQUENCIES.map(f => <option key={f}>{f}</option>)}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style={labelStyle}>Lên kế hoạch cho bao nhiêu tuần?</label>
+          <div style={{ display: "flex", gap: 8 }}>
+            {[1, 2, 3, 4].map(n => (
+              <button key={n} onClick={() => setNumWeeks(n)} style={{
+                flex: 1, padding: "10px 0", borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: "pointer",
+                border: numWeeks === n ? "2px solid #d97706" : "1.5px solid #e7e5e4",
+                background: numWeeks === n ? "#fef3c7" : "#fff",
+                color: numWeeks === n ? "#92400e" : "#78716c",
+                transition: "all .15s",
+              }}>{n} tuần</button>
+            ))}
+          </div>
+        </div>
+      </div>
+      {error && <p style={{ color: "#dc2626", fontSize: 13, marginBottom: 12 }}>{error}</p>}
+      <button style={btnPrimary} onClick={generate} disabled={loading}>
+        {loading ? "Đang lập kế hoạch..." : "📅 Tạo Master Content Plan"}
+      </button>
+
+      {loading && <Spinner />}
+
+      {result && (
+        <div style={{ marginTop: 28 }}>
+
+          {/* Header bar */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
+            <div>
+              <h3 style={{ margin: "0 0 4px", fontSize: 18, fontWeight: 800, color: "#1c1917" }}>
+                {result.month_theme}
+              </h3>
+              <p style={{ margin: 0, fontSize: 13, color: "#78716c" }}>
+                {platform} · {freq} · {result.weeks?.reduce((s, w) => s + (w.posts?.length || 0), 0)} bài trong tháng
+              </p>
             </div>
+            <button onClick={exportExcel} disabled={exporting} style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "9px 18px", borderRadius: 8,
+              background: "#fff", border: "1.5px solid #059669",
+              color: "#059669", fontSize: 13, fontWeight: 700, cursor: "pointer",
+            }}>
+              {exporting ? "⏳ Đang xuất..." : "⬇️ Tải Excel"}
+            </button>
           </div>
-          <div class="post-acts" id="acts-${i}" style="display:none">
-            <button class="btng" onclick="copyC(${i})">Copy</button>
-            <button class="btng" onclick="toggleAiEdit(${i})">✦ AI sửa</button>
-            <button class="btng" onclick="editC(${i})" id="editbtn-${i}">Tự sửa</button>
-            <button class="btns" style="font-size:11px;padding:3px 12px" onclick="saveC(${i})">Lưu lại</button>
-            <button class="btng" onclick="regenC(${i})">↻ Viết lại</button>
-          </div>
-        `:`
-          <div class="post-acts" style="margin-top:10px">
-            <button class="btns" style="font-size:12px" onclick="writeOne(${i})">✦ Viết caption bài này</button>
-          </div>
-          <div class="cap-box" id="cap-${i}" style="display:none"></div>
-          <textarea class="cap-edit" id="edit-${i}"></textarea>
-          <div class="ai-edit-box" id="aiedit-${i}">
-            <textarea id="aiprompt-${i}" rows="2" placeholder="VD: Viết ngắn lại, thêm emoji hơn, đổi hook mạnh hơn, thêm CTA cuối..."></textarea>
-            <div class="ai-edit-actions">
-              <button class="btnp" style="flex:1;padding:7px;font-size:12px" onclick="aiEditC(${i})">✦ AI chỉnh sửa</button>
-              <button class="btns" style="font-size:12px" onclick="closeAiEdit(${i})">Huỷ</button>
+          {saveMsg && (
+            <div style={{
+              background: saveMsg.startsWith("✅") ? "#dcfce7" : saveMsg.startsWith("☁️") ? "#eff6ff" : "#fee2e2",
+              border: "1px solid " + (saveMsg.startsWith("✅") ? "#86efac" : saveMsg.startsWith("☁️") ? "#bfdbfe" : "#fca5a5"),
+              borderRadius: 8, padding: "8px 14px", marginBottom: 12,
+              display: "flex", alignItems: "center", gap: 8,
+            }}>
+              {saving && <div style={{ width: 14, height: 14, border: "2px solid #bfdbfe", borderTop: "2px solid #3b82f6", borderRadius: "50%", animation: "spin 0.8s linear infinite", flexShrink: 0 }} />}
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: saveMsg.startsWith("✅") ? "#166534" : saveMsg.startsWith("☁️") ? "#1e40af" : "#991b1b" }}>{saveMsg}</p>
             </div>
+          )}
+
+          {/* Pillar legend */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
+            {[
+              { label: "🍵 Kiến thức", color: "#1e40af", bg: "#dbeafe" },
+              { label: "🔬 R&D", color: "#166534", bg: "#dcfce7" },
+              { label: "💫 Cảm hứng", color: "#7e22ce", bg: "#f3e8ff" },
+              { label: "💬 Engagement", color: "#c2410c", bg: "#ffedd5" },
+              { label: "📚 Khoá học", color: "#991b1b", bg: "#fee2e2" },
+            ].map(p => (
+              <span key={p.label} style={{
+                fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 20,
+                background: p.bg, color: p.color,
+              }}>{p.label}</span>
+            ))}
           </div>
-          <div class="post-acts" id="acts-${i}" style="display:none">
-            <button class="btng" onclick="copyC(${i})">Copy</button>
-            <button class="btng" onclick="toggleAiEdit(${i})">✦ AI sửa</button>
-            <button class="btng" onclick="editC(${i})" id="editbtn-${i}">Tự sửa</button>
-            <button class="btns" style="font-size:11px;padding:3px 12px" onclick="saveC(${i})">Lưu lại</button>
-            <button class="btng" onclick="regenC(${i})">↻ Viết lại</button>
+
+          {/* Calendar weeks */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            {(result.weeks && result.weeks.length > 0)
+              ? result.weeks.map((week, wi) => (
+                  <WeekBoard key={wi} week={week} />
+                ))
+              : <p style={{ color: "#dc2626", fontSize: 13 }}>Không có dữ liệu tuần. Vui lòng thử lại.</p>
+            }
           </div>
-        `}
-      </div>`;
-    document.getElementById('planGrid').appendChild(c);
+
+          <button onClick={exportExcel} disabled={exporting} style={{
+            marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            width: "100%", padding: "13px", borderRadius: 10,
+            background: "linear-gradient(135deg, #059669, #10b981)",
+            color: "#fff", border: "none", fontSize: 14, fontWeight: 700, cursor: "pointer",
+          }}>
+            ⬇️ Tải file Excel — Content Plan + Tracker
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== SOP & CHECKLIST =====
+function SOPChecklist() {
+  const [checks, setChecks] = useState({
+    c1: false, c2: false, c3: false, c4: false, c5: false,
+    c6: false, c7: false, c8: false, c9: false, c10: false,
   });
-}
 
-function toggleCard(i){document.getElementById('pb-'+i).classList.toggle('open')}
-function setPS(i,st){const e=document.getElementById('ps-'+i);if(e)e.className='psdot ps-'+st}
-function setCapLoading(i){
-  const e=document.getElementById('cap-'+i);if(!e)return;
-  e.style.display='';e.className='cap-box dim';e.innerHTML='<span class="spin"></span> Đang viết...';
-}
-function setCapDone(i,cap,post){
-  const e=document.getElementById('cap-'+i);if(!e)return;
-  e.className='cap-box';e.textContent=cap;e.dataset.cap=cap;e.dataset.post=JSON.stringify(post||{});
-  e.style.display='';
-  const a=document.getElementById('acts-'+i);if(a)a.style.display='flex';
-}
-function setCapErr(i,msg){
-  const e=document.getElementById('cap-'+i);if(!e)return;
-  e.className='cap-box';e.style.color='var(--red)';e.textContent=msg;
-}
+  const items = [
+    { id: "c1", text: "Trợ lý đã soạn caption / script bằng Claude AI Tool" },
+    { id: "c2", text: "Cô Hương đã đọc và chỉnh lại giọng thật của mình" },
+    { id: "c3", text: "Hook 2 dòng đầu gây tò mò / kể chuyện (không mở đầu chung chung)" },
+    { id: "c4", text: "Nội dung có ít nhất 1 ví dụ / chi tiết thực tế từ kinh nghiệm cô Hương" },
+    { id: "c5", text: "CTA rõ ràng cuối bài (comment / share / liên hệ học)" },
+    { id: "c6", text: "Có đính kèm ảnh / video chất lượng tốt" },
+    { id: "c7", text: "Hashtag đã copy từ tool (8–10 hashtag)" },
+    { id: "c8", text: "Đăng đúng khung giờ (FB: 19–21h / TikTok: 11–12h hoặc 20–22h)" },
+    { id: "c9", text: "Trợ lý theo dõi và reply comment trong 30 phút đầu" },
+    { id: "c10", text: "Cập nhật số liệu vào Excel Tracker cuối ngày" },
+  ];
 
-async function writeOne(i){
-  const p=window._outline?.[i];if(!p)return;
-  const capEl=document.getElementById('cap-'+i);capEl.style.display='';
-  setCapLoading(i);
-  const prompt=`${brandCtx()}${refCtx()}\nViết caption: ${p.day} — ${p.type} (${p.angle||''})\nThông điệp: ${p.key_msg||''}\nCampaign: ${p.campaign||''}\nChỉ trả về caption.`;
-  try{const cap=await callGemini(prompt);setCapDone(i,cap,p)}
-  catch(e){setCapErr(i,'Lỗi: '+e.message)}
-}
+  const done = Object.values(checks).filter(Boolean).length;
 
-async function regenC(i){
-  const p=window._outline?.[i];if(!p)return;
-  setPS(i,'load');setCapLoading(i);
-  const a=document.getElementById('acts-'+i);if(a)a.style.display='none';
-  const prompt=`Viết lại caption HOÀN TOÀN MỚI (khác lần trước) cho:
-${brandCtx()}${refCtx()}
-Bài: ${p.day} — ${p.type} (${p.angle||''}). Thông điệp: ${p.key_msg||''}. Campaign: ${p.campaign||''}
-Chỉ trả về caption.`;
-  try{const cap=await callGemini(prompt);setCapDone(i,cap,p);setPS(i,'done')}
-  catch(e){setCapErr(i,'Lỗi: '+e.message);setPS(i,'err')}
-}
-
-function toggleAiEdit(i){
-  const box=document.getElementById('aiedit-'+i);
-  const capEl=document.getElementById('cap-'+i);
-  const editEl=document.getElementById('edit-'+i);
-  // Close manual edit if open
-  if(editEl.style.display==='block'){
-    capEl.textContent=editEl.value;capEl.dataset.cap=editEl.value;
-    editEl.style.display='none';capEl.style.display='';
-    const eb=document.getElementById('editbtn-'+i);if(eb)eb.textContent='Tự sửa';
+  function reset() {
+    setChecks({ c1: false, c2: false, c3: false, c4: false, c5: false, c6: false, c7: false, c8: false, c9: false, c10: false });
   }
-  const isOpen=box.style.display==='block';
-  box.style.display=isOpen?'none':'block';
-  if(!isOpen){
-    const ta=document.getElementById('aiprompt-'+i);
-    if(ta)ta.focus();
-  }
-}
-function closeAiEdit(i){
-  document.getElementById('aiedit-'+i).style.display='none';
-}
-async function aiEditC(i){
-  const cap=document.getElementById('cap-'+i);
-  const promptEl=document.getElementById('aiprompt-'+i);
-  const instruction=promptEl.value.trim();
-  if(!instruction){promptEl.focus();promptEl.style.borderColor='var(--red)';setTimeout(()=>promptEl.style.borderColor='',1500);return}
-  const currentCap=cap.dataset.cap||cap.textContent;
-  const btn=document.querySelector(`#aiedit-${i} .btnp`);
-  btn.textContent='Đang chỉnh sửa...';btn.disabled=true;
-  const prompt=`Bạn là chuyên gia viết content social media.
 
-Đây là caption hiện tại:
----
-${currentCap}
----
+  const pillars = [
+    { name: "🍵 Kiến thức & Mẹo nghề", pct: "35%", example: "5 lỗi pha trà trái cây khiến mất vị tươi · Cách chọn nguyên liệu chuẩn", color: "#1e40af", bg: "#eff6ff" },
+    { name: "🔬 R&D & Công thức mới", pct: "25%", example: "Hậu trường thử công thức mới · Thất bại và thành công khi R&D", color: "#166534", bg: "#f0fdf4" },
+    { name: "💫 Câu chuyện / Cảm hứng", pct: "20%", example: "Hành trình học pha chế · Học viên thành công · Lý do cô yêu nghề", color: "#7e22ce", bg: "#fdf4ff" },
+    { name: "💬 Engagement", pct: "10%", example: "Poll: Trà trái cây hay trà sữa? · Hỏi đáp · Thử thách nhỏ", color: "#c2410c", bg: "#fff7ed" },
+    { name: "📚 Khoá học / Promo", pct: "10%", example: "Giới thiệu lớp học · Ưu đãi đăng ký · Lịch khai giảng", color: "#991b1b", bg: "#fef2f2" },
+  ];
 
-Yêu cầu chỉnh sửa: ${instruction}
+  const postTimes = [
+    { platform: "Facebook", time: "19:00 – 21:00", reason: "Người dùng online sau giờ làm" },
+    { platform: "TikTok", time: "11:00 – 12:00 hoặc 20:00 – 22:00", reason: "Giờ nghỉ trưa và tối" },
+  ];
 
-Chỉnh sửa caption theo đúng yêu cầu, giữ nguyên tone và style gốc, chỉ thay đổi những gì được yêu cầu.
-Chỉ trả về caption đã chỉnh sửa, không giải thích.`;
-  try{
-    const newCap=await callGemini(prompt);
-    setCapDone(i,newCap,window._outline?.[i]||{});
-    setPS(i,'done');
-    promptEl.value='';
-    document.getElementById('aiedit-'+i).style.display='none';
-  }catch(e){
-    btn.textContent='✦ AI chỉnh sửa';btn.disabled=false;
-    alert('Lỗi: '+e.message);
-  }
-  btn.textContent='✦ AI chỉnh sửa';btn.disabled=false;
-}
-function editC(i){
-  const capEl=document.getElementById('cap-'+i);
-  const editEl=document.getElementById('edit-'+i);
-  const btn=document.getElementById('editbtn-'+i)||event.target;
-  // Close AI edit if open
-  const aiBox=document.getElementById('aiedit-'+i);
-  if(aiBox)aiBox.style.display='none';
-  if(editEl.style.display==='block'){
-    capEl.textContent=editEl.value;capEl.dataset.cap=editEl.value;
-    editEl.style.display='none';capEl.style.display='';
-    btn.textContent='Tự sửa';
-  }else{
-    editEl.value=capEl.dataset.cap||capEl.textContent;
-    editEl.style.display='block';capEl.style.display='none';
-    editEl.focus();btn.textContent='✓ Lưu';
-  }
-}
-function copyC(i){
-  const e=document.getElementById('cap-'+i);
-  const btn=event.target;
-  navigator.clipboard.writeText(e.dataset.cap||e.textContent);
-  btn.textContent='✓ Đã copy!';setTimeout(()=>btn.textContent='Copy',1500);
-}
-async function saveC(i){
-  const e=document.getElementById('cap-'+i);
-  const btn=event.target;
-  btn.disabled=true;btn.textContent='Đang lưu...';
-  const p=window._outline?.[i]||{};
-  const cap=e.dataset.cap||e.textContent;
-  const item={id:Date.now(),date:new Date().toLocaleString('vi-VN'),day:p.day||`Post ${i+1}`,type:p.type||'',campaign:p.campaign||'',cap};
-  saved.unshift(item);
-  if(saved.length>100)saved=saved.slice(0,100);
-  localStorage.setItem('cp3_saved',JSON.stringify(saved));
-  if(sbConnected) await pushToSupabase(SAVED_ID,saved);
-  uhc();
-  btn.disabled=false;btn.textContent='✓ Đã lưu!';
-  setTimeout(()=>btn.textContent='Lưu lại',1500);
-}
-
-// ── SAVED ──
-function uhc(){document.getElementById('hc').textContent=saved.length?`(${saved.length})`:''}
-function renderSaved(){
-  const l=document.getElementById('savedList');
-  document.getElementById('savedCount').textContent=`${saved.length} caption đã lưu`;
-  if(!saved.length){l.innerHTML='<div class="empty"><div class="big">📋</div>Chưa có caption nào.<br>Nhấn "Lưu lại" trên từng caption trong Content Plan.</div>';return}
-  l.innerHTML='';
-  saved.forEach((item,i)=>{
-    const el=document.createElement('div');el.className='si';
-    el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-      <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
-        <span class="mpill" style="background:var(--ad);color:var(--ac)">${item.day}</span>
-        ${item.type?`<span class="mpill">${item.type}</span>`:''}
-        ${item.campaign?`<span class="mpill" style="background:rgba(200,240,96,.08);color:var(--ac)">📌 ${item.campaign}</span>`:''}
-        <span style="font-size:10px;color:var(--tx3)">${item.date}</span>
+  return (
+    <div>
+      {/* Checklist */}
+      <div style={{ background: "#fffbeb", border: "1.5px solid #fde68a", borderRadius: 12, padding: 20, marginBottom: 24 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#92400e" }}>
+            ✅ Checklist Trước Khi Đăng Bài
+          </h3>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{
+              fontSize: 13, fontWeight: 700, color: done === 10 ? "#166534" : "#d97706",
+              background: done === 10 ? "#dcfce7" : "#fef3c7", padding: "3px 10px", borderRadius: 6,
+            }}>{done}/{items.length}</span>
+            <button onClick={reset} style={{
+              fontSize: 12, padding: "4px 12px", border: "1px solid #d97706",
+              background: "transparent", color: "#d97706", borderRadius: 6, cursor: "pointer",
+            }}>Reset</button>
+          </div>
+        </div>
+        <div style={{ height: 6, background: "#fde68a", borderRadius: 4, marginBottom: 16, overflow: "hidden" }}>
+          <div style={{
+            height: "100%", background: "#d97706", borderRadius: 4,
+            width: `${(done / 10) * 100}%`, transition: "width .3s ease",
+          }} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {items.map(item => (
+            <label key={item.id} style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+              <input
+                type="checkbox" checked={checks[item.id]}
+                onChange={e => setChecks(prev => ({ ...prev, [item.id]: e.target.checked }))}
+                style={{ marginTop: 2, accentColor: "#d97706", width: 16, height: 16, flexShrink: 0 }}
+              />
+              <span style={{
+                fontSize: 14, color: checks[item.id] ? "#78716c" : "#1c1917",
+                textDecoration: checks[item.id] ? "line-through" : "none", lineHeight: 1.5,
+              }}>{item.text}</span>
+            </label>
+          ))}
+        </div>
+        {done === 10 && (
+          <div style={{ marginTop: 16, background: "#dcfce7", borderRadius: 8, padding: "10px 14px", textAlign: "center" }}>
+            <span style={{ color: "#166534", fontWeight: 700, fontSize: 14 }}>🎉 Hoàn thành checklist! Sẵn sàng đăng bài!</span>
+          </div>
+        )}
       </div>
-      <div style="display:flex;gap:5px;flex-shrink:0">
-        <button class="btng" onclick="copySaved(${i})">Copy</button>
-        <button class="btnd" onclick="rmSaved(${i})">Xóa</button>
+
+      {/* Khung giờ đăng */}
+      <div style={{ marginBottom: 24 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1c1917", marginBottom: 12 }}>🕐 Khung Giờ Đăng Tốt Nhất</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          {postTimes.map(pt => (
+            <div key={pt.platform} style={{ background: "#fff", border: "1.5px solid #e7e5e4", borderRadius: 10, padding: 14 }}>
+              <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 14, color: "#1c1917" }}>{pt.platform}</p>
+              <p style={{ margin: "0 0 4px", fontSize: 15, color: "#d97706", fontWeight: 600 }}>{pt.time}</p>
+              <p style={{ margin: 0, fontSize: 12, color: "#78716c" }}>{pt.reason}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Content Pillars */}
+      <div>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1c1917", marginBottom: 12 }}>🎯 5 Content Pillars</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {pillars.map(p => (
+            <div key={p.name} style={{
+              background: p.bg, border: `1.5px solid ${p.color}30`,
+              borderLeft: `4px solid ${p.color}`, borderRadius: 8, padding: "10px 14px",
+              display: "flex", alignItems: "flex-start", gap: 12,
+            }}>
+              <span style={{
+                fontSize: 13, fontWeight: 800, color: p.color,
+                background: "#fff", padding: "2px 8px", borderRadius: 5, whiteSpace: "nowrap",
+              }}>{p.pct}</span>
+              <div>
+                <p style={{ margin: "0 0 3px", fontSize: 14, fontWeight: 600, color: p.color }}>{p.name}</p>
+                <p style={{ margin: 0, fontSize: 12, color: "#57534e" }}>{p.example}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
-    <div class="si-cap" id="sc-${i}">${item.cap}</div>
-    <button class="see-more-btn" id="smb-${i}" onclick="toggleSeeMore(${i})">Xem thêm ↓</button>`;
-    l.appendChild(el);
-    requestAnimationFrame(()=>{
-      const ce=document.getElementById('sc-'+i);
-      const btn=document.getElementById('smb-'+i);
-      if(ce&&btn)btn.style.display=ce.scrollHeight>ce.clientHeight+2?'block':'none';
-    });
-  });
-}
-function toggleSeeMore(i){
-  const ce=document.getElementById('sc-'+i);
-  const btn=document.getElementById('smb-'+i);
-  if(!ce||!btn)return;
-  const ex=ce.classList.toggle('expanded');
-  btn.textContent=ex?'Thu gọn ↑':'Xem thêm ↓';
-}
-function copySaved(i){const btn=event.target;navigator.clipboard.writeText(saved[i].cap);btn.textContent='✓';setTimeout(()=>btn.textContent='Copy',1500)}
-async function rmSaved(i){
-  saved.splice(i,1);
-  localStorage.setItem('cp3_saved',JSON.stringify(saved));
-  if(sbConnected)await pushToSupabase(SAVED_ID,saved);
-  uhc();renderSaved();
-}
-async function clearSaved(){
-  if(confirm('Xóa tất cả?')){
-    saved=[];
-    localStorage.removeItem('cp3_saved');
-    if(sbConnected)await pushToSupabase(SAVED_ID,[]);
-    uhc();renderSaved();
-  }
+  );
 }
 
-// ── DEFAULTS (điền key của bạn vào đây — ai mở app cũng dùng được ngay) ──
-const DEFAULT_GEMINI_KEY = 'AIzaSyCRpAOtDFnB-M_m3MJS9vHeztFLBLkNaZ4';
-const DEFAULT_MODEL      = 'gemini-2.5-flash';
-const DEFAULT_SB_URL     = 'https://hwtwrgvyumhdsoxmeogo.supabase.co';
-const DEFAULT_SB_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh3dHdyZ3Z5dW1oZHNveG1lb2dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1NDk3MzMsImV4cCI6MjA5MzEyNTczM30.1I_o1xh-EUBIUfjI-PdziP3zl5BULqvPZu9wWCHtpMg';
+// ===== SHARED STYLES =====
+const labelStyle = {
+  display: "block", fontSize: 13, fontWeight: 600, color: "#44403c", marginBottom: 6,
+};
+const inputStyle = {
+  width: "100%", padding: "10px 14px", border: "1.5px solid #e7e5e4",
+  borderRadius: 8, fontSize: 14, color: "#1c1917", background: "#fff",
+  boxSizing: "border-box", outline: "none",
+};
+const selectStyle = {
+  width: "100%", padding: "10px 14px", border: "1.5px solid #e7e5e4",
+  borderRadius: 8, fontSize: 14, color: "#1c1917", background: "#fff",
+  boxSizing: "border-box", outline: "none", cursor: "pointer",
+};
+const btnPrimary = {
+  display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 24px",
+  background: "linear-gradient(135deg, #d97706, #f59e0b)",
+  color: "#fff", border: "none", borderRadius: 9, fontSize: 14,
+  fontWeight: 700, cursor: "pointer", transition: "opacity .2s",
+};
 
-// ── BOOT ──
-// Supabase: ưu tiên localStorage (user đã nhập tay), fallback về default
-const sbConf=JSON.parse(localStorage.getItem('cp3_sb')||'{}');
-const _sbUrl=sbConf.url||DEFAULT_SB_URL;
-const _sbKey=sbConf.key||DEFAULT_SB_KEY;
-if(_sbUrl&&_sbKey){
-  sbUrl=_sbUrl;sbKey=_sbKey;sbConnected=true;
-  // Lưu vào localStorage luôn để lần sau không cần xử lý lại
-  localStorage.setItem('cp3_sb',JSON.stringify({url:_sbUrl,key:_sbKey}));
-  setSyncStatus('syncing','Đang kết nối...');
-} else setSyncStatus('','Chưa sync');
+// ===== MAIN APP =====
+export default function App() {
+  const [activeTab, setActiveTab] = useState("hook");
 
-renderKolBlocks();
-loadAll();
+  const renderContent = () => {
+    switch (activeTab) {
+      case "hook": return <HookGenerator />;
+      case "caption": return <CaptionBuilder />;
+      case "script": return <ScriptTikTok />;
+      case "plan": return <ContentPlan />;
+      case "sop": return <SOPChecklist />;
+      default: return null;
+    }
+  };
 
-// Sau khi load xong, điền default key nếu chưa có
-setTimeout(()=>{
-  if(!g('apiKey')&&DEFAULT_GEMINI_KEY){
-    document.getElementById('apiKey').value=DEFAULT_GEMINI_KEY;
-    debounceSave();
-  }
-  if(!g('geminiModel')&&DEFAULT_MODEL){
-    document.getElementById('geminiModel').value=DEFAULT_MODEL;
-  }
-},600);
-</script>
-</body>
-</html>
+  return (
+    <div style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", minHeight: "100vh", background: "#fafaf9" }}>
+      {/* Header */}
+      <div style={{
+        background: "linear-gradient(135deg, #92400e 0%, #d97706 60%, #f59e0b 100%)",
+        padding: "28px 32px 24px",
+      }}>
+        <div style={{ maxWidth: 780, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: "50%", background: "rgba(255,255,255,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+            }}>🍵</div>
+            <div>
+              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#fff", letterSpacing: -0.3 }}>
+                Cô Hương Content Tool
+              </h1>
+              <p style={{ margin: "3px 0 0", fontSize: 13, color: "rgba(255,255,255,0.8)" }}>
+                Giáo viên pha chế trà trái cây, trà sữa & R&D sáng tạo
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{ background: "#fff", borderBottom: "1.5px solid #e7e5e4", position: "sticky", top: 0, zIndex: 10 }}>
+        <div style={{ maxWidth: 780, margin: "0 auto", display: "flex", overflowX: "auto" }}>
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: "14px 20px", border: "none", background: "transparent",
+                fontSize: 13, fontWeight: activeTab === tab.id ? 700 : 500,
+                color: activeTab === tab.id ? "#d97706" : "#78716c",
+                borderBottom: activeTab === tab.id ? "2.5px solid #d97706" : "2.5px solid transparent",
+                cursor: "pointer", whiteSpace: "nowrap", transition: "all .15s",
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ maxWidth: 780, margin: "0 auto", padding: "28px 20px 60px" }}>
+        {renderContent()}
+      </div>
+
+      {/* Footer */}
+      <div style={{ borderTop: "1px solid #e7e5e4", padding: "16px 32px", textAlign: "center", background: "#fff" }}>
+        <p style={{ margin: 0, fontSize: 12, color: "#a8a29e" }}>
+          🤖 Powered by Claude AI · Phiên bản 1.0 · SOP Content Cô Trương Dáng Hương
+        </p>
+      </div>
+    </div>
+  );
+}
