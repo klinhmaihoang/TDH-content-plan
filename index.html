@@ -1,5 +1,29 @@
-import { useState, useRef, useEffect } from "react";
-import * as XLSX from "xlsx";
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cô Hương Content Tool 🍵</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fafaf9; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    input:focus, select:focus { outline: 2px solid #d97706 !important; border-color: #d97706 !important; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f5f5f4; }
+    ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+    const XLSX_LIB = window.XLSX;
+
 
 // ===== SUPABASE CONFIG =====
 const SUPABASE_URL = "https://aleijrjqfrortenufhzn.supabase.co";
@@ -678,7 +702,7 @@ Tra ve JSON (khong them gi khac):
     if (!result) return;
     setExporting(true);
     try {
-      const wb = XLSX.utils.book_new();
+      const wb = XLSX_LIB.utils.book_new();
 
       // ── Sheet 1: Overview ──
       const overviewData = [
@@ -696,9 +720,9 @@ Tra ve JSON (khong them gi khac):
         ["💬 Engagement", "10%", "Poll: Trà trái cây hay trà sữa?"],
         ["📚 Khoá học / Promo", "10%", "Giới thiệu lớp học · Ưu đãi đăng ký"],
       ];
-      const wsOverview = XLSX.utils.aoa_to_sheet(overviewData);
+      const wsOverview = XLSX_LIB.utils.aoa_to_sheet(overviewData);
       wsOverview["!cols"] = [{ wch: 32 }, { wch: 14 }, { wch: 48 }];
-      XLSX.utils.book_append_sheet(wb, wsOverview, "📌 Overview");
+      XLSX_LIB.utils.book_append_sheet(wb, wsOverview, "📌 Overview");
 
       // ── Sheet 2: Lịch đăng (all posts flat) ──
       const calHeader = ["Tuần", "Thứ / Ngày", "Pillar", "Chủ đề bài", "Nền tảng", "Format", "Caption Draft", "Hashtag", "Trạng thái"];
@@ -718,9 +742,9 @@ Tra ve JSON (khong them gi khac):
           ]);
         });
       });
-      const wsCal = XLSX.utils.aoa_to_sheet(calRows);
+      const wsCal = XLSX_LIB.utils.aoa_to_sheet(calRows);
       wsCal["!cols"] = [{ wch: 22 }, { wch: 14 }, { wch: 26 }, { wch: 46 }, { wch: 18 }, { wch: 14 }, { wch: 40 }, { wch: 30 }, { wch: 14 }];
-      XLSX.utils.book_append_sheet(wb, wsCal, "📅 Lịch đăng");
+      XLSX_LIB.utils.book_append_sheet(wb, wsCal, "📅 Lịch đăng");
 
       // ── Sheet 3: Theo tuần (1 sheet per week) ──
       result.weeks?.forEach(w => {
@@ -732,9 +756,9 @@ Tra ve JSON (khong them gi khac):
         w.posts?.forEach(p => {
           rows.push([p.day, p.pillar, p.topic, p.platform, p.format, p.caption_draft || "", p.status || "Chưa làm"]);
         });
-        const ws = XLSX.utils.aoa_to_sheet(rows);
+        const ws = XLSX_LIB.utils.aoa_to_sheet(rows);
         ws["!cols"] = [{ wch: 14 }, { wch: 26 }, { wch: 46 }, { wch: 16 }, { wch: 14 }, { wch: 40 }, { wch: 14 }];
-        XLSX.utils.book_append_sheet(wb, ws, `Tuần ${w.week}`);
+        XLSX_LIB.utils.book_append_sheet(wb, ws, `Tuần ${w.week}`);
       });
 
       // ── Sheet 4: Tracker số liệu ──
@@ -745,12 +769,12 @@ Tra ve JSON (khong them gi khac):
           trackerRows.push([p.day, p.topic, p.platform, p.format, "", "", "", "", "", ""]);
         });
       });
-      const wsTracker = XLSX.utils.aoa_to_sheet(trackerRows);
+      const wsTracker = XLSX_LIB.utils.aoa_to_sheet(trackerRows);
       wsTracker["!cols"] = [{ wch: 14 }, { wch: 40 }, { wch: 14 }, { wch: 14 }, { wch: 8 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 24 }];
-      XLSX.utils.book_append_sheet(wb, wsTracker, "📊 Tracker số liệu");
+      XLSX_LIB.utils.book_append_sheet(wb, wsTracker, "📊 Tracker số liệu");
 
       const safeName = (result.month_theme || "content-plan").replace(/[^a-zA-Z0-9À-ỹ\s]/g, "").replace(/\s+/g, "-").substring(0, 40);
-      XLSX.writeFile(wb, `content-plan-co-huong-${safeName}.xlsx`);
+      XLSX_LIB.writeFile(wb, `content-plan-co-huong-${safeName}.xlsx`);
     } catch (e) {
       console.error(e);
     }
@@ -1080,7 +1104,7 @@ const btnPrimary = {
 };
 
 // ===== MAIN APP =====
-export default function App() {
+function App() {
   const [activeTab, setActiveTab] = useState("hook");
 
   const renderContent = () => {
@@ -1154,3 +1178,11 @@ export default function App() {
     </div>
   );
 }
+
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+
+  </script>
+</body>
+</html>
